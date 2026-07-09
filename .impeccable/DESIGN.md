@@ -4,14 +4,19 @@
 Playful & colorful, terasa fun dan selaras tema gamifikasi RPG (XP, level, badge, streak rank) — namun tetap tidak childish berlebihan. Hangat & terstruktur (referensi Me+). Konsisten di light & dark mode.
 
 ## Warna — Tema "Warna Alam"
-- **Primary:** Hijau daun / forest green 🌿 — signature utama, growth metaphor
-- **Secondary/Accent:** Kuning keemasan / oranye hangat 🌻 — elemen gamifikasi (XP bar, badge, celebration)
-- **Supporting:** Coklat tanah / terracotta 🌰 — kartu, border, elemen sekunder
-- **Dark Mode:** Background forest deep green (bukan hitam pekat), aksen hijau muda & kuning tetap vibrant
-- Hex/shade spesifik ditentukan saat implementasi tema (`lib/core/theme/`)
+- **Primary:** Hijau daun / forest green 🌿 — `#2F6B3D` (light) / `#7ED08A` (dark) — signature utama, growth metaphor
+- **Secondary/Accent:** Kuning keemasan / oranye hangat 🌻 — `#F0A83C` (light) / `#FFC069` (dark) — elemen gamifikasi (XP bar, badge, celebration)
+- **Supporting:** Coklat tanah / terracotta 🌰 — `#B0662E` — kartu, border, elemen sekunder
+- **Background (light):** `#FAF7F0` (warm off-white, bukan putih pekat)
+- **Background (dark):** `#16231A` (forest deep green, bukan hitam pekat)
+- Diimplementasikan di `lib/core/theme/app_colors.dart`
 
 ## Typography
-Belum dipilih — pilih Google Font yang playful tapi tetap terbaca & terstruktur (bukan font dekoratif/sulit dibaca), sesuai vibe "hangat & terstruktur". Tunggu konfirmasi user sebelum setup di tema.
+Font terpilih (dari font Google, di-bundle offline sebagai asset lokal — bukan via package `google_fonts` yang fetch runtime, karena app 100% offline):
+- **Judul (headline/title):** Spicy Rice — bold, playful, jadi identitas visual utama
+- **Penjelasan/body (deskripsi, teks panjang):** Sour Gummy — tetap playful tapi lebih terbaca untuk teks panjang
+- **Lainnya (label, tombol, tag, UI chrome):** Unkempt — aksen playful di elemen kecil
+- Diimplementasikan di `lib/core/theme/app_typography.dart`, font file di `assets/fonts/`
 
 ## Three Dials
 
