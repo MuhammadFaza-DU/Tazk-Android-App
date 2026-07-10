@@ -4,6 +4,7 @@ import '../../features/calendar/calendar_screen.dart';
 import '../../features/habits/habits_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/pomodoro/pomodoro_screen.dart';
+import '../../features/profile/profile_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
 import 'coming_soon_screen.dart';
 
@@ -49,7 +50,7 @@ class AppDrawer extends StatelessWidget {
             _DrawerItem(
               icon: Icons.person_outline_rounded,
               label: 'Profil',
-              builder: (_) => const ComingSoonScreen(title: 'Profil'),
+              builder: (_) => const ProfileScreen(),
             ),
             _DrawerItem(
               icon: Icons.settings_outlined,

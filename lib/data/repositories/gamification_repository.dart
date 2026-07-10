@@ -63,6 +63,12 @@ class GamificationRepository {
         .write(UserProfileCompanion(name: Value(name)));
   }
 
+  Future<void> updateAvatar(String avatarId) async {
+    final profile = await ensureProfile();
+    await (_db.update(_db.userProfile)..where((u) => u.id.equals(profile.id)))
+        .write(UserProfileCompanion(avatarId: Value(avatarId)));
+  }
+
   Stream<List<BadgeUnlock>> watchBadges() => _db.select(_db.badgeUnlocks).watch();
 
   Stream<List<CosmeticUnlock>> watchCosmetics() =>
