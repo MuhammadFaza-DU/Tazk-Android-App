@@ -101,6 +101,7 @@ flutter:
 
   assets:
     - assets/fonts/
+    - assets/videos/
 
   fonts:
     - family: SpicyRice
