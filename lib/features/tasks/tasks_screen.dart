@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/task_providers.dart';
 import 'task_form_screen.dart';
@@ -14,9 +15,10 @@ class TasksScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tasksAsync = ref.watch(todayTasksProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
-      title: 'Tasks — Hari Ini',
+      title: l10n.tasksScreenTitle,
       actions: [
         IconButton(
           icon: const Icon(Icons.add_rounded),
@@ -29,14 +31,14 @@ class TasksScreen extends ConsumerWidget {
       ],
       body: tasksAsync.when(
         data: (tasks) => tasks.isEmpty
-            ? const Center(child: Text('Belum ada task hari ini'))
+            ? Center(child: Text(l10n.homeNoTasksToday))
             : ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 itemCount: tasks.length,
                 itemBuilder: (context, index) => _TaskListTile(task: tasks[index]),
               ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text('Gagal memuat task: $error')),
+        error: (error, _) => Center(child: Text(l10n.errorLoadingTasks(error.toString()))),
       ),
     );
   }
@@ -47,14 +49,15 @@ class _TaskListTile extends ConsumerWidget {
 
   final Task task;
 
-  String get _priorityLabel => switch (task.priority) {
-        TaskPriority.low => 'Low',
-        TaskPriority.medium => 'Med',
-        TaskPriority.high => 'High',
+  String _priorityLabel(AppLocalizations l10n) => switch (task.priority) {
+        TaskPriority.low => l10n.priorityLowShort,
+        TaskPriority.medium => l10n.priorityMedShort,
+        TaskPriority.high => l10n.priorityHighShort,
       };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
       leading: Checkbox(
         value: task.isCompleted,
@@ -69,7 +72,7 @@ class _TaskListTile extends ConsumerWidget {
             : null,
       ),
       subtitle: Text([
-        _priorityLabel,
+        _priorityLabel(l10n),
         if (task.time != null) TimeOfDay.fromDateTime(task.time!).format(context),
         if (task.location != null && task.location!.isNotEmpty) task.location!,
       ].join(' · ')),
@@ -80,7 +83,7 @@ class _TaskListTile extends ConsumerWidget {
       },
       trailing: IconButton(
         icon: const Icon(Icons.copy_rounded),
-        tooltip: 'Duplikat',
+        tooltip: l10n.taskDuplicateTooltip,
         onPressed: () => ref.read(taskRepositoryProvider).duplicateTask(task),
       ),
     );

@@ -85,3 +85,17 @@ class CosmeticUnlocks extends Table {
         {levelMilestone},
       ];
 }
+
+class AppSettings extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get themeMode =>
+      intEnum<AppThemeMode>().withDefault(const Constant(0))();
+  IntColumn get language =>
+      intEnum<AppLanguage>().withDefault(const Constant(0))();
+  BoolColumn get notifyTasks => boolean().withDefault(const Constant(true))();
+  BoolColumn get notifyHabits => boolean().withDefault(const Constant(true))();
+  BoolColumn get notifyStreakWarning =>
+      boolean().withDefault(const Constant(true))();
+  BoolColumn get notifyFreezeUsed =>
+      boolean().withDefault(const Constant(true))();
+}

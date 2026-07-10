@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/gamification_providers.dart';
 import '../../providers/habit_providers.dart';
 import '../../providers/repository_providers.dart';
@@ -20,34 +21,36 @@ class HomeScreen extends ConsumerWidget {
     final streak = ref.watch(streakStateProvider).valueOrNull;
     final tasksAsync = ref.watch(todayTasksProvider);
     final habitsAsync = ref.watch(activeHabitsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       title: (profile == null || profile.name.trim().isEmpty)
-          ? 'Tazk'
-          : 'Halo, ${profile.name}!',
+          ? l10n.appTitle
+          : l10n.homeGreeting(profile.name),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _GamificationSummary(profile: profile, streak: streak),
           const SizedBox(height: 24),
-          Text('Tasks Hari Ini', style: Theme.of(context).textTheme.titleLarge),
+          Text(l10n.homeTasksToday, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           tasksAsync.when(
             data: (tasks) => tasks.isEmpty
-                ? const _EmptyState(message: 'Belum ada task hari ini')
+                ? _EmptyState(message: l10n.homeNoTasksToday)
                 : Column(children: [for (final task in tasks) _TaskTile(task: task)]),
             loading: () => const _LoadingRow(),
-            error: (error, _) => _EmptyState(message: 'Gagal memuat task: $error'),
+            error: (error, _) => _EmptyState(message: l10n.errorLoadingTasks(error.toString())),
           ),
           const SizedBox(height: 24),
-          Text('Habits Hari Ini', style: Theme.of(context).textTheme.titleLarge),
+          Text(l10n.homeHabitsToday, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           habitsAsync.when(
             data: (habits) => habits.isEmpty
-                ? const _EmptyState(message: 'Belum ada habit aktif')
+                ? _EmptyState(message: l10n.homeNoActiveHabits)
                 : Column(children: [for (final habit in habits) _HabitTile(habit: habit)]),
             loading: () => const _LoadingRow(),
-            error: (error, _) => _EmptyState(message: 'Gagal memuat habit: $error'),
+            error: (error, _) =>
+                _EmptyState(message: l10n.errorLoadingHabits(error.toString())),
           ),
           const SizedBox(height: 24),
           SizedBox(
@@ -59,7 +62,7 @@ class HomeScreen extends ConsumerWidget {
                 );
               },
               icon: const Icon(Icons.play_arrow_rounded),
-              label: const Text('Mulai Pomodoro'),
+              label: Text(l10n.homeStartPomodoroButton),
             ),
           ),
         ],
@@ -76,11 +79,12 @@ class _GamificationSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final level = profile?.level ?? 1;
     final xp = profile?.xp ?? 0;
     final needed = 100 * level;
     final streakDays = streak?.currentStreak ?? 0;
-    final rankLabel = streakDays > 0 ? streakRankForDays(streakDays).label : '-';
+    final rankLabel = streakDays > 0 ? streakRankForDays(streakDays).label(context) : '-';
 
     return Card(
       child: Padding(
@@ -88,7 +92,7 @@ class _GamificationSummary extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Level $level', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.levelLabel(level), style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
@@ -100,9 +104,9 @@ class _GamificationSummary extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text('$xp/$needed XP'),
+            Text(l10n.xpProgress(xp, needed)),
             const SizedBox(height: 12),
-            Text('🔥 Streak $streakDays hari · $rankLabel'),
+            Text(l10n.streakSummary(streakDays, rankLabel)),
           ],
         ),
       ),
@@ -115,10 +119,17 @@ class _TaskTile extends ConsumerWidget {
 
   final Task task;
 
+  String _priorityLabel(AppLocalizations l10n) => switch (task.priority) {
+        TaskPriority.low => l10n.priorityLowShort,
+        TaskPriority.medium => l10n.priorityMedShort,
+        TaskPriority.high => l10n.priorityHighShort,
+      };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final subtitleParts = <String>[
-      task.priority.name,
+      _priorityLabel(l10n),
       if (task.time != null) TimeOfDay.fromDateTime(task.time!).format(context),
     ];
     return CheckboxListTile(

@@ -2981,6 +2981,496 @@ class CosmeticUnlocksCompanion extends UpdateCompanion<CosmeticUnlock> {
   }
 }
 
+class $AppSettingsTable extends AppSettings
+    with TableInfo<$AppSettingsTable, AppSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AppSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<AppThemeMode, int> themeMode =
+      GeneratedColumn<int>(
+        'theme_mode',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0),
+      ).withConverter<AppThemeMode>($AppSettingsTable.$converterthemeMode);
+  @override
+  late final GeneratedColumnWithTypeConverter<AppLanguage, int> language =
+      GeneratedColumn<int>(
+        'language',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0),
+      ).withConverter<AppLanguage>($AppSettingsTable.$converterlanguage);
+  static const VerificationMeta _notifyTasksMeta = const VerificationMeta(
+    'notifyTasks',
+  );
+  @override
+  late final GeneratedColumn<bool> notifyTasks = GeneratedColumn<bool>(
+    'notify_tasks',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("notify_tasks" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _notifyHabitsMeta = const VerificationMeta(
+    'notifyHabits',
+  );
+  @override
+  late final GeneratedColumn<bool> notifyHabits = GeneratedColumn<bool>(
+    'notify_habits',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("notify_habits" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _notifyStreakWarningMeta =
+      const VerificationMeta('notifyStreakWarning');
+  @override
+  late final GeneratedColumn<bool> notifyStreakWarning = GeneratedColumn<bool>(
+    'notify_streak_warning',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("notify_streak_warning" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _notifyFreezeUsedMeta = const VerificationMeta(
+    'notifyFreezeUsed',
+  );
+  @override
+  late final GeneratedColumn<bool> notifyFreezeUsed = GeneratedColumn<bool>(
+    'notify_freeze_used',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("notify_freeze_used" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    themeMode,
+    language,
+    notifyTasks,
+    notifyHabits,
+    notifyStreakWarning,
+    notifyFreezeUsed,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'app_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AppSetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('notify_tasks')) {
+      context.handle(
+        _notifyTasksMeta,
+        notifyTasks.isAcceptableOrUnknown(
+          data['notify_tasks']!,
+          _notifyTasksMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notify_habits')) {
+      context.handle(
+        _notifyHabitsMeta,
+        notifyHabits.isAcceptableOrUnknown(
+          data['notify_habits']!,
+          _notifyHabitsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notify_streak_warning')) {
+      context.handle(
+        _notifyStreakWarningMeta,
+        notifyStreakWarning.isAcceptableOrUnknown(
+          data['notify_streak_warning']!,
+          _notifyStreakWarningMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notify_freeze_used')) {
+      context.handle(
+        _notifyFreezeUsedMeta,
+        notifyFreezeUsed.isAcceptableOrUnknown(
+          data['notify_freeze_used']!,
+          _notifyFreezeUsedMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AppSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AppSetting(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      themeMode: $AppSettingsTable.$converterthemeMode.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}theme_mode'],
+        )!,
+      ),
+      language: $AppSettingsTable.$converterlanguage.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}language'],
+        )!,
+      ),
+      notifyTasks: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}notify_tasks'],
+      )!,
+      notifyHabits: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}notify_habits'],
+      )!,
+      notifyStreakWarning: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}notify_streak_warning'],
+      )!,
+      notifyFreezeUsed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}notify_freeze_used'],
+      )!,
+    );
+  }
+
+  @override
+  $AppSettingsTable createAlias(String alias) {
+    return $AppSettingsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<AppThemeMode, int, int> $converterthemeMode =
+      const EnumIndexConverter<AppThemeMode>(AppThemeMode.values);
+  static JsonTypeConverter2<AppLanguage, int, int> $converterlanguage =
+      const EnumIndexConverter<AppLanguage>(AppLanguage.values);
+}
+
+class AppSetting extends DataClass implements Insertable<AppSetting> {
+  final int id;
+  final AppThemeMode themeMode;
+  final AppLanguage language;
+  final bool notifyTasks;
+  final bool notifyHabits;
+  final bool notifyStreakWarning;
+  final bool notifyFreezeUsed;
+  const AppSetting({
+    required this.id,
+    required this.themeMode,
+    required this.language,
+    required this.notifyTasks,
+    required this.notifyHabits,
+    required this.notifyStreakWarning,
+    required this.notifyFreezeUsed,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    {
+      map['theme_mode'] = Variable<int>(
+        $AppSettingsTable.$converterthemeMode.toSql(themeMode),
+      );
+    }
+    {
+      map['language'] = Variable<int>(
+        $AppSettingsTable.$converterlanguage.toSql(language),
+      );
+    }
+    map['notify_tasks'] = Variable<bool>(notifyTasks);
+    map['notify_habits'] = Variable<bool>(notifyHabits);
+    map['notify_streak_warning'] = Variable<bool>(notifyStreakWarning);
+    map['notify_freeze_used'] = Variable<bool>(notifyFreezeUsed);
+    return map;
+  }
+
+  AppSettingsCompanion toCompanion(bool nullToAbsent) {
+    return AppSettingsCompanion(
+      id: Value(id),
+      themeMode: Value(themeMode),
+      language: Value(language),
+      notifyTasks: Value(notifyTasks),
+      notifyHabits: Value(notifyHabits),
+      notifyStreakWarning: Value(notifyStreakWarning),
+      notifyFreezeUsed: Value(notifyFreezeUsed),
+    );
+  }
+
+  factory AppSetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AppSetting(
+      id: serializer.fromJson<int>(json['id']),
+      themeMode: $AppSettingsTable.$converterthemeMode.fromJson(
+        serializer.fromJson<int>(json['themeMode']),
+      ),
+      language: $AppSettingsTable.$converterlanguage.fromJson(
+        serializer.fromJson<int>(json['language']),
+      ),
+      notifyTasks: serializer.fromJson<bool>(json['notifyTasks']),
+      notifyHabits: serializer.fromJson<bool>(json['notifyHabits']),
+      notifyStreakWarning: serializer.fromJson<bool>(
+        json['notifyStreakWarning'],
+      ),
+      notifyFreezeUsed: serializer.fromJson<bool>(json['notifyFreezeUsed']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'themeMode': serializer.toJson<int>(
+        $AppSettingsTable.$converterthemeMode.toJson(themeMode),
+      ),
+      'language': serializer.toJson<int>(
+        $AppSettingsTable.$converterlanguage.toJson(language),
+      ),
+      'notifyTasks': serializer.toJson<bool>(notifyTasks),
+      'notifyHabits': serializer.toJson<bool>(notifyHabits),
+      'notifyStreakWarning': serializer.toJson<bool>(notifyStreakWarning),
+      'notifyFreezeUsed': serializer.toJson<bool>(notifyFreezeUsed),
+    };
+  }
+
+  AppSetting copyWith({
+    int? id,
+    AppThemeMode? themeMode,
+    AppLanguage? language,
+    bool? notifyTasks,
+    bool? notifyHabits,
+    bool? notifyStreakWarning,
+    bool? notifyFreezeUsed,
+  }) => AppSetting(
+    id: id ?? this.id,
+    themeMode: themeMode ?? this.themeMode,
+    language: language ?? this.language,
+    notifyTasks: notifyTasks ?? this.notifyTasks,
+    notifyHabits: notifyHabits ?? this.notifyHabits,
+    notifyStreakWarning: notifyStreakWarning ?? this.notifyStreakWarning,
+    notifyFreezeUsed: notifyFreezeUsed ?? this.notifyFreezeUsed,
+  );
+  AppSetting copyWithCompanion(AppSettingsCompanion data) {
+    return AppSetting(
+      id: data.id.present ? data.id.value : this.id,
+      themeMode: data.themeMode.present ? data.themeMode.value : this.themeMode,
+      language: data.language.present ? data.language.value : this.language,
+      notifyTasks: data.notifyTasks.present
+          ? data.notifyTasks.value
+          : this.notifyTasks,
+      notifyHabits: data.notifyHabits.present
+          ? data.notifyHabits.value
+          : this.notifyHabits,
+      notifyStreakWarning: data.notifyStreakWarning.present
+          ? data.notifyStreakWarning.value
+          : this.notifyStreakWarning,
+      notifyFreezeUsed: data.notifyFreezeUsed.present
+          ? data.notifyFreezeUsed.value
+          : this.notifyFreezeUsed,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppSetting(')
+          ..write('id: $id, ')
+          ..write('themeMode: $themeMode, ')
+          ..write('language: $language, ')
+          ..write('notifyTasks: $notifyTasks, ')
+          ..write('notifyHabits: $notifyHabits, ')
+          ..write('notifyStreakWarning: $notifyStreakWarning, ')
+          ..write('notifyFreezeUsed: $notifyFreezeUsed')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    themeMode,
+    language,
+    notifyTasks,
+    notifyHabits,
+    notifyStreakWarning,
+    notifyFreezeUsed,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AppSetting &&
+          other.id == this.id &&
+          other.themeMode == this.themeMode &&
+          other.language == this.language &&
+          other.notifyTasks == this.notifyTasks &&
+          other.notifyHabits == this.notifyHabits &&
+          other.notifyStreakWarning == this.notifyStreakWarning &&
+          other.notifyFreezeUsed == this.notifyFreezeUsed);
+}
+
+class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
+  final Value<int> id;
+  final Value<AppThemeMode> themeMode;
+  final Value<AppLanguage> language;
+  final Value<bool> notifyTasks;
+  final Value<bool> notifyHabits;
+  final Value<bool> notifyStreakWarning;
+  final Value<bool> notifyFreezeUsed;
+  const AppSettingsCompanion({
+    this.id = const Value.absent(),
+    this.themeMode = const Value.absent(),
+    this.language = const Value.absent(),
+    this.notifyTasks = const Value.absent(),
+    this.notifyHabits = const Value.absent(),
+    this.notifyStreakWarning = const Value.absent(),
+    this.notifyFreezeUsed = const Value.absent(),
+  });
+  AppSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    this.themeMode = const Value.absent(),
+    this.language = const Value.absent(),
+    this.notifyTasks = const Value.absent(),
+    this.notifyHabits = const Value.absent(),
+    this.notifyStreakWarning = const Value.absent(),
+    this.notifyFreezeUsed = const Value.absent(),
+  });
+  static Insertable<AppSetting> custom({
+    Expression<int>? id,
+    Expression<int>? themeMode,
+    Expression<int>? language,
+    Expression<bool>? notifyTasks,
+    Expression<bool>? notifyHabits,
+    Expression<bool>? notifyStreakWarning,
+    Expression<bool>? notifyFreezeUsed,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (themeMode != null) 'theme_mode': themeMode,
+      if (language != null) 'language': language,
+      if (notifyTasks != null) 'notify_tasks': notifyTasks,
+      if (notifyHabits != null) 'notify_habits': notifyHabits,
+      if (notifyStreakWarning != null)
+        'notify_streak_warning': notifyStreakWarning,
+      if (notifyFreezeUsed != null) 'notify_freeze_used': notifyFreezeUsed,
+    });
+  }
+
+  AppSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<AppThemeMode>? themeMode,
+    Value<AppLanguage>? language,
+    Value<bool>? notifyTasks,
+    Value<bool>? notifyHabits,
+    Value<bool>? notifyStreakWarning,
+    Value<bool>? notifyFreezeUsed,
+  }) {
+    return AppSettingsCompanion(
+      id: id ?? this.id,
+      themeMode: themeMode ?? this.themeMode,
+      language: language ?? this.language,
+      notifyTasks: notifyTasks ?? this.notifyTasks,
+      notifyHabits: notifyHabits ?? this.notifyHabits,
+      notifyStreakWarning: notifyStreakWarning ?? this.notifyStreakWarning,
+      notifyFreezeUsed: notifyFreezeUsed ?? this.notifyFreezeUsed,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (themeMode.present) {
+      map['theme_mode'] = Variable<int>(
+        $AppSettingsTable.$converterthemeMode.toSql(themeMode.value),
+      );
+    }
+    if (language.present) {
+      map['language'] = Variable<int>(
+        $AppSettingsTable.$converterlanguage.toSql(language.value),
+      );
+    }
+    if (notifyTasks.present) {
+      map['notify_tasks'] = Variable<bool>(notifyTasks.value);
+    }
+    if (notifyHabits.present) {
+      map['notify_habits'] = Variable<bool>(notifyHabits.value);
+    }
+    if (notifyStreakWarning.present) {
+      map['notify_streak_warning'] = Variable<bool>(notifyStreakWarning.value);
+    }
+    if (notifyFreezeUsed.present) {
+      map['notify_freeze_used'] = Variable<bool>(notifyFreezeUsed.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('themeMode: $themeMode, ')
+          ..write('language: $language, ')
+          ..write('notifyTasks: $notifyTasks, ')
+          ..write('notifyHabits: $notifyHabits, ')
+          ..write('notifyStreakWarning: $notifyStreakWarning, ')
+          ..write('notifyFreezeUsed: $notifyFreezeUsed')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2994,6 +3484,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CosmeticUnlocksTable cosmeticUnlocks = $CosmeticUnlocksTable(
     this,
   );
+  late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3007,6 +3498,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     badgeUnlocks,
     userProfile,
     cosmeticUnlocks,
+    appSettings,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -5072,6 +5564,248 @@ typedef $$CosmeticUnlocksTableProcessedTableManager =
       CosmeticUnlock,
       PrefetchHooks Function()
     >;
+typedef $$AppSettingsTableCreateCompanionBuilder =
+    AppSettingsCompanion Function({
+      Value<int> id,
+      Value<AppThemeMode> themeMode,
+      Value<AppLanguage> language,
+      Value<bool> notifyTasks,
+      Value<bool> notifyHabits,
+      Value<bool> notifyStreakWarning,
+      Value<bool> notifyFreezeUsed,
+    });
+typedef $$AppSettingsTableUpdateCompanionBuilder =
+    AppSettingsCompanion Function({
+      Value<int> id,
+      Value<AppThemeMode> themeMode,
+      Value<AppLanguage> language,
+      Value<bool> notifyTasks,
+      Value<bool> notifyHabits,
+      Value<bool> notifyStreakWarning,
+      Value<bool> notifyFreezeUsed,
+    });
+
+class $$AppSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<AppThemeMode, AppThemeMode, int>
+  get themeMode => $composableBuilder(
+    column: $table.themeMode,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<AppLanguage, AppLanguage, int> get language =>
+      $composableBuilder(
+        column: $table.language,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<bool> get notifyTasks => $composableBuilder(
+    column: $table.notifyTasks,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get notifyHabits => $composableBuilder(
+    column: $table.notifyHabits,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get notifyStreakWarning => $composableBuilder(
+    column: $table.notifyStreakWarning,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get notifyFreezeUsed => $composableBuilder(
+    column: $table.notifyFreezeUsed,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AppSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get themeMode => $composableBuilder(
+    column: $table.themeMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get language => $composableBuilder(
+    column: $table.language,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get notifyTasks => $composableBuilder(
+    column: $table.notifyTasks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get notifyHabits => $composableBuilder(
+    column: $table.notifyHabits,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get notifyStreakWarning => $composableBuilder(
+    column: $table.notifyStreakWarning,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get notifyFreezeUsed => $composableBuilder(
+    column: $table.notifyFreezeUsed,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AppSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<AppThemeMode, int> get themeMode =>
+      $composableBuilder(column: $table.themeMode, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<AppLanguage, int> get language =>
+      $composableBuilder(column: $table.language, builder: (column) => column);
+
+  GeneratedColumn<bool> get notifyTasks => $composableBuilder(
+    column: $table.notifyTasks,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get notifyHabits => $composableBuilder(
+    column: $table.notifyHabits,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get notifyStreakWarning => $composableBuilder(
+    column: $table.notifyStreakWarning,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get notifyFreezeUsed => $composableBuilder(
+    column: $table.notifyFreezeUsed,
+    builder: (column) => column,
+  );
+}
+
+class $$AppSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AppSettingsTable,
+          AppSetting,
+          $$AppSettingsTableFilterComposer,
+          $$AppSettingsTableOrderingComposer,
+          $$AppSettingsTableAnnotationComposer,
+          $$AppSettingsTableCreateCompanionBuilder,
+          $$AppSettingsTableUpdateCompanionBuilder,
+          (
+            AppSetting,
+            BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>,
+          ),
+          AppSetting,
+          PrefetchHooks Function()
+        > {
+  $$AppSettingsTableTableManager(_$AppDatabase db, $AppSettingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AppSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AppSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AppSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<AppThemeMode> themeMode = const Value.absent(),
+                Value<AppLanguage> language = const Value.absent(),
+                Value<bool> notifyTasks = const Value.absent(),
+                Value<bool> notifyHabits = const Value.absent(),
+                Value<bool> notifyStreakWarning = const Value.absent(),
+                Value<bool> notifyFreezeUsed = const Value.absent(),
+              }) => AppSettingsCompanion(
+                id: id,
+                themeMode: themeMode,
+                language: language,
+                notifyTasks: notifyTasks,
+                notifyHabits: notifyHabits,
+                notifyStreakWarning: notifyStreakWarning,
+                notifyFreezeUsed: notifyFreezeUsed,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<AppThemeMode> themeMode = const Value.absent(),
+                Value<AppLanguage> language = const Value.absent(),
+                Value<bool> notifyTasks = const Value.absent(),
+                Value<bool> notifyHabits = const Value.absent(),
+                Value<bool> notifyStreakWarning = const Value.absent(),
+                Value<bool> notifyFreezeUsed = const Value.absent(),
+              }) => AppSettingsCompanion.insert(
+                id: id,
+                themeMode: themeMode,
+                language: language,
+                notifyTasks: notifyTasks,
+                notifyHabits: notifyHabits,
+                notifyStreakWarning: notifyStreakWarning,
+                notifyFreezeUsed: notifyFreezeUsed,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AppSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AppSettingsTable,
+      AppSetting,
+      $$AppSettingsTableFilterComposer,
+      $$AppSettingsTableOrderingComposer,
+      $$AppSettingsTableAnnotationComposer,
+      $$AppSettingsTableCreateCompanionBuilder,
+      $$AppSettingsTableUpdateCompanionBuilder,
+      (
+        AppSetting,
+        BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>,
+      ),
+      AppSetting,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5092,4 +5826,6 @@ class $AppDatabaseManager {
       $$UserProfileTableTableManager(_db, _db.userProfile);
   $$CosmeticUnlocksTableTableManager get cosmeticUnlocks =>
       $$CosmeticUnlocksTableTableManager(_db, _db.cosmeticUnlocks);
+  $$AppSettingsTableTableManager get appSettings =>
+      $$AppSettingsTableTableManager(_db, _db.appSettings);
 }

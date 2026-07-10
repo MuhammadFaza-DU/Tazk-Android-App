@@ -1,4 +1,5 @@
 import 'package:drift/native.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,5 +23,11 @@ void main() {
     expect(find.text('Tazk'), findsWidgets);
 
     await tester.pump(const Duration(seconds: 5));
+
+    // Force ProviderScope (and its Drift stream queries) to dispose now,
+    // then pump once more so the zero-duration cleanup timer it schedules
+    // fires before the test binding's pending-timer invariant check runs.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 1));
   });
 }

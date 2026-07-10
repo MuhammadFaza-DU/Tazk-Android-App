@@ -1,0 +1,235 @@
+{
+  "@@locale": "id",
+
+  "appTitle": "Tazk",
+  "navHome": "Home",
+  "navTasks": "Tasks",
+  "navHabits": "Habits",
+  "navCalendar": "Kalender",
+  "navPomodoro": "Pomodoro",
+  "navProfile": "Profil",
+  "navSettings": "Pengaturan",
+
+  "comingSoonMessage": "{title} — segera hadir",
+  "@comingSoonMessage": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+
+  "cancelButton": "Batal",
+  "saveButton": "Simpan",
+  "okButton": "OK",
+  "deleteButton": "Hapus",
+  "startButton": "Mulai",
+  "yesLabel": "Ya",
+  "noLabel": "Tidak",
+
+  "onboardingWelcome": "Selamat datang di Tazk!",
+  "onboardingAskName": "Siapa nama kamu?",
+  "fieldNameLabel": "Nama",
+  "onboardingNameEmptyError": "Nama tidak boleh kosong",
+
+  "homeGreeting": "Halo, {name}!",
+  "@homeGreeting": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "homeTasksToday": "Tasks Hari Ini",
+  "homeNoTasksToday": "Belum ada task hari ini",
+  "errorLoadingTasks": "Gagal memuat task: {error}",
+  "@errorLoadingTasks": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "homeHabitsToday": "Habits Hari Ini",
+  "homeNoActiveHabits": "Belum ada habit aktif",
+  "errorLoadingHabits": "Gagal memuat habit: {error}",
+  "@errorLoadingHabits": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "homeStartPomodoroButton": "Mulai Pomodoro",
+  "levelLabel": "Level {level}",
+  "@levelLabel": {
+    "placeholders": { "level": { "type": "int" } }
+  },
+  "xpProgress": "{xp}/{needed} XP",
+  "@xpProgress": {
+    "placeholders": {
+      "xp": { "type": "int" },
+      "needed": { "type": "int" }
+    }
+  },
+  "streakSummary": "🔥 Streak {days} hari · {rank}",
+  "@streakSummary": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "rank": { "type": "String" }
+    }
+  },
+
+  "tasksScreenTitle": "Tasks — Hari Ini",
+  "taskDuplicateTooltip": "Duplikat",
+  "priorityLowShort": "Low",
+  "priorityMedShort": "Med",
+  "priorityHighShort": "High",
+
+  "editTaskTitle": "Edit Task",
+  "addTaskTitle": "Tambah Task",
+  "fieldTitleLabel": "Judul",
+  "taskTitleRequiredError": "Judul wajib diisi",
+  "fieldDateLabel": "Tanggal",
+  "fieldTimeOptionalLabel": "Jam (opsional)",
+  "fieldPriorityLabel": "Prioritas",
+  "priorityLow": "Low",
+  "priorityMedium": "Medium",
+  "priorityHigh": "High",
+  "fieldLocationOptionalLabel": "Lokasi (opsional)",
+  "checklistOptionalLabel": "Checklist/Subtask (opsional)",
+  "addItemHint": "Tambah item",
+
+  "habitsScreenTitle": "Habits",
+  "habitProgressLabel": "{current}/{target} menit",
+  "@habitProgressLabel": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "target": { "type": "int" }
+    }
+  },
+
+  "editHabitTitle": "Edit Habit",
+  "addHabitTitle": "Tambah Habit",
+  "habitNameRequiredError": "Nama wajib diisi",
+  "fieldFrequencyLabel": "Frekuensi",
+  "frequencyDaily": "Harian",
+  "frequencyWeekly": "Mingguan",
+  "frequencyMonthly": "Bulanan",
+  "frequencyCustom": "Custom",
+  "fieldScheduledTimeOptionalLabel": "Waktu (opsional)",
+  "hasProgressLabel": "Progress bertahap?",
+  "targetMinutesLabel": "Target waktu (menit)",
+  "targetMinutesInvalidError": "Masukkan target menit yang valid",
+
+  "frequencyDisplay": "Frekuensi: {frequency}",
+  "@frequencyDisplay": {
+    "placeholders": { "frequency": { "type": "String" } }
+  },
+  "streakContributionDisplay": "Streak kontribusi: {status}",
+  "@streakContributionDisplay": {
+    "placeholders": { "status": { "type": "String" } }
+  },
+  "streakContributionActive": "aktif",
+  "streakContributionInactive": "belum hari ini",
+  "historyTitle": "Histori",
+  "errorLoadingHistory": "Gagal memuat histori: {error}",
+  "@errorLoadingHistory": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "deleteHabitDialogTitle": "Hapus habit?",
+  "deleteHabitDialogContent": "Histori dan streak \"{name}\" tetap tersimpan, tapi habit ini tidak akan aktif lagi.",
+  "@deleteHabitDialogContent": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "weekdayMon": "Sen",
+  "weekdayTue": "Sel",
+  "weekdayWed": "Rab",
+  "weekdayThu": "Kam",
+  "weekdayFri": "Jum",
+  "weekdaySat": "Sab",
+  "weekdaySun": "Min",
+
+  "calendarScreenTitle": "Kalender — {month} {year}",
+  "@calendarScreenTitle": {
+    "placeholders": {
+      "month": { "type": "String" },
+      "year": { "type": "int" }
+    }
+  },
+  "errorLoadingCalendar": "Gagal memuat: {error}",
+  "@errorLoadingCalendar": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "taskMovedMessage": "\"{title}\" dipindah ke {date}",
+  "@taskMovedMessage": {
+    "placeholders": {
+      "title": { "type": "String" },
+      "date": { "type": "String" }
+    }
+  },
+  "noTasksHabitsThisDate": "Tidak ada task/habit di tanggal ini",
+  "tasksLabel": "Tasks",
+  "dailyHabitsLabel": "Habits (harian)",
+  "dailyHabitInfo": "Habit harian berlaku setiap hari — lihat status di halaman Habits.",
+  "monthJanuary": "Januari",
+  "monthFebruary": "Februari",
+  "monthMarch": "Maret",
+  "monthApril": "April",
+  "monthMay": "Mei",
+  "monthJune": "Juni",
+  "monthJuly": "Juli",
+  "monthAugust": "Agustus",
+  "monthSeptember": "September",
+  "monthOctober": "Oktober",
+  "monthNovember": "November",
+  "monthDecember": "Desember",
+
+  "pomodoroScreenTitle": "Pomodoro",
+  "modeLabel": "Mode",
+  "modeHabitLinked": "Terkait Habit",
+  "modeFreeStanding": "Bebas Mandiri",
+  "selectHabitLabel": "Pilih Habit",
+  "durationMinutesLabel": "Durasi (menit)",
+  "durationHelperText": "Kustomisasi bebas",
+  "pauseButton": "Pause",
+  "resumeButton": "Lanjutkan",
+  "cancelSessionButton": "Batalkan",
+  "sessionCompleteTitle": "Sesi selesai!",
+  "sessionCompleteHabitMessage": "Progress \"{name}\" tercatat.",
+  "@sessionCompleteHabitMessage": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "sessionCompleteFreeMessage": "Sesi fokus bebas selesai.",
+
+  "profileScreenTitle": "Profil",
+  "changeAvatarTooltip": "Ganti Avatar",
+  "editNameTooltip": "Edit Nama",
+  "noNamePlaceholder": "(Belum ada nama)",
+  "badgeCollectionTitle": "Badge Collection",
+  "errorLoadingBadges": "Gagal memuat badge: {error}",
+  "@errorLoadingBadges": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "avatarCollectionTitle": "Avatar Collection — unlock per 10 level",
+  "errorLoadingAvatars": "Gagal memuat avatar: {error}",
+  "@errorLoadingAvatars": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "editNameDialogTitle": "Edit Nama",
+
+  "splashTagline": "Tumbuh tiap hari",
+
+  "rankPerintis": "Perintis",
+  "rankPetarung": "Petarung",
+  "rankPenakluk": "Penakluk",
+  "rankSangAhli": "Sang Ahli",
+  "rankSangMaster": "Sang Master",
+  "rankLegenda": "Legenda",
+
+  "settingsScreenTitle": "Pengaturan",
+  "settingsNotifications": "Notifikasi",
+  "settingsNotificationsSubtitle": "Task, Habit, Streak Warning, Freeze",
+  "settingsAppearance": "Tampilan",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "settingsLanguage": "Bahasa",
+  "languageIndonesian": "Indonesia",
+  "languageEnglish": "English",
+  "settingsAbout": "Tentang App",
+  "notificationsScreenTitle": "Notifikasi",
+  "notifTaskLabel": "Task",
+  "notifHabitLabel": "Habit",
+  "notifStreakWarningLabel": "Streak Warning",
+  "notifFreezeLabel": "Freeze",
+  "aboutScreenTitle": "Tentang App",
+  "aboutVersionLabel": "Versi {version}",
+  "@aboutVersionLabel": {
+    "placeholders": { "version": { "type": "String" } }
+  },
+  "aboutDescription": "Tazk menggabungkan manajemen tugas, pelacakan kebiasaan, dan gamifikasi RPG dalam satu aplikasi 100% offline."
+}

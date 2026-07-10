@@ -19,6 +19,7 @@ part 'database.g.dart';
   BadgeUnlocks,
   UserProfile,
   CosmeticUnlocks,
+  AppSettings,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

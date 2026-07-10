@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/gamification_providers.dart';
 import '../../providers/repository_providers.dart';
 
@@ -36,13 +37,14 @@ class ProfileScreen extends ConsumerWidget {
     final streak = ref.watch(streakStateProvider).valueOrNull;
     final badgesAsync = ref.watch(badgesProvider);
     final cosmeticsAsync = ref.watch(cosmeticsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
-      title: 'Profil',
+      title: l10n.profileScreenTitle,
       actions: [
         IconButton(
           icon: const Icon(Icons.edit_rounded),
-          tooltip: 'Ganti Avatar',
+          tooltip: l10n.changeAvatarTooltip,
           onPressed: profile == null
               ? null
               : () => _openAvatarPicker(
@@ -76,13 +78,13 @@ class ProfileScreen extends ConsumerWidget {
                   children: [
                     Text(
                       (profile == null || profile.name.trim().isEmpty)
-                          ? '(Belum ada nama)'
+                          ? l10n.noNamePlaceholder
                           : profile.name,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit_rounded, size: 18),
-                      tooltip: 'Edit Nama',
+                      tooltip: l10n.editNameTooltip,
                       onPressed: profile == null
                           ? null
                           : () => _openRenameDialog(context, ref, profile.name),
@@ -95,7 +97,7 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           _GamificationSummary(profile: profile, streak: streak),
           const SizedBox(height: 24),
-          Text('Badge Collection', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.badgeCollectionTitle, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           badgesAsync.when(
             data: (badges) {
@@ -103,11 +105,11 @@ class ProfileScreen extends ConsumerWidget {
               return _BadgeGrid(unlockedRanks: unlockedRanks);
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => Text('Gagal memuat badge: $error'),
+            error: (error, _) => Text(l10n.errorLoadingBadges(error.toString())),
           ),
           const SizedBox(height: 24),
           Text(
-            'Avatar Collection — unlock per 10 level',
+            l10n.avatarCollectionTitle,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
@@ -116,7 +118,7 @@ class ProfileScreen extends ConsumerWidget {
               unlockedMilestones: cosmetics.map((c) => c.levelMilestone).toList(),
             ),
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => Text('Gagal memuat avatar: $error'),
+            error: (error, _) => Text(l10n.errorLoadingAvatars(error.toString())),
           ),
         ],
       ),
@@ -128,24 +130,25 @@ class ProfileScreen extends ConsumerWidget {
     WidgetRef ref,
     String currentName,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: currentName);
     final newName = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Edit Nama'),
+        title: Text(l10n.editNameDialogTitle),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(labelText: 'Nama'),
+          decoration: InputDecoration(labelText: l10n.fieldNameLabel),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Batal'),
+            child: Text(l10n.cancelButton),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(controller.text.trim()),
-            child: const Text('Simpan'),
+            child: Text(l10n.saveButton),
           ),
         ],
       ),
@@ -203,11 +206,12 @@ class _GamificationSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final level = profile?.level ?? 1;
     final xp = profile?.xp ?? 0;
     final needed = 100 * level;
     final streakDays = streak?.currentStreak ?? 0;
-    final rankLabel = streakDays > 0 ? streakRankForDays(streakDays).label : '-';
+    final rankLabel = streakDays > 0 ? streakRankForDays(streakDays).label(context) : '-';
 
     return Card(
       child: Padding(
@@ -215,7 +219,7 @@ class _GamificationSummary extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Level $level', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.levelLabel(level), style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
@@ -227,9 +231,9 @@ class _GamificationSummary extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text('$xp/$needed XP'),
+            Text(l10n.xpProgress(xp, needed)),
             const SizedBox(height: 12),
-            Text('🔥 Streak $streakDays hari · $rankLabel'),
+            Text(l10n.streakSummary(streakDays, rankLabel)),
           ],
         ),
       ),
@@ -252,7 +256,7 @@ class _BadgeGrid extends StatelessWidget {
           _CollectionSlot(
             isUnlocked: unlockedRanks.contains(rank),
             icon: Icons.military_tech_rounded,
-            label: rank.label,
+            label: rank.label(context),
           ),
       ],
     );

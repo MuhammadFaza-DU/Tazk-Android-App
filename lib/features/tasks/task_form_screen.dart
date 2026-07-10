@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/task_providers.dart';
 
@@ -117,8 +118,11 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Edit Task' : 'Tambah Task')),
+      appBar: AppBar(
+        title: Text(_isEditing ? l10n.editTaskTitle : l10n.addTaskTitle),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -126,21 +130,22 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
           children: [
             TextFormField(
               controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Judul'),
-              validator: (value) =>
-                  (value == null || value.trim().isEmpty) ? 'Judul wajib diisi' : null,
+              decoration: InputDecoration(labelText: l10n.fieldTitleLabel),
+              validator: (value) => (value == null || value.trim().isEmpty)
+                  ? l10n.taskTitleRequiredError
+                  : null,
             ),
             const SizedBox(height: 16),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Tanggal'),
+              title: Text(l10n.fieldDateLabel),
               subtitle: Text('${_date.day}/${_date.month}/${_date.year}'),
               trailing: const Icon(Icons.calendar_today_rounded),
               onTap: _pickDate,
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Jam (opsional)'),
+              title: Text(l10n.fieldTimeOptionalLabel),
               subtitle: Text(_time == null ? '-' : _time!.format(context)),
               trailing: _time == null
                   ? const Icon(Icons.access_time_rounded)
@@ -151,25 +156,25 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               onTap: _pickTime,
             ),
             const SizedBox(height: 8),
-            Text('Prioritas', style: Theme.of(context).textTheme.titleSmall),
+            Text(l10n.fieldPriorityLabel, style: Theme.of(context).textTheme.titleSmall),
             RadioGroup<TaskPriority>(
               groupValue: _priority,
               onChanged: (value) => setState(() => _priority = value!),
-              child: const Column(
+              child: Column(
                 children: [
                   RadioListTile<TaskPriority>(
                     contentPadding: EdgeInsets.zero,
-                    title: Text('Low'),
+                    title: Text(l10n.priorityLow),
                     value: TaskPriority.low,
                   ),
                   RadioListTile<TaskPriority>(
                     contentPadding: EdgeInsets.zero,
-                    title: Text('Medium'),
+                    title: Text(l10n.priorityMedium),
                     value: TaskPriority.medium,
                   ),
                   RadioListTile<TaskPriority>(
                     contentPadding: EdgeInsets.zero,
-                    title: Text('High'),
+                    title: Text(l10n.priorityHigh),
                     value: TaskPriority.high,
                   ),
                 ],
@@ -178,11 +183,10 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             const SizedBox(height: 8),
             TextFormField(
               controller: _locationController,
-              decoration: const InputDecoration(labelText: 'Lokasi (opsional)'),
+              decoration: InputDecoration(labelText: l10n.fieldLocationOptionalLabel),
             ),
             const SizedBox(height: 16),
-            Text('Checklist/Subtask (opsional)',
-                style: Theme.of(context).textTheme.titleSmall),
+            Text(l10n.checklistOptionalLabel, style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             if (_isEditing)
               _ExistingSubtasksList(taskId: widget.task!.id)
@@ -207,7 +211,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
                 Expanded(
                   child: TextField(
                     controller: _subtaskInputController,
-                    decoration: const InputDecoration(hintText: 'Tambah item'),
+                    decoration: InputDecoration(hintText: l10n.addItemHint),
                     onSubmitted: (_) => _addSubtaskField(),
                   ),
                 ),
@@ -222,7 +226,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: _save,
-                child: const Text('Simpan'),
+                child: Text(l10n.saveButton),
               ),
             ),
           ],

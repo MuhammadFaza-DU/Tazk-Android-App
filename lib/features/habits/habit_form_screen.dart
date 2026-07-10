@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/repository_providers.dart';
 
 class HabitFormScreen extends ConsumerStatefulWidget {
@@ -101,8 +102,11 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Edit Habit' : 'Tambah Habit')),
+      appBar: AppBar(
+        title: Text(_isEditing ? l10n.editHabitTitle : l10n.addHabitTitle),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -110,12 +114,13 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nama'),
-              validator: (value) =>
-                  (value == null || value.trim().isEmpty) ? 'Nama wajib diisi' : null,
+              decoration: InputDecoration(labelText: l10n.fieldNameLabel),
+              validator: (value) => (value == null || value.trim().isEmpty)
+                  ? l10n.habitNameRequiredError
+                  : null,
             ),
             const SizedBox(height: 16),
-            Text('Frekuensi', style: Theme.of(context).textTheme.titleSmall),
+            Text(l10n.fieldFrequencyLabel, style: Theme.of(context).textTheme.titleSmall),
             RadioGroup<HabitFrequency>(
               groupValue: _frequency,
               onChanged: (value) => setState(() => _frequency = value!),
@@ -124,7 +129,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                   for (final frequency in HabitFrequency.values)
                     RadioListTile<HabitFrequency>(
                       contentPadding: EdgeInsets.zero,
-                      title: Text(frequency.label),
+                      title: Text(frequency.label(context)),
                       value: frequency,
                     ),
                 ],
@@ -133,7 +138,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
             const SizedBox(height: 8),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Waktu (opsional)'),
+              title: Text(l10n.fieldScheduledTimeOptionalLabel),
               subtitle: Text(
                 _scheduledTime == null ? '-' : _scheduledTime!.format(context),
               ),
@@ -146,20 +151,20 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
               onTap: _pickTime,
             ),
             const SizedBox(height: 8),
-            Text('Progress bertahap?', style: Theme.of(context).textTheme.titleSmall),
+            Text(l10n.hasProgressLabel, style: Theme.of(context).textTheme.titleSmall),
             RadioGroup<bool>(
               groupValue: _hasProgress,
               onChanged: (value) => setState(() => _hasProgress = value!),
-              child: const Column(
+              child: Column(
                 children: [
                   RadioListTile<bool>(
                     contentPadding: EdgeInsets.zero,
-                    title: Text('Ya'),
+                    title: Text(l10n.yesLabel),
                     value: true,
                   ),
                   RadioListTile<bool>(
                     contentPadding: EdgeInsets.zero,
-                    title: Text('Tidak'),
+                    title: Text(l10n.noLabel),
                     value: false,
                   ),
                 ],
@@ -169,13 +174,13 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _targetMinutesController,
-                decoration: const InputDecoration(labelText: 'Target waktu (menit)'),
+                decoration: InputDecoration(labelText: l10n.targetMinutesLabel),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (!_hasProgress) return null;
                   final parsed = int.tryParse(value?.trim() ?? '');
                   return (parsed == null || parsed <= 0)
-                      ? 'Masukkan target menit yang valid'
+                      ? l10n.targetMinutesInvalidError
                       : null;
                 },
               ),
@@ -185,7 +190,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: _save,
-                child: const Text('Simpan'),
+                child: Text(l10n.saveButton),
               ),
             ),
           ],

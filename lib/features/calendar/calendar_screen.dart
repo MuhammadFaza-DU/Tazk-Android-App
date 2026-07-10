@@ -5,6 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/habit_providers.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/task_providers.dart';
@@ -12,7 +13,30 @@ import '../tasks/task_form_screen.dart';
 
 DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
-const _weekdayAbbrev = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+List<String> _weekdayAbbrev(AppLocalizations l10n) => [
+      l10n.weekdayMon,
+      l10n.weekdayTue,
+      l10n.weekdayWed,
+      l10n.weekdayThu,
+      l10n.weekdayFri,
+      l10n.weekdaySat,
+      l10n.weekdaySun,
+    ];
+
+List<String> _monthNames(AppLocalizations l10n) => [
+      l10n.monthJanuary,
+      l10n.monthFebruary,
+      l10n.monthMarch,
+      l10n.monthApril,
+      l10n.monthMay,
+      l10n.monthJune,
+      l10n.monthJuly,
+      l10n.monthAugust,
+      l10n.monthSeptember,
+      l10n.monthOctober,
+      l10n.monthNovember,
+      l10n.monthDecember,
+    ];
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
@@ -38,7 +62,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     await ref.read(taskRepositoryProvider).updateTask(task.copyWith(date: newDate));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('"${task.title}" dipindah ke ${_formatDate(newDate)}')),
+      SnackBar(
+        content: Text(
+          AppLocalizations.of(context)!.taskMovedMessage(task.title, _formatDate(newDate)),
+        ),
+      ),
     );
   }
 
@@ -66,9 +94,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       return [...tasks, if (hasDailyHabit) 'habit'];
     }
 
+    final l10n = AppLocalizations.of(context)!;
+
     return AppScaffold(
-      title:
-          'Kalender — ${_monthName(_focusedDay.month)} ${_focusedDay.year}',
+      title: l10n.calendarScreenTitle(
+        _monthNames(l10n)[_focusedDay.month - 1],
+        _focusedDay.year,
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.chevron_left_rounded),
@@ -107,7 +139,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             },
             calendarBuilders: CalendarBuilders<Object>(
               dowBuilder: (context, day) => Center(
-                child: Text(_weekdayAbbrev[day.weekday - 1]),
+                child: Text(_weekdayAbbrev(AppLocalizations.of(context)!)[day.weekday - 1]),
               ),
               defaultBuilder: (context, day, focusedDay) =>
                   _DayCell(day: day, onTaskDropped: _onTaskDropped),
@@ -137,28 +169,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 hasDailyHabit: hasDailyHabit,
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) => Center(child: Text('Gagal memuat: $error')),
+              error: (error, _) =>
+                  Center(child: Text(l10n.errorLoadingCalendar(error.toString()))),
             ),
           ),
         ],
       ),
     );
   }
-
-  static String _monthName(int month) => const [
-        'Januari',
-        'Februari',
-        'Maret',
-        'April',
-        'Mei',
-        'Juni',
-        'Juli',
-        'Agustus',
-        'September',
-        'Oktober',
-        'November',
-        'Desember',
-      ][month - 1];
 }
 
 class _DayCell extends StatelessWidget {
@@ -229,15 +247,16 @@ class _DayDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (tasks.isEmpty && !hasDailyHabit) {
-      return const Center(child: Text('Tidak ada task/habit di tanggal ini'));
+      return Center(child: Text(l10n.noTasksHabitsThisDate));
     }
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         if (tasks.isNotEmpty) ...[
-          Text('Tasks', style: Theme.of(context).textTheme.titleSmall),
+          Text(l10n.tasksLabel, style: Theme.of(context).textTheme.titleSmall),
           const SizedBox(height: 4),
           for (final task in tasks)
             Draggable<Task>(
@@ -259,9 +278,9 @@ class _DayDetail extends StatelessWidget {
         ],
         if (hasDailyHabit) ...[
           const SizedBox(height: 16),
-          Text('Habits (harian)', style: Theme.of(context).textTheme.titleSmall),
+          Text(l10n.dailyHabitsLabel, style: Theme.of(context).textTheme.titleSmall),
           const SizedBox(height: 4),
-          const Text('Habit harian berlaku setiap hari — lihat status di halaman Habits.'),
+          Text(l10n.dailyHabitInfo),
         ],
       ],
     );
@@ -273,13 +292,19 @@ class _TaskRow extends StatelessWidget {
 
   final Task task;
 
+  String _priorityLabel(AppLocalizations l10n) => switch (task.priority) {
+        TaskPriority.low => l10n.priorityLowShort,
+        TaskPriority.medium => l10n.priorityMedShort,
+        TaskPriority.high => l10n.priorityHighShort,
+      };
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: const Icon(Icons.drag_indicator_rounded),
       title: Text(task.title),
-      subtitle: Text(task.priority.name),
+      subtitle: Text(_priorityLabel(AppLocalizations.of(context)!)),
       trailing: task.isCompleted ? const Icon(Icons.check_circle_rounded) : null,
       onTap: () {
         Navigator.of(context).push(

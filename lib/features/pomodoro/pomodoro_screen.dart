@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/app_scaffold.dart';
 import '../../data/database/database.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/habit_providers.dart';
 import '../../providers/repository_providers.dart';
 
@@ -113,19 +114,20 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
     }
 
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Sesi selesai!'),
+        title: Text(l10n.sessionCompleteTitle),
         content: Text(
           _isHabitMode && _selectedHabit != null
-              ? 'Progress "${_selectedHabit!.name}" tercatat.'
-              : 'Sesi fokus bebas selesai.',
+              ? l10n.sessionCompleteHabitMessage(_selectedHabit!.name)
+              : l10n.sessionCompleteFreeMessage,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('OK'),
+            child: Text(l10n.okButton),
           ),
         ],
       ),
@@ -142,13 +144,14 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
   Widget build(BuildContext context) {
     final activeHabits = ref.watch(activeHabitsProvider).valueOrNull ?? const <Habit>[];
     final isEditable = _status == _SessionStatus.idle;
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
-      title: 'Pomodoro',
+      title: l10n.pomodoroScreenTitle,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('Mode', style: Theme.of(context).textTheme.titleSmall),
+          Text(l10n.modeLabel, style: Theme.of(context).textTheme.titleSmall),
           RadioGroup<bool>(
             groupValue: _isHabitMode,
             onChanged: isEditable
@@ -158,12 +161,12 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
               children: [
                 RadioListTile<bool>(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Terkait Habit'),
+                  title: Text(l10n.modeHabitLinked),
                   value: true,
                 ),
                 RadioListTile<bool>(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Bebas Mandiri'),
+                  title: Text(l10n.modeFreeStanding),
                   value: false,
                 ),
               ],
@@ -173,7 +176,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
             const SizedBox(height: 8),
             DropdownButtonFormField<Habit>(
               initialValue: _selectedHabit,
-              decoration: const InputDecoration(labelText: 'Pilih Habit'),
+              decoration: InputDecoration(labelText: l10n.selectHabitLabel),
               items: [
                 for (final habit in activeHabits)
                   DropdownMenuItem(value: habit, child: Text(habit.name)),
@@ -187,9 +190,9 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
           TextField(
             controller: _durationController,
             enabled: isEditable,
-            decoration: const InputDecoration(
-              labelText: 'Durasi (menit)',
-              helperText: 'Kustomisasi bebas',
+            decoration: InputDecoration(
+              labelText: l10n.durationMinutesLabel,
+              helperText: l10n.durationHelperText,
             ),
             keyboardType: TextInputType.number,
             onChanged: (_) => setState(() {}),
@@ -210,7 +213,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: _canStart ? _start : null,
-                child: const Text('Mulai'),
+                child: Text(l10n.startButton),
               ),
             )
           else
@@ -219,14 +222,16 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: _cancel,
-                    child: const Text('Batalkan'),
+                    child: Text(l10n.cancelSessionButton),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
                     onPressed: _status == _SessionStatus.running ? _pause : _resume,
-                    child: Text(_status == _SessionStatus.running ? 'Pause' : 'Lanjutkan'),
+                    child: Text(
+                      _status == _SessionStatus.running ? l10n.pauseButton : l10n.resumeButton,
+                    ),
                   ),
                 ),
               ],

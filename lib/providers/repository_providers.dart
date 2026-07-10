@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/repositories/gamification_repository.dart';
 import '../data/repositories/habit_repository.dart';
+import '../data/repositories/settings_repository.dart';
 import '../data/repositories/task_repository.dart';
 import 'database_provider.dart';
 
@@ -21,4 +22,8 @@ final habitRepositoryProvider = Provider<HabitRepository>((ref) {
     ref.watch(appDatabaseProvider),
     ref.watch(gamificationRepositoryProvider),
   );
+});
+
+final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
+  return SettingsRepository(ref.watch(appDatabaseProvider));
 });

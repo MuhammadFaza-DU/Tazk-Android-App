@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import 'app_scaffold.dart';
 
 /// Placeholder for screens not yet built in this pass of the build order.
@@ -14,7 +15,7 @@ class ComingSoonScreen extends StatelessWidget {
       title: title,
       body: Center(
         child: Text(
-          '$title — segera hadir',
+          AppLocalizations.of(context)!.comingSoonMessage(title),
           style: Theme.of(context).textTheme.bodyLarge,
         ),
       ),

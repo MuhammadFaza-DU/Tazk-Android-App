@@ -3,11 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/habit_providers.dart';
 import '../../providers/repository_providers.dart';
 import 'habit_form_screen.dart';
 
-const _weekdayAbbrev = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+List<String> _weekdayAbbrev(AppLocalizations l10n) => [
+      l10n.weekdayMon,
+      l10n.weekdayTue,
+      l10n.weekdayWed,
+      l10n.weekdayThu,
+      l10n.weekdayFri,
+      l10n.weekdaySat,
+      l10n.weekdaySun,
+    ];
 
 class HabitDetailScreen extends ConsumerWidget {
   const HabitDetailScreen({super.key, required this.habit});
@@ -19,6 +28,7 @@ class HabitDetailScreen extends ConsumerWidget {
     final todayLog = ref.watch(habitTodayLogProvider(habit.id)).valueOrNull;
     final historyAsync = ref.watch(habitHistoryProvider(habit.id));
     final isActiveToday = todayLog?.isCompleted ?? false;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -41,16 +51,20 @@ class HabitDetailScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('Frekuensi: ${habit.frequency.label}'),
+          Text(l10n.frequencyDisplay(habit.frequency.label(context))),
           const SizedBox(height: 8),
-          Text('Streak kontribusi: ${isActiveToday ? 'aktif' : 'belum hari ini'}'),
+          Text(
+            l10n.streakContributionDisplay(
+              isActiveToday ? l10n.streakContributionActive : l10n.streakContributionInactive,
+            ),
+          ),
           const SizedBox(height: 24),
-          Text('Histori', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.historyTitle, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 12),
           historyAsync.when(
             data: (logs) => _HistoryGrid(logs: logs),
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => Text('Gagal memuat histori: $error'),
+            error: (error, _) => Text(l10n.errorLoadingHistory(error.toString())),
           ),
         ],
       ),
@@ -58,21 +72,20 @@ class HabitDetailScreen extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Hapus habit?'),
-        content: Text(
-          'Histori dan streak "${habit.name}" tetap tersimpan, tapi habit ini tidak akan aktif lagi.',
-        ),
+        title: Text(l10n.deleteHabitDialogTitle),
+        content: Text(l10n.deleteHabitDialogContent(habit.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Batal'),
+            child: Text(l10n.cancelButton),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Hapus'),
+            child: Text(l10n.deleteButton),
           ),
         ],
       ),
@@ -123,7 +136,7 @@ class _HistoryDayTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(_weekdayAbbrev[day.weekday - 1]),
+        Text(_weekdayAbbrev(AppLocalizations.of(context)!)[day.weekday - 1]),
         const SizedBox(height: 4),
         Icon(
           _isCompleted ? Icons.check_circle_rounded : Icons.cancel_outlined,

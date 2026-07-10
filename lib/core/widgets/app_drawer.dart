@@ -5,14 +5,16 @@ import '../../features/habits/habits_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/pomodoro/pomodoro_screen.dart';
 import '../../features/profile/profile_screen.dart';
+import '../../features/settings/settings_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
-import 'coming_soon_screen.dart';
+import '../../l10n/app_localizations.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Drawer(
       child: SafeArea(
         child: ListView(
@@ -20,42 +22,42 @@ class AppDrawer extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(24),
-              child: Text('Tazk', style: Theme.of(context).textTheme.headlineMedium),
+              child: Text(l10n.appTitle, style: Theme.of(context).textTheme.headlineMedium),
             ),
             _DrawerItem(
               icon: Icons.home_rounded,
-              label: 'Home',
+              label: l10n.navHome,
               builder: (_) => const HomeScreen(),
             ),
             _DrawerItem(
               icon: Icons.check_circle_outline_rounded,
-              label: 'Tasks',
+              label: l10n.navTasks,
               builder: (_) => const TasksScreen(),
             ),
             _DrawerItem(
               icon: Icons.autorenew_rounded,
-              label: 'Habits',
+              label: l10n.navHabits,
               builder: (_) => const HabitsScreen(),
             ),
             _DrawerItem(
               icon: Icons.calendar_month_rounded,
-              label: 'Kalender',
+              label: l10n.navCalendar,
               builder: (_) => const CalendarScreen(),
             ),
             _DrawerItem(
               icon: Icons.timer_outlined,
-              label: 'Pomodoro',
+              label: l10n.navPomodoro,
               builder: (_) => const PomodoroScreen(),
             ),
             _DrawerItem(
               icon: Icons.person_outline_rounded,
-              label: 'Profil',
+              label: l10n.navProfile,
               builder: (_) => const ProfileScreen(),
             ),
             _DrawerItem(
               icon: Icons.settings_outlined,
-              label: 'Pengaturan',
-              builder: (_) => const ComingSoonScreen(title: 'Pengaturan'),
+              label: l10n.navSettings,
+              builder: (_) => const SettingsScreen(),
             ),
           ],
         ),

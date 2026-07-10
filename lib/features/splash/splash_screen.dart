@@ -4,6 +4,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/repository_providers.dart';
 import '../home/home_screen.dart';
 import '../onboarding/onboarding_screen.dart';
@@ -156,6 +157,7 @@ class _FallbackSplash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: AnimatedBuilder(
         animation: animation,
@@ -174,7 +176,7 @@ class _FallbackSplash extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      'Tazk',
+                      l10n.appTitle,
                       style: TextStyle(
                         fontFamily: AppTypography.titleFont,
                         fontSize: 40,
@@ -185,7 +187,7 @@ class _FallbackSplash extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Tumbuh tiap hari',
+                      l10n.splashTagline,
                       style: TextStyle(
                         fontFamily: AppTypography.bodyFont,
                         fontSize: 16,
