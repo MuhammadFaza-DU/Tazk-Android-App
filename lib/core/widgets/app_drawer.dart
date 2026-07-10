@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../features/home/home_screen.dart';
+import '../../features/tasks/tasks_screen.dart';
 import 'coming_soon_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -25,7 +26,7 @@ class AppDrawer extends StatelessWidget {
             _DrawerItem(
               icon: Icons.check_circle_outline_rounded,
               label: 'Tasks',
-              builder: (_) => const ComingSoonScreen(title: 'Tasks'),
+              builder: (_) => const TasksScreen(),
             ),
             _DrawerItem(
               icon: Icons.autorenew_rounded,
