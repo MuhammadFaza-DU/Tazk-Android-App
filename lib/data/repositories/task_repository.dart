@@ -24,6 +24,16 @@ class TaskRepository {
         .watch();
   }
 
+  Stream<List<Task>> watchTasksInMonth(DateTime month) {
+    final start = DateTime(month.year, month.month, 1);
+    final end = DateTime(month.year, month.month + 1, 1);
+    return (_db.select(_db.tasks)
+          ..where(
+            (t) => t.date.isBiggerOrEqualValue(start) & t.date.isSmallerThanValue(end),
+          ))
+        .watch();
+  }
+
   Stream<List<Subtask>> watchSubtasks(int taskId) {
     return (_db.select(_db.subtasks)..where((s) => s.taskId.equals(taskId)))
         .watch();

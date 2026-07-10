@@ -21,6 +21,6 @@ void main() {
 
     expect(find.text('Tazk'), findsWidgets);
 
-    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(const Duration(seconds: 5));
   });
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../features/calendar/calendar_screen.dart';
 import '../../features/habits/habits_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
@@ -37,7 +38,7 @@ class AppDrawer extends StatelessWidget {
             _DrawerItem(
               icon: Icons.calendar_month_rounded,
               label: 'Kalender',
-              builder: (_) => const ComingSoonScreen(title: 'Kalender'),
+              builder: (_) => const CalendarScreen(),
             ),
             _DrawerItem(
               icon: Icons.timer_outlined,
