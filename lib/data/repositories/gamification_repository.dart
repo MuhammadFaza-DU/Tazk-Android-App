@@ -1,12 +1,25 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/widgets.dart';
 
+import '../../l10n/app_localizations.dart';
+import '../../notifications/notification_service.dart';
 import '../database/database.dart';
 import '../models/enums.dart';
+import 'settings_repository.dart';
 
 class GamificationRepository {
-  GamificationRepository(this._db);
+  GamificationRepository(this._db, this._notifications, this._settings);
 
   final AppDatabase _db;
+  final NotificationService _notifications;
+  final SettingsRepository _settings;
+
+  Future<AppLocalizations> _l10n() async {
+    final settings = await _settings.ensureSettings();
+    return lookupAppLocalizations(
+      Locale(settings.language == AppLanguage.english ? 'en' : 'id'),
+    );
+  }
 
   static const taskXp = 10;
   static const habitXp = 15;
@@ -137,7 +150,38 @@ class GamificationRepository {
       ),
     );
 
+    // Today now has an activity, so tonight's "you haven't done anything
+    // yet" warning is no longer applicable.
+    await _notifications.cancelStreakWarning();
+
     await _unlockBadgeIfNeeded(newStreak);
+  }
+
+  /// Schedules or cancels tonight's streak-warning notification depending on
+  /// whether the user has already completed a task/habit today. Call once
+  /// when the app opens (after [evaluateMissedDay]).
+  Future<void> refreshStreakWarningNotification() async {
+    final settings = await _settings.ensureSettings();
+    if (!settings.notifyStreakWarning) {
+      await _notifications.cancelStreakWarning();
+      return;
+    }
+
+    final state = await ensureStreakState();
+    final today = _dateOnly(DateTime.now());
+    final alreadyActiveToday =
+        state.lastActiveDate != null && _dateOnly(state.lastActiveDate!) == today;
+
+    if (alreadyActiveToday) {
+      await _notifications.cancelStreakWarning();
+      return;
+    }
+
+    final l10n = await _l10n();
+    await _notifications.scheduleTonightsStreakWarning(
+      title: l10n.notifStreakWarningTitle,
+      body: l10n.notifStreakWarningBody,
+    );
   }
 
   Future<void> _unlockBadgeIfNeeded(int streakDays) async {
@@ -165,6 +209,14 @@ class GamificationRepository {
           lastActiveDate: Value(today.subtract(const Duration(days: 1))),
         ),
       );
+      final settings = await _settings.ensureSettings();
+      if (settings.notifyFreezeUsed) {
+        final l10n = await _l10n();
+        await _notifications.showFreezeUsedNotification(
+          title: l10n.notifFreezeUsedTitle,
+          body: l10n.notifFreezeUsedBody,
+        );
+      }
     } else {
       await (_db.update(_db.streakState)..where((s) => s.id.equals(state.id)))
           .write(

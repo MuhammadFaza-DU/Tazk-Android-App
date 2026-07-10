@@ -480,4 +480,36 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get aboutDescription =>
       'Tazk menggabungkan manajemen tugas, pelacakan kebiasaan, dan gamifikasi RPG dalam satu aplikasi 100% offline.';
+
+  @override
+  String notifTaskReminderTitle(String title) {
+    return 'Waktunya: $title';
+  }
+
+  @override
+  String get notifTaskReminderBody =>
+      'Task ini dijadwalkan sekarang. Yuk selesaikan!';
+
+  @override
+  String notifHabitReminderTitle(String name) {
+    return 'Waktunya: $name';
+  }
+
+  @override
+  String get notifHabitReminderBody =>
+      'Habit ini dijadwalkan sekarang. Jaga streak kamu!';
+
+  @override
+  String get notifStreakWarningTitle => 'Jangan putus streak kamu!';
+
+  @override
+  String get notifStreakWarningBody =>
+      'Belum ada task/habit yang selesai hari ini. Selesaikan sebelum tengah malam ya!';
+
+  @override
+  String get notifFreezeUsedTitle => 'Freeze terpakai!';
+
+  @override
+  String get notifFreezeUsedBody =>
+      'Streak kamu tetap aman karena freeze otomatis dipakai untuk hari yang terlewat.';
 }

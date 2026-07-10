@@ -51,6 +51,7 @@ dependencies:
   # Notifications
   flutter_local_notifications: ^18.0.1
   timezone: ^0.9.4
+  flutter_timezone: ^3.0.1
 
   # Splash video & UI animation
   video_player: ^2.9.2

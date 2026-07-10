@@ -1,14 +1,38 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/widgets.dart';
 
+import '../../l10n/app_localizations.dart';
+import '../../notifications/notification_service.dart';
 import '../database/database.dart';
 import '../models/enums.dart';
 import 'gamification_repository.dart';
+import 'settings_repository.dart';
 
 class TaskRepository {
-  TaskRepository(this._db, this._gamification);
+  TaskRepository(this._db, this._gamification, this._notifications, this._settings);
 
   final AppDatabase _db;
   final GamificationRepository _gamification;
+  final NotificationService _notifications;
+  final SettingsRepository _settings;
+
+  Future<void> _scheduleReminder(Task task) async {
+    final settings = await _settings.ensureSettings();
+    if (!settings.notifyTasks) {
+      await _notifications.cancelTaskReminder(task.id);
+      return;
+    }
+    final l10n = lookupAppLocalizations(
+      Locale(settings.language == AppLanguage.english ? 'en' : 'id'),
+    );
+    await _notifications.scheduleTaskReminder(
+      taskId: task.id,
+      title: l10n.notifTaskReminderTitle(task.title),
+      body: l10n.notifTaskReminderBody,
+      date: task.date,
+      time: task.time,
+    );
+  }
 
   Stream<List<Task>> watchTasksForDate(DateTime date) {
     final start = DateTime(date.year, date.month, date.day);
@@ -45,20 +69,32 @@ class TaskRepository {
     DateTime? time,
     required TaskPriority priority,
     String? location,
-  }) {
-    return _db.into(_db.tasks).insert(TasksCompanion.insert(
+  }) async {
+    final id = await _db.into(_db.tasks).insert(TasksCompanion.insert(
           title: title,
           date: date,
           time: Value(time),
           priority: priority,
           location: Value(location),
         ));
+    final task = await (_db.select(_db.tasks)..where((t) => t.id.equals(id))).getSingle();
+    if (!task.isCompleted) await _scheduleReminder(task);
+    return id;
   }
 
-  Future<void> updateTask(Task task) => _db.update(_db.tasks).replace(task);
+  Future<void> updateTask(Task task) async {
+    await _db.update(_db.tasks).replace(task);
+    if (task.isCompleted) {
+      await _notifications.cancelTaskReminder(task.id);
+    } else {
+      await _scheduleReminder(task);
+    }
+  }
 
-  Future<void> deleteTask(int id) =>
-      (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
+  Future<void> deleteTask(int id) async {
+    await (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
+    await _notifications.cancelTaskReminder(id);
+  }
 
   Future<int> addSubtask(int taskId, String title) {
     return _db.into(_db.subtasks).insert(
@@ -96,5 +132,7 @@ class TaskRepository {
           .write(const SubtasksCompanion(isCompleted: Value(true)));
       await _gamification.onTaskCompleted();
     });
+    await _notifications.cancelTaskReminder(taskId);
+    await _gamification.refreshStreakWarningNotification();
   }
 }

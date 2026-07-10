@@ -1,14 +1,37 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/widgets.dart';
 
+import '../../l10n/app_localizations.dart';
+import '../../notifications/notification_service.dart';
 import '../database/database.dart';
 import '../models/enums.dart';
 import 'gamification_repository.dart';
+import 'settings_repository.dart';
 
 class HabitRepository {
-  HabitRepository(this._db, this._gamification);
+  HabitRepository(this._db, this._gamification, this._notifications, this._settings);
 
   final AppDatabase _db;
   final GamificationRepository _gamification;
+  final NotificationService _notifications;
+  final SettingsRepository _settings;
+
+  Future<void> _scheduleReminder(Habit habit) async {
+    final settings = await _settings.ensureSettings();
+    if (!settings.notifyHabits) {
+      await _notifications.cancelHabitReminder(habit.id);
+      return;
+    }
+    final l10n = lookupAppLocalizations(
+      Locale(settings.language == AppLanguage.english ? 'en' : 'id'),
+    );
+    await _notifications.scheduleHabitReminder(
+      habitId: habit.id,
+      title: l10n.notifHabitReminderTitle(habit.name),
+      body: l10n.notifHabitReminderBody,
+      scheduledTime: habit.scheduledTime,
+    );
+  }
 
   Stream<List<Habit>> watchActiveHabits() {
     return (_db.select(_db.habits)..where((h) => h.isActive.equals(true)))
@@ -37,21 +60,32 @@ class HabitRepository {
     DateTime? scheduledTime,
     bool hasProgress = false,
     int? targetMinutes,
-  }) {
-    return _db.into(_db.habits).insert(HabitsCompanion.insert(
+  }) async {
+    final id = await _db.into(_db.habits).insert(HabitsCompanion.insert(
           name: name,
           frequency: frequency,
           scheduledTime: Value(scheduledTime),
           hasProgress: Value(hasProgress),
           targetMinutes: Value(targetMinutes),
         ));
+    final habit = await (_db.select(_db.habits)..where((h) => h.id.equals(id))).getSingle();
+    await _scheduleReminder(habit);
+    return id;
   }
 
-  Future<void> updateHabit(Habit habit) => _db.update(_db.habits).replace(habit);
+  Future<void> updateHabit(Habit habit) async {
+    await _db.update(_db.habits).replace(habit);
+    if (habit.isActive) {
+      await _scheduleReminder(habit);
+    } else {
+      await _notifications.cancelHabitReminder(habit.id);
+    }
+  }
 
   Future<void> deactivateHabit(int id) async {
     await (_db.update(_db.habits)..where((h) => h.id.equals(id)))
         .write(const HabitsCompanion(isActive: Value(false)));
+    await _notifications.cancelHabitReminder(id);
   }
 
   Future<void> logProgress(int habitId, int minutes) async {
@@ -96,6 +130,7 @@ class HabitRepository {
       }
       await _gamification.onHabitCompleted();
     });
+    await _gamification.refreshStreakWarningNotification();
   }
 
   DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);

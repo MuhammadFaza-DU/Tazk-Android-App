@@ -481,4 +481,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aboutDescription =>
       'Tazk combines task management, habit tracking, and RPG-style gamification in one 100% offline app.';
+
+  @override
+  String notifTaskReminderTitle(String title) {
+    return 'Time for: $title';
+  }
+
+  @override
+  String get notifTaskReminderBody =>
+      'This task is scheduled now. Let\'s get it done!';
+
+  @override
+  String notifHabitReminderTitle(String name) {
+    return 'Time for: $name';
+  }
+
+  @override
+  String get notifHabitReminderBody =>
+      'This habit is scheduled now. Keep your streak alive!';
+
+  @override
+  String get notifStreakWarningTitle => 'Don\'t break your streak!';
+
+  @override
+  String get notifStreakWarningBody =>
+      'No task/habit completed yet today. Finish one before midnight!';
+
+  @override
+  String get notifFreezeUsedTitle => 'Freeze used!';
+
+  @override
+  String get notifFreezeUsedBody =>
+      'Your streak stayed safe because a freeze was automatically used for the missed day.';
 }

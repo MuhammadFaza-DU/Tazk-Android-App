@@ -5,6 +5,7 @@ import 'package:video_player/video_player.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/notification_provider.dart';
 import '../../providers/repository_providers.dart';
 import '../home/home_screen.dart';
 import '../onboarding/onboarding_screen.dart';
@@ -67,9 +68,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   Future<void> _navigateNext() async {
     final delay = Future<void>.delayed(_duration);
-    final profileFuture = ref
-        .read(gamificationRepositoryProvider)
-        .ensureProfile();
+    final gamification = ref.read(gamificationRepositoryProvider);
+    final notifications = ref.read(notificationServiceProvider);
+
+    final profileFuture = notifications.initialize().then((_) async {
+      await notifications.requestPermission();
+      await gamification.evaluateMissedDay();
+      await gamification.refreshStreakWarningNotification();
+      return gamification.ensureProfile();
+    });
     await delay;
     final profile = await profileFuture;
     if (!mounted) return;

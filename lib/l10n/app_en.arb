@@ -159,5 +159,14 @@
   "notifFreezeLabel": "Freeze",
   "aboutScreenTitle": "About App",
   "aboutVersionLabel": "Version {version}",
-  "aboutDescription": "Tazk combines task management, habit tracking, and RPG-style gamification in one 100% offline app."
+  "aboutDescription": "Tazk combines task management, habit tracking, and RPG-style gamification in one 100% offline app.",
+
+  "notifTaskReminderTitle": "Time for: {title}",
+  "notifTaskReminderBody": "This task is scheduled now. Let's get it done!",
+  "notifHabitReminderTitle": "Time for: {name}",
+  "notifHabitReminderBody": "This habit is scheduled now. Keep your streak alive!",
+  "notifStreakWarningTitle": "Don't break your streak!",
+  "notifStreakWarningBody": "No task/habit completed yet today. Finish one before midnight!",
+  "notifFreezeUsedTitle": "Freeze used!",
+  "notifFreezeUsedBody": "Your streak stayed safe because a freeze was automatically used for the missed day."
 }

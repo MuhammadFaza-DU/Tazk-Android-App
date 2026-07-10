@@ -231,5 +231,20 @@
   "@aboutVersionLabel": {
     "placeholders": { "version": { "type": "String" } }
   },
-  "aboutDescription": "Tazk menggabungkan manajemen tugas, pelacakan kebiasaan, dan gamifikasi RPG dalam satu aplikasi 100% offline."
+  "aboutDescription": "Tazk menggabungkan manajemen tugas, pelacakan kebiasaan, dan gamifikasi RPG dalam satu aplikasi 100% offline.",
+
+  "notifTaskReminderTitle": "Waktunya: {title}",
+  "@notifTaskReminderTitle": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "notifTaskReminderBody": "Task ini dijadwalkan sekarang. Yuk selesaikan!",
+  "notifHabitReminderTitle": "Waktunya: {name}",
+  "@notifHabitReminderTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "notifHabitReminderBody": "Habit ini dijadwalkan sekarang. Jaga streak kamu!",
+  "notifStreakWarningTitle": "Jangan putus streak kamu!",
+  "notifStreakWarningBody": "Belum ada task/habit yang selesai hari ini. Selesaikan sebelum tengah malam ya!",
+  "notifFreezeUsedTitle": "Freeze terpakai!",
+  "notifFreezeUsedBody": "Streak kamu tetap aman karena freeze otomatis dipakai untuk hari yang terlewat."
 }

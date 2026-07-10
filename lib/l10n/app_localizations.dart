@@ -961,6 +961,54 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Tazk menggabungkan manajemen tugas, pelacakan kebiasaan, dan gamifikasi RPG dalam satu aplikasi 100% offline.'**
   String get aboutDescription;
+
+  /// No description provided for @notifTaskReminderTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Waktunya: {title}'**
+  String notifTaskReminderTitle(String title);
+
+  /// No description provided for @notifTaskReminderBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Task ini dijadwalkan sekarang. Yuk selesaikan!'**
+  String get notifTaskReminderBody;
+
+  /// No description provided for @notifHabitReminderTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Waktunya: {name}'**
+  String notifHabitReminderTitle(String name);
+
+  /// No description provided for @notifHabitReminderBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Habit ini dijadwalkan sekarang. Jaga streak kamu!'**
+  String get notifHabitReminderBody;
+
+  /// No description provided for @notifStreakWarningTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Jangan putus streak kamu!'**
+  String get notifStreakWarningTitle;
+
+  /// No description provided for @notifStreakWarningBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada task/habit yang selesai hari ini. Selesaikan sebelum tengah malam ya!'**
+  String get notifStreakWarningBody;
+
+  /// No description provided for @notifFreezeUsedTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Freeze terpakai!'**
+  String get notifFreezeUsedTitle;
+
+  /// No description provided for @notifFreezeUsedBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak kamu tetap aman karena freeze otomatis dipakai untuk hari yang terlewat.'**
+  String get notifFreezeUsedBody;
 }
 
 class _AppLocalizationsDelegate
