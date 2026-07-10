@@ -2,6 +2,15 @@ enum TaskPriority { low, medium, high }
 
 enum HabitFrequency { daily, weekly, monthly, custom }
 
+extension HabitFrequencyLabel on HabitFrequency {
+  String get label => switch (this) {
+        HabitFrequency.daily => 'Harian',
+        HabitFrequency.weekly => 'Mingguan',
+        HabitFrequency.monthly => 'Bulanan',
+        HabitFrequency.custom => 'Custom',
+      };
+}
+
 enum StreakRank { perintis, petarung, penakluk, sangAhli, sangMaster, legenda }
 
 extension StreakRankLabel on StreakRank {

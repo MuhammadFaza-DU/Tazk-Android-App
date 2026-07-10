@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../features/habits/habits_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
 import 'coming_soon_screen.dart';
@@ -31,7 +32,7 @@ class AppDrawer extends StatelessWidget {
             _DrawerItem(
               icon: Icons.autorenew_rounded,
               label: 'Habits',
-              builder: (_) => const ComingSoonScreen(title: 'Habits'),
+              builder: (_) => const HabitsScreen(),
             ),
             _DrawerItem(
               icon: Icons.calendar_month_rounded,
