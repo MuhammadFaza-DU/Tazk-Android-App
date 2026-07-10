@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../features/calendar/calendar_screen.dart';
 import '../../features/habits/habits_screen.dart';
 import '../../features/home/home_screen.dart';
+import '../../features/pomodoro/pomodoro_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
 import 'coming_soon_screen.dart';
 
@@ -43,7 +44,7 @@ class AppDrawer extends StatelessWidget {
             _DrawerItem(
               icon: Icons.timer_outlined,
               label: 'Pomodoro',
-              builder: (_) => const ComingSoonScreen(title: 'Pomodoro'),
+              builder: (_) => const PomodoroScreen(),
             ),
             _DrawerItem(
               icon: Icons.person_outline_rounded,

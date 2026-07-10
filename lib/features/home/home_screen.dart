@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_scaffold.dart';
-import '../../core/widgets/coming_soon_screen.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../providers/gamification_providers.dart';
 import '../../providers/habit_providers.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/task_providers.dart';
+import '../pomodoro/pomodoro_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -55,9 +55,7 @@ class HomeScreen extends ConsumerWidget {
             child: FilledButton.icon(
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const ComingSoonScreen(title: 'Pomodoro'),
-                  ),
+                  MaterialPageRoute(builder: (_) => const PomodoroScreen()),
                 );
               },
               icon: const Icon(Icons.play_arrow_rounded),
