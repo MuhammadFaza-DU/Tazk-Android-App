@@ -96,7 +96,3 @@ Release signing uses local files under `android/key.properties` and `android/*.j
 ## Project Status
 
 Tazk is actively being developed as an Android-first productivity app.
-
-## License
-
-No open-source license has been selected yet. The source code is public for viewing, but reuse, redistribution, or modification is not granted until a license is added.
