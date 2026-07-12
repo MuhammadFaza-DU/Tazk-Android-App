@@ -29,6 +29,15 @@ void main() {
     );
   });
 
+  test('WorkManager auto initializer is disabled for classic RemoteViews widgets', () {
+    final manifest = File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
+
+    expect(manifest, contains('xmlns:tools="http://schemas.android.com/tools"'));
+    expect(manifest, contains('android:name="androidx.startup.InitializationProvider"'));
+    expect(manifest, contains('android:name="androidx.work.WorkManagerInitializer"'));
+    expect(manifest, contains('tools:node="remove"'));
+  });
+
   test('calendar widget asks launcher for a compact footprint', () {
     final info = File(
       'android/app/src/main/res/xml/tazk_calendar_tasks_habits_widget_info.xml',

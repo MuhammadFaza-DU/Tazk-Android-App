@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
 
-const _appVersion = '1.0.0';
+const _appVersion = '1.0.1';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});

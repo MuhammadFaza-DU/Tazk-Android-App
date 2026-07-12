@@ -27,7 +27,34 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createAll();
+            await _addHabitColumnIfMissing(m, habits.customDaysOfWeek);
+            await _addHabitColumnIfMissing(m, habits.customInterval);
+            await _addHabitColumnIfMissing(m, habits.customDayOfMonth);
+            await _addHabitColumnIfMissing(m, habits.customFrequencyType);
+          }
+        },
+      );
+
+  Future<void> _addHabitColumnIfMissing(
+    Migrator migrator,
+    GeneratedColumn<Object> column,
+  ) async {
+    final existingColumns = await customSelect('PRAGMA table_info(habits)').get();
+    final columnExists = existingColumns.any(
+      (row) => row.read<String>('name') == column.name,
+    );
+    if (!columnExists) {
+      await migrator.addColumn(habits, column);
+    }
+  }
 }
 
 LazyDatabase _openConnection() {
