@@ -8,9 +8,9 @@
 
 - **Nama Project:** Tazk
 - **Masalah yang Diselesaikan:**
-  Gen Z sering merasa *overwhelmed* dengan banyaknya tugas yang menumpuk, kesulitan membangun habit/rutinitas yang konsisten, serta kesulitan mengatur waktu di antara kuliah, kerja, dan kehidupan sosial.
+  Gen Z sering merasa *overwhelmed* dengan banyaknya tugas yang menumpuk, kesulitan membangun habit/rutinitas yg konsisten, serta kesulitan mengatur waktu di antara kuliah, kerja, dan kehidupan sosial.
 - **Solusi / Differentiator Utama:**
-  Kombinasi task management + habit tracking + sistem gamifikasi RPG-style (XP, level, streak rank, unlock kosmetik) yang jarang digabungkan dalam satu app produktivitas — dilengkapi widget homescreen dan Pomodoro/Focus Timer yang terintegrasi langsung dengan progress habit *(detail lengkap di section 3 — Fitur & Fungsi)*
+  Kombinasi task management + habit tracking + sistem gamifikasi RPG-style (XP, level, streak rank, unlock kosmetik) yg jarang digabungkan dalam satu app produktivitas — dilengkapi widget homescreen dan Pomodoro/Focus Timer yang terintegrasi langsung dengan progress habit *(detail lengkap di section 3 — Fitur & Fungsi)*
 - **Target Pengguna:** Gen Z secara umum (mahasiswa, pekerja muda, dan yang sejenis — tidak dibatasi satu segmen spesifik)
 - **Value Utama:**
   Membantu user lebih mudah mengelola waktu, menstruktur tugas, membangun habit, tetap produktif, dan lebih bersemangat menjalani hari.
