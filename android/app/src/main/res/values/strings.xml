@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_tasks_habits_description">Today\'s Tasks &amp; Habits</string>
+    <string name="widget_tasks_only_description">Today\'s Tasks</string>
+    <string name="widget_habits_only_description">Today\'s Habits</string>
+    <string name="widget_streak_description">Streak Counter</string>
+</resources>

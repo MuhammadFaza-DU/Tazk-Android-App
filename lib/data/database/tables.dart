@@ -30,6 +30,12 @@ class Habits extends Table {
   IntColumn get targetMinutes => integer().nullable()();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  // Custom frequency columns
+  IntColumn get customDaysOfWeek => integer().nullable()(); // Bitmask: 1=Mon, 2=Tue, 4=Wed, 8=Thu, 16=Fri, 32=Sat, 64=Sun
+  IntColumn get customInterval => integer().nullable()(); // Interval in days (e.g., every 2 days)
+  IntColumn get customDayOfMonth => integer().nullable()(); // Day of month (1-31)
+  IntColumn get customFrequencyType => integer().nullable()(); // 0=weeklyDays, 1=intervalDays, 2=monthlyDay
 }
 
 class HabitLogs extends Table {

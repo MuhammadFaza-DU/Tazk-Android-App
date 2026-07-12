@@ -78,10 +78,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     final monthTasksAsync = ref.watch(tasksInMonthProvider(monthKey));
     final activeHabitsAsync = ref.watch(activeHabitsProvider);
     final selectedDayTasksAsync = ref.watch(tasksForDateProvider(_selectedDay));
+    final selectedDayHabits = ref.watch(habitsForDateProvider(_selectedDay));
 
     final monthTasks = monthTasksAsync.valueOrNull ?? const <Task>[];
-    final hasDailyHabit = (activeHabitsAsync.valueOrNull ?? const <Habit>[])
-        .any((habit) => habit.frequency == HabitFrequency.daily);
+    final activeHabits = activeHabitsAsync.valueOrNull ?? const <Habit>[];
 
     final tasksByDay = <DateTime, List<Task>>{};
     for (final task in monthTasks) {
@@ -89,9 +89,25 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       tasksByDay.putIfAbsent(key, () => []).add(task);
     }
 
+    // Pre-compute habits due for each day in the month for calendar markers
+    final habitsByDay = <DateTime, List<Habit>>{};
+    for (final habit in activeHabits) {
+      // Check due days for this month
+      final startOfMonth = DateTime(_focusedDay.year, _focusedDay.month, 1);
+      final endOfMonth = DateTime(_focusedDay.year, _focusedDay.month + 1, 0);
+      for (DateTime d = startOfMonth; d.isBefore(endOfMonth.add(const Duration(days: 1))); d = d.add(const Duration(days: 1))) {
+        // Check if habit is due on this day
+        final repo = ref.read(habitRepositoryProvider);
+        if (repo.isDueOnDate(habit, d)) {
+          habitsByDay.putIfAbsent(_dateOnly(d), () => []).add(habit);
+        }
+      }
+    }
+
     List<Object> eventsForDay(DateTime day) {
       final tasks = tasksByDay[_dateOnly(day)] ?? const <Task>[];
-      return [...tasks, if (hasDailyHabit) 'habit'];
+      final habits = habitsByDay[_dateOnly(day)] ?? const <Habit>[];
+      return [...tasks, ...habits];
     }
 
     final l10n = AppLocalizations.of(context)!;
@@ -166,7 +182,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               data: (tasks) => _DayDetail(
                 date: _selectedDay,
                 tasks: tasks,
-                hasDailyHabit: hasDailyHabit,
+                habits: selectedDayHabits,
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, _) =>
@@ -238,17 +254,17 @@ class _DayDetail extends StatelessWidget {
   const _DayDetail({
     required this.date,
     required this.tasks,
-    required this.hasDailyHabit,
+    required this.habits,
   });
 
   final DateTime date;
   final List<Task> tasks;
-  final bool hasDailyHabit;
+  final List<Habit> habits;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    if (tasks.isEmpty && !hasDailyHabit) {
+    if (tasks.isEmpty && habits.isEmpty) {
       return Center(child: Text(l10n.noTasksHabitsThisDate));
     }
 
@@ -276,13 +292,44 @@ class _DayDetail extends StatelessWidget {
               child: _TaskRow(task: task),
             ),
         ],
-        if (hasDailyHabit) ...[
-          const SizedBox(height: 16),
+        if (habits.isNotEmpty) ...[
+          if (tasks.isNotEmpty) const SizedBox(height: 16),
           Text(l10n.dailyHabitsLabel, style: Theme.of(context).textTheme.titleSmall),
           const SizedBox(height: 4),
-          Text(l10n.dailyHabitInfo),
+          for (final habit in habits)
+            _HabitRow(habit: habit, date: date),
         ],
       ],
+    );
+  }
+}
+
+class _HabitRow extends ConsumerWidget {
+  const _HabitRow({required this.habit, required this.date});
+
+  final Habit habit;
+  final DateTime date;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final habitLogAsync = ref.watch(habitTodayLogProvider(habit.id));
+    final isCompleted = habitLogAsync.valueOrNull?.isCompleted ?? false;
+
+    return CheckboxListTile(
+      value: isCompleted,
+      onChanged: isCompleted
+          ? null
+          : (_) => ref.read(habitRepositoryProvider).completeHabitToday(habit.id),
+      controlAffinity: ListTileControlAffinity.leading,
+      title: Text(
+        habit.name,
+        style: isCompleted
+            ? const TextStyle(decoration: TextDecoration.lineThrough)
+            : null,
+      ),
+      subtitle: habit.hasProgress
+          ? Text('${habitLogAsync.valueOrNull?.progressMinutes ?? 0}/${habit.targetMinutes ?? 0} menit')
+          : Text(habit.frequency.label(context)),
     );
   }
 }

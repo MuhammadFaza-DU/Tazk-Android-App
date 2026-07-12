@@ -202,6 +202,67 @@ class AppLocalizationsId extends AppLocalizations {
   String get frequencyCustom => 'Custom';
 
   @override
+  String get customFrequencyConfigTitle => 'Pengaturan frekuensi kustom';
+
+  @override
+  String get customFrequencyTypeLabel => 'Jenis frekuensi kustom';
+
+  @override
+  String get customTypeWeeklyDays => 'Hari tertentu tiap minggu';
+
+  @override
+  String get customTypeIntervalDays => 'Setiap N hari';
+
+  @override
+  String get customTypeMonthlyDay => 'Tanggal tertentu tiap bulan';
+
+  @override
+  String get customDaysOfWeekLabel => 'Pilih hari';
+
+  @override
+  String get customDaysRequiredError => 'Pilih minimal satu hari';
+
+  @override
+  String get customIntervalLabel => 'Interval (hari)';
+
+  @override
+  String get customIntervalHelper => 'cth: 2 = setiap 2 hari';
+
+  @override
+  String get customIntervalInvalidError => 'Masukkan interval valid (1+)';
+
+  @override
+  String get customDayOfMonthLabel => 'Tanggal';
+
+  @override
+  String get customDayOfMonthHelper =>
+      '1-31 (dilewati jika bulan tidak punya tanggal ini)';
+
+  @override
+  String get customDayOfMonthInvalidError => 'Masukkan tanggal valid (1-31)';
+
+  @override
+  String get weekdayMonShort => 'Sen';
+
+  @override
+  String get weekdayTueShort => 'Sel';
+
+  @override
+  String get weekdayWedShort => 'Rab';
+
+  @override
+  String get weekdayThuShort => 'Kam';
+
+  @override
+  String get weekdayFriShort => 'Jum';
+
+  @override
+  String get weekdaySatShort => 'Sab';
+
+  @override
+  String get weekdaySunShort => 'Min';
+
+  @override
   String get fieldScheduledTimeOptionalLabel => 'Waktu (opsional)';
 
   @override

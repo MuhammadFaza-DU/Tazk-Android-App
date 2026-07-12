@@ -5,6 +5,7 @@ import '../data/repositories/habit_repository.dart';
 import '../data/repositories/settings_repository.dart';
 import '../data/repositories/task_repository.dart';
 import 'database_provider.dart';
+import 'home_widget_provider.dart';
 import 'notification_provider.dart';
 
 final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
@@ -16,6 +17,7 @@ final gamificationRepositoryProvider = Provider<GamificationRepository>((ref) {
     ref.watch(appDatabaseProvider),
     ref.watch(notificationServiceProvider),
     ref.watch(settingsRepositoryProvider),
+    ref.watch(homeWidgetServiceProvider),
   );
 });
 
@@ -25,6 +27,7 @@ final taskRepositoryProvider = Provider<TaskRepository>((ref) {
     ref.watch(gamificationRepositoryProvider),
     ref.watch(notificationServiceProvider),
     ref.watch(settingsRepositoryProvider),
+    ref.watch(homeWidgetServiceProvider),
   );
 });
 
@@ -34,5 +37,6 @@ final habitRepositoryProvider = Provider<HabitRepository>((ref) {
     ref.watch(gamificationRepositoryProvider),
     ref.watch(notificationServiceProvider),
     ref.watch(settingsRepositoryProvider),
+    ref.watch(homeWidgetServiceProvider),
   );
 });

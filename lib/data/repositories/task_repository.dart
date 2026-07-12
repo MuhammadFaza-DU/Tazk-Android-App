@@ -3,18 +3,26 @@ import 'package:flutter/widgets.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../notifications/notification_service.dart';
+import '../../widgets/home_widget_service.dart';
 import '../database/database.dart';
 import '../models/enums.dart';
 import 'gamification_repository.dart';
 import 'settings_repository.dart';
 
 class TaskRepository {
-  TaskRepository(this._db, this._gamification, this._notifications, this._settings);
+  TaskRepository(
+    this._db,
+    this._gamification,
+    this._notifications,
+    this._settings,
+    this._widget,
+  );
 
   final AppDatabase _db;
   final GamificationRepository _gamification;
   final NotificationService _notifications;
   final SettingsRepository _settings;
+  final HomeWidgetService _widget;
 
   Future<void> _scheduleReminder(Task task) async {
     final settings = await _settings.ensureSettings();
@@ -44,6 +52,7 @@ class TaskRepository {
           ..orderBy([
             (t) => OrderingTerm(expression: t.priority, mode: OrderingMode.desc),
             (t) => OrderingTerm(expression: t.time, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc),
           ]))
         .watch();
   }
@@ -79,6 +88,7 @@ class TaskRepository {
         ));
     final task = await (_db.select(_db.tasks)..where((t) => t.id.equals(id))).getSingle();
     if (!task.isCompleted) await _scheduleReminder(task);
+    await _widget.refreshAll();
     return id;
   }
 
@@ -89,11 +99,13 @@ class TaskRepository {
     } else {
       await _scheduleReminder(task);
     }
+    await _widget.refreshAll();
   }
 
   Future<void> deleteTask(int id) async {
     await (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
     await _notifications.cancelTaskReminder(id);
+    await _widget.refreshAll();
   }
 
   Future<int> addSubtask(int taskId, String title) {
@@ -134,5 +146,6 @@ class TaskRepository {
     });
     await _notifications.cancelTaskReminder(taskId);
     await _gamification.refreshStreakWarningNotification();
+    await _widget.refreshAll();
   }
 }

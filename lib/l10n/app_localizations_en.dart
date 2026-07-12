@@ -202,6 +202,67 @@ class AppLocalizationsEn extends AppLocalizations {
   String get frequencyCustom => 'Custom';
 
   @override
+  String get customFrequencyConfigTitle => 'Custom frequency settings';
+
+  @override
+  String get customFrequencyTypeLabel => 'Custom frequency type';
+
+  @override
+  String get customTypeWeeklyDays => 'Specific days of week';
+
+  @override
+  String get customTypeIntervalDays => 'Every N days';
+
+  @override
+  String get customTypeMonthlyDay => 'Specific day of month';
+
+  @override
+  String get customDaysOfWeekLabel => 'Select days';
+
+  @override
+  String get customDaysRequiredError => 'Select at least one day';
+
+  @override
+  String get customIntervalLabel => 'Interval (days)';
+
+  @override
+  String get customIntervalHelper => 'e.g., 2 = every 2 days';
+
+  @override
+  String get customIntervalInvalidError => 'Enter a valid interval (1+)';
+
+  @override
+  String get customDayOfMonthLabel => 'Day of month';
+
+  @override
+  String get customDayOfMonthHelper =>
+      '1-31 (will skip months without this day)';
+
+  @override
+  String get customDayOfMonthInvalidError => 'Enter a valid day (1-31)';
+
+  @override
+  String get weekdayMonShort => 'Mon';
+
+  @override
+  String get weekdayTueShort => 'Tue';
+
+  @override
+  String get weekdayWedShort => 'Wed';
+
+  @override
+  String get weekdayThuShort => 'Thu';
+
+  @override
+  String get weekdayFriShort => 'Fri';
+
+  @override
+  String get weekdaySatShort => 'Sat';
+
+  @override
+  String get weekdaySunShort => 'Sun';
+
+  @override
   String get fieldScheduledTimeOptionalLabel => 'Time (optional)';
 
   @override

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/animated_xp_progress.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
@@ -221,15 +222,7 @@ class _GamificationSummary extends StatelessWidget {
           children: [
             Text(l10n.levelLabel(level), style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: needed == 0 ? 0 : (xp / needed).clamp(0.0, 1.0),
-                minHeight: 10,
-                backgroundColor: AppColors.terracotta.withAlpha(40),
-                valueColor: const AlwaysStoppedAnimation(AppColors.accentLight),
-              ),
-            ),
+      AnimatedXpProgress(value: needed == 0 ? 0 : xp / needed),
             const SizedBox(height: 4),
             Text(l10n.xpProgress(xp, needed)),
             const SizedBox(height: 12),

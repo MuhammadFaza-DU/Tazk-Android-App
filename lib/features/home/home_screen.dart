@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/animated_xp_progress.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
@@ -20,7 +20,7 @@ class HomeScreen extends ConsumerWidget {
     final profile = ref.watch(userProfileProvider).valueOrNull;
     final streak = ref.watch(streakStateProvider).valueOrNull;
     final tasksAsync = ref.watch(todayTasksProvider);
-    final habitsAsync = ref.watch(activeHabitsProvider);
+    final todayHabits = ref.watch(todayHabitsProvider);
     final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
@@ -44,14 +44,9 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           Text(l10n.homeHabitsToday, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
-          habitsAsync.when(
-            data: (habits) => habits.isEmpty
-                ? _EmptyState(message: l10n.homeNoActiveHabits)
-                : Column(children: [for (final habit in habits) _HabitTile(habit: habit)]),
-            loading: () => const _LoadingRow(),
-            error: (error, _) =>
-                _EmptyState(message: l10n.errorLoadingHabits(error.toString())),
-          ),
+          todayHabits.isEmpty
+              ? _EmptyState(message: l10n.homeNoActiveHabits)
+              : Column(children: [for (final habit in todayHabits) _HabitTile(habit: habit)]),
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
@@ -94,15 +89,7 @@ class _GamificationSummary extends StatelessWidget {
           children: [
             Text(l10n.levelLabel(level), style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: needed == 0 ? 0 : (xp / needed).clamp(0.0, 1.0),
-                minHeight: 10,
-                backgroundColor: AppColors.terracotta.withAlpha(40),
-                valueColor: const AlwaysStoppedAnimation(AppColors.accentLight),
-              ),
-            ),
+            AnimatedXpProgress(value: needed == 0 ? 0 : xp / needed),
             const SizedBox(height: 4),
             Text(l10n.xpProgress(xp, needed)),
             const SizedBox(height: 12),
@@ -138,7 +125,12 @@ class _TaskTile extends ConsumerWidget {
           ? null
           : (_) => ref.read(taskRepositoryProvider).completeTask(task.id),
       controlAffinity: ListTileControlAffinity.leading,
-      title: Text(task.title),
+      title: Text(
+        task.title,
+        style: task.isCompleted
+            ? const TextStyle(decoration: TextDecoration.lineThrough)
+            : null,
+      ),
       subtitle: Text(subtitleParts.join(' · ')),
     );
   }
@@ -160,7 +152,12 @@ class _HabitTile extends ConsumerWidget {
           ? null
           : (_) => ref.read(habitRepositoryProvider).completeHabitToday(habit.id),
       controlAffinity: ListTileControlAffinity.leading,
-      title: Text(habit.name),
+      title: Text(
+        habit.name,
+        style: isCompleted
+            ? const TextStyle(decoration: TextDecoration.lineThrough)
+            : null,
+      ),
     );
   }
 }

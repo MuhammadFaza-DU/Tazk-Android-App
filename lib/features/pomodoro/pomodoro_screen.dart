@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,8 +7,7 @@ import '../../data/database/database.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/habit_providers.dart';
 import '../../providers/repository_providers.dart';
-
-enum _SessionStatus { idle, running, paused }
+import 'pomodoro_controller.dart';
 
 class PomodoroScreen extends ConsumerStatefulWidget {
   const PomodoroScreen({super.key});
@@ -21,107 +18,43 @@ class PomodoroScreen extends ConsumerStatefulWidget {
 
 class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
   final _durationController = TextEditingController(text: '25');
+  late final PomodoroController _controller;
+  int _handledCompletionSerial = 0;
+  bool _isDurationInputValid = true;
 
-  bool _isHabitMode = false;
-  Habit? _selectedHabit;
-  _SessionStatus _status = _SessionStatus.idle;
-
-  Duration _sessionDuration = const Duration(minutes: 25);
-  Duration _remaining = const Duration(minutes: 25);
-  DateTime? _endTime;
-  Timer? _ticker;
+  @override
+  void initState() {
+    super.initState();
+    _controller = ref.read(pomodoroControllerProvider);
+    _handledCompletionSerial = _controller.completionSerial;
+    _controller.addListener(_handlePomodoroCompletion);
+  }
 
   @override
   void dispose() {
-    _ticker?.cancel();
+    _controller.removeListener(_handlePomodoroCompletion);
     _durationController.dispose();
     super.dispose();
   }
 
-  bool get _canStart {
-    final minutes = int.tryParse(_durationController.text.trim());
-    if (minutes == null || minutes <= 0) return false;
-    if (_isHabitMode && _selectedHabit == null) return false;
-    return true;
-  }
-
-  void _start() {
-    if (!_canStart) return;
-    final minutes = int.parse(_durationController.text.trim());
-    setState(() {
-      _sessionDuration = Duration(minutes: minutes);
-      _remaining = _sessionDuration;
-      _endTime = DateTime.now().add(_remaining);
-      _status = _SessionStatus.running;
-    });
-    _startTicker();
-  }
-
-  void _startTicker() {
-    _ticker?.cancel();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
-  }
-
-  void _tick() {
-    final endTime = _endTime;
-    if (endTime == null) return;
-    final remaining = endTime.difference(DateTime.now());
-    if (remaining <= Duration.zero) {
-      _ticker?.cancel();
-      setState(() {
-        _remaining = Duration.zero;
-        _status = _SessionStatus.idle;
-      });
-      _onSessionCompleted();
-      return;
-    }
-    setState(() => _remaining = remaining);
-  }
-
-  void _pause() {
-    _ticker?.cancel();
-    setState(() => _status = _SessionStatus.paused);
-  }
-
-  void _resume() {
-    setState(() {
-      _endTime = DateTime.now().add(_remaining);
-      _status = _SessionStatus.running;
-    });
-    _startTicker();
-  }
-
-  void _cancel() {
-    _ticker?.cancel();
-    setState(() {
-      _status = _SessionStatus.idle;
-      _remaining = _sessionDuration;
-      _endTime = null;
-    });
-  }
-
-  Future<void> _onSessionCompleted() async {
-    SystemSound.play(SystemSoundType.alert);
-
-    if (_isHabitMode && _selectedHabit != null) {
-      final habit = _selectedHabit!;
-      final repo = ref.read(habitRepositoryProvider);
-      if (habit.hasProgress) {
-        await repo.logProgress(habit.id, _sessionDuration.inMinutes);
-      } else {
-        await repo.completeHabitToday(habit.id);
-      }
-    }
-
+  void _handlePomodoroCompletion() {
+    final controller = ref.read(pomodoroControllerProvider);
+    if (controller.completionSerial == _handledCompletionSerial) return;
+    _handledCompletionSerial = controller.completionSerial;
     if (!mounted) return;
+    _showCompletionDialog(controller.lastCompletedHabitName);
+  }
+
+  Future<void> _showCompletionDialog(String? habitName) async {
+    SystemSound.play(SystemSoundType.alert);
     final l10n = AppLocalizations.of(context)!;
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n.sessionCompleteTitle),
         content: Text(
-          _isHabitMode && _selectedHabit != null
-              ? l10n.sessionCompleteHabitMessage(_selectedHabit!.name)
+          habitName != null
+              ? l10n.sessionCompleteHabitMessage(habitName)
               : l10n.sessionCompleteFreeMessage,
         ),
         actions: [
@@ -134,6 +67,16 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
     );
   }
 
+  void _syncDurationField(int minutes) {
+    if (!_isDurationInputValid) return;
+    final text = minutes.toString();
+    if (_durationController.text == text) return;
+    _durationController.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+
   String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
     final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
@@ -142,9 +85,32 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final activeHabits = ref.watch(activeHabitsProvider).valueOrNull ?? const <Habit>[];
-    final isEditable = _status == _SessionStatus.idle;
+    final controller = ref.watch(pomodoroControllerProvider);
+    final activeHabits =
+        ref.watch(activeHabitsProvider).valueOrNull ?? const <Habit>[];
+    final habitRepository = ref.watch(habitRepositoryProvider);
     final l10n = AppLocalizations.of(context)!;
+
+    final completionByHabitId = <int, bool>{};
+    for (final habit in activeHabits) {
+      if (!habit.hasProgress || (habit.targetMinutes ?? 0) <= 0) continue;
+      completionByHabitId[habit.id] =
+          ref.watch(habitTodayLogProvider(habit.id)).valueOrNull?.isCompleted ??
+          false;
+    }
+
+    final pomodoroHabits = availablePomodoroHabits(
+      habits: activeHabits,
+      isDueToday: habitRepository.isDueToday,
+      isCompletedToday: (habitId) => completionByHabitId[habitId] ?? false,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(pomodoroControllerProvider)
+          .clearSelectedHabitIfUnavailable(pomodoroHabits);
+    });
+    _syncDurationField(controller.durationMinutes);
 
     return AppScaffold(
       title: l10n.pomodoroScreenTitle,
@@ -153,9 +119,12 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
         children: [
           Text(l10n.modeLabel, style: Theme.of(context).textTheme.titleSmall),
           RadioGroup<bool>(
-            groupValue: _isHabitMode,
-            onChanged: isEditable
-                ? (value) => setState(() => _isHabitMode = value!)
+            groupValue: controller.isHabitMode,
+            onChanged: controller.isEditable
+                ? (value) {
+                    setState(() => _isDurationInputValid = true);
+                    ref.read(pomodoroControllerProvider).setHabitMode(value!);
+                  }
                 : (_) {},
             child: Column(
               children: [
@@ -172,47 +141,78 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
               ],
             ),
           ),
-          if (_isHabitMode) ...[
+          if (controller.isHabitMode) ...[
             const SizedBox(height: 8),
             DropdownButtonFormField<Habit>(
-              initialValue: _selectedHabit,
+              initialValue: pomodoroHabits.contains(controller.selectedHabit)
+                  ? controller.selectedHabit
+                  : null,
               decoration: InputDecoration(labelText: l10n.selectHabitLabel),
               items: [
-                for (final habit in activeHabits)
+                for (final habit in pomodoroHabits)
                   DropdownMenuItem(value: habit, child: Text(habit.name)),
               ],
-              onChanged: isEditable
-                  ? (value) => setState(() => _selectedHabit = value)
+              onChanged: controller.isEditable
+                  ? (habit) {
+                      setState(() => _isDurationInputValid = true);
+                      ref.read(pomodoroControllerProvider).selectHabit(habit);
+                    }
                   : null,
             ),
           ],
           const SizedBox(height: 16),
           TextField(
             controller: _durationController,
-            enabled: isEditable,
+            enabled: controller.isEditable,
             decoration: InputDecoration(
               labelText: l10n.durationMinutesLabel,
               helperText: l10n.durationHelperText,
             ),
             keyboardType: TextInputType.number,
-            onChanged: (_) => setState(() {}),
+            onChanged: (value) {
+              final minutes = int.tryParse(value.trim());
+              setState(
+                () => _isDurationInputValid = minutes != null && minutes > 0,
+              );
+              if (minutes != null && minutes > 0) {
+                ref
+                    .read(pomodoroControllerProvider)
+                    .setDurationMinutes(minutes);
+              }
+            },
           ),
           const SizedBox(height: 32),
           Center(
             child: Text(
-              _formatDuration(_status == _SessionStatus.idle ? _sessionDuration : _remaining),
-              style: Theme.of(context)
-                  .textTheme
-                  .displayMedium
-                  ?.copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
+              _formatDuration(
+                controller.status == PomodoroSessionStatus.idle
+                    ? controller.sessionDuration
+                    : controller.remaining,
+              ),
+              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
           ),
           const SizedBox(height: 24),
-          if (_status == _SessionStatus.idle)
+          if (controller.status == PomodoroSessionStatus.idle)
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: _canStart ? _start : null,
+                onPressed: controller.canStart && _isDurationInputValid
+                    ? () => ref
+                          .read(pomodoroControllerProvider)
+                          .start(
+                            completionTitle: l10n.sessionCompleteTitle,
+                            completionBody:
+                                controller.isHabitMode &&
+                                    controller.selectedHabit != null
+                                ? l10n.sessionCompleteHabitMessage(
+                                    controller.selectedHabit!.name,
+                                  )
+                                : l10n.sessionCompleteFreeMessage,
+                          )
+                    : null,
                 child: Text(l10n.startButton),
               ),
             )
@@ -221,16 +221,32 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: _cancel,
+                    onPressed: ref.read(pomodoroControllerProvider).cancel,
                     child: Text(l10n.cancelSessionButton),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
-                    onPressed: _status == _SessionStatus.running ? _pause : _resume,
+                    onPressed:
+                        controller.status == PomodoroSessionStatus.running
+                        ? ref.read(pomodoroControllerProvider).pause
+                        : () => ref
+                              .read(pomodoroControllerProvider)
+                              .resume(
+                                completionTitle: l10n.sessionCompleteTitle,
+                                completionBody:
+                                    controller.isHabitMode &&
+                                        controller.selectedHabit != null
+                                    ? l10n.sessionCompleteHabitMessage(
+                                        controller.selectedHabit!.name,
+                                      )
+                                    : l10n.sessionCompleteFreeMessage,
+                              ),
                     child: Text(
-                      _status == _SessionStatus.running ? l10n.pauseButton : l10n.resumeButton,
+                      controller.status == PomodoroSessionStatus.running
+                          ? l10n.pauseButton
+                          : l10n.resumeButton,
                     ),
                   ),
                 ),

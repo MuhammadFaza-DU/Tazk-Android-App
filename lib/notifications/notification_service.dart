@@ -4,12 +4,11 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../data/database/database.dart';
+import '../data/models/enums.dart';
+import '../data/repositories/habit_repository.dart';
+
 /// Wraps [FlutterLocalNotificationsPlugin] for Tazk's reminder system.
-///
-/// Notification id ranges (to allow bulk cancel/lookup by category without a
-/// native tagging API): task reminders `100000..199999`, habit reminders
-/// `200000..299999`, plus two fixed singleton ids for streak warning and
-/// freeze-used.
 class NotificationService {
   NotificationService._();
 
@@ -24,13 +23,16 @@ class NotificationService {
 
   static const streakWarningNotificationId = 900001;
   static const freezeUsedNotificationId = 900002;
+  static const focusSessionNotificationId = 900003;
 
   static const _taskChannelId = 'task_reminders';
   static const _habitChannelId = 'habit_reminders';
   static const _streakChannelId = 'streak_warning';
   static const _freezeChannelId = 'freeze_used';
+  static const _focusChannelId = 'focus_session';
 
   int taskNotificationId(int taskId) => _taskIdBase + taskId;
+
   int habitNotificationId(int habitId) => _habitIdBase + habitId;
 
   Future<void> initialize() async {
@@ -56,7 +58,8 @@ class NotificationService {
   Future<void> requestPermission() async {
     try {
       await _plugin
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.requestNotificationsPermission();
     } catch (error) {
       debugPrint('NotificationService: requestPermission failed: $error');
@@ -67,7 +70,6 @@ class NotificationService {
     if (time != null) {
       return DateTime(date.year, date.month, date.day, time.hour, time.minute);
     }
-    // PRD 3.1/3.2: default 2 hours before midnight when no time is set.
     return DateTime(date.year, date.month, date.day, 22);
   }
 
@@ -92,7 +94,8 @@ class NotificationService {
     );
   }
 
-  Future<void> cancelTaskReminder(int taskId) => _cancel(taskNotificationId(taskId));
+  Future<void> cancelTaskReminder(int taskId) =>
+      _cancel(taskNotificationId(taskId));
 
   Future<void> cancelAllTaskReminders() => _cancelIdRange(_taskIdBase);
 
@@ -101,30 +104,78 @@ class NotificationService {
     required String title,
     required String body,
     DateTime? scheduledTime,
+    required HabitRepository habitRepository,
+    required Habit habit,
   }) async {
     await cancelHabitReminder(habitId);
     final now = DateTime.now();
-    var scheduled = resolveReminderTime(DateTime(now.year, now.month, now.day), scheduledTime);
-    if (!scheduled.isAfter(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
+
+    if (habit.frequency == HabitFrequency.daily) {
+      var scheduled =
+          resolveReminderTime(DateTime(now.year, now.month, now.day), scheduledTime);
+      if (!scheduled.isAfter(now)) {
+        scheduled = scheduled.add(const Duration(days: 1));
+      }
+
+      await _zonedSchedule(
+        id: habitNotificationId(habitId),
+        title: title,
+        body: body,
+        scheduledDate: scheduled,
+        channelId: _habitChannelId,
+        channelName: 'Habit Reminders',
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      return;
     }
 
-    await _zonedSchedule(
-      id: habitNotificationId(habitId),
-      title: title,
-      body: body,
-      scheduledDate: scheduled,
-      channelId: _habitChannelId,
-      channelName: 'Habit Reminders',
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+    final dueDates = _getNextDueDates(habit, habitRepository, now, 7);
+    for (var i = 0; i < dueDates.length; i++) {
+      final scheduled = resolveReminderTime(dueDates[i], scheduledTime);
+      if (!scheduled.isAfter(now)) continue;
+
+      await _zonedSchedule(
+        id: habitNotificationId(habitId) + i,
+        title: title,
+        body: body,
+        scheduledDate: scheduled,
+        channelId: _habitChannelId,
+        channelName: 'Habit Reminders',
+      );
+    }
   }
 
-  Future<void> cancelHabitReminder(int habitId) => _cancel(habitNotificationId(habitId));
+  List<DateTime> _getNextDueDates(
+    Habit habit,
+    HabitRepository repo,
+    DateTime fromDate,
+    int count,
+  ) {
+    final dates = <DateTime>[];
+    var current = _dateOnly(fromDate);
+    final endSearch = current.add(const Duration(days: 60));
+
+    while (dates.length < count && current.isBefore(endSearch)) {
+      if (repo.isDueOnDate(habit, current)) {
+        dates.add(current);
+      }
+      current = current.add(const Duration(days: 1));
+    }
+    return dates;
+  }
+
+  Future<void> cancelHabitReminder(int habitId) async {
+    for (var i = 0; i < 7; i++) {
+      await _cancel(habitNotificationId(habitId) + i);
+    }
+  }
 
   Future<void> cancelAllHabitReminders() => _cancelIdRange(_habitIdBase);
 
-  Future<void> scheduleTonightsStreakWarning({required String title, required String body}) async {
+  Future<void> scheduleTonightsStreakWarning({
+    required String title,
+    required String body,
+  }) async {
     final now = DateTime.now();
     final scheduled = DateTime(now.year, now.month, now.day, 21);
     if (!scheduled.isAfter(now)) return;
@@ -141,7 +192,10 @@ class NotificationService {
 
   Future<void> cancelStreakWarning() => _cancel(streakWarningNotificationId);
 
-  Future<void> showFreezeUsedNotification({required String title, required String body}) async {
+  Future<void> showFreezeUsedNotification({
+    required String title,
+    required String body,
+  }) async {
     try {
       const androidDetails = AndroidNotificationDetails(
         _freezeChannelId,
@@ -159,6 +213,27 @@ class NotificationService {
       debugPrint('NotificationService: showFreezeUsedNotification failed: $error');
     }
   }
+
+  Future<void> scheduleFocusSessionComplete({
+    required String title,
+    required String body,
+    required DateTime scheduledDate,
+  }) async {
+    await cancelFocusSessionComplete();
+    if (!scheduledDate.isAfter(DateTime.now())) return;
+
+    await _zonedSchedule(
+      id: focusSessionNotificationId,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      channelId: _focusChannelId,
+      channelName: 'Focus Session',
+    );
+  }
+
+  Future<void> cancelFocusSessionComplete() =>
+      _cancel(focusSessionNotificationId);
 
   Future<void> _zonedSchedule({
     required int id,
@@ -213,4 +288,6 @@ class NotificationService {
       debugPrint('NotificationService: cancelIdRange($base) failed: $error');
     }
   }
+
+  DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 }

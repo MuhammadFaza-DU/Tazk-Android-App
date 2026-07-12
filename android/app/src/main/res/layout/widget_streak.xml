@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <ImageView
+        android:id="@+id/streak_flame"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_flame" />
+
+    <TextView
+        android:id="@+id/streak_days"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="0 hari"
+        android:textColor="#1E2E22"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Streak aktif"
+        android:textColor="#889"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/streak_rank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:textColor="#B0662E"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+</LinearLayout>

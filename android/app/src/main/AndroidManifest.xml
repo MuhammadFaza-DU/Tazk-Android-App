@@ -1,8 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Required so scheduled task/habit/streak reminders survive a device reboot. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
-        android:label="tazk"
+        android:label="Tazk"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -26,6 +27,10 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Lets HomeWidgetLaunchIntent open the app when a widget is tapped. -->
+            <intent-filter>
+                <action android:name="es.antonborri.home_widget.action.LAUNCH" />
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
@@ -41,6 +46,58 @@
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
+
+        <!-- Homescreen widgets (PRD section 4, Widget 1 + Widget 2). -->
+        <receiver android:name=".TazkTasksHabitsWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tazk_tasks_habits_widget_info" />
+        </receiver>
+        <receiver android:name=".TazkTasksOnlyWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tazk_tasks_only_widget_info" />
+        </receiver>
+        <receiver android:name=".TazkHabitsOnlyWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tazk_habits_only_widget_info" />
+        </receiver>
+        <receiver android:name=".TazkStreakWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tazk_streak_widget_info" />
+        </receiver>
+        <receiver android:name=".TazkCalendarTasksHabitsWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tazk_calendar_tasks_habits_widget_info" />
+        </receiver>
+
+        <!-- Lets widget checkbox taps run Dart code in the background (home_widget plugin). -->
+        <receiver android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="es.antonborri.home_widget.action.BACKGROUND" />
+            </intent-filter>
+        </receiver>
+        <service android:name="es.antonborri.home_widget.HomeWidgetBackgroundService"
+            android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/completion_checkbox.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
@@ -59,11 +60,11 @@ class _TaskListTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return ListTile(
-      leading: Checkbox(
+      leading: CompletionCheckbox(
         value: task.isCompleted,
-        onChanged: task.isCompleted
+        onComplete: task.isCompleted
             ? null
-            : (_) => ref.read(taskRepositoryProvider).completeTask(task.id),
+            : () => ref.read(taskRepositoryProvider).completeTask(task.id),
       ),
       title: Text(
         task.title,

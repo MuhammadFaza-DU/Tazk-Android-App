@@ -3,16 +3,18 @@ import 'package:flutter/widgets.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../notifications/notification_service.dart';
+import '../../widgets/home_widget_service.dart';
 import '../database/database.dart';
 import '../models/enums.dart';
 import 'settings_repository.dart';
 
 class GamificationRepository {
-  GamificationRepository(this._db, this._notifications, this._settings);
+  GamificationRepository(this._db, this._notifications, this._settings, this._widget);
 
   final AppDatabase _db;
   final NotificationService _notifications;
   final SettingsRepository _settings;
+  final HomeWidgetService _widget;
 
   Future<AppLocalizations> _l10n() async {
     final settings = await _settings.ensureSettings();
@@ -155,6 +157,7 @@ class GamificationRepository {
     await _notifications.cancelStreakWarning();
 
     await _unlockBadgeIfNeeded(newStreak);
+    await _widget.refreshAll();
   }
 
   /// Schedules or cancels tonight's streak-warning notification depending on
@@ -226,6 +229,7 @@ class GamificationRepository {
         ),
       );
     }
+    await _widget.refreshAll();
   }
 
   DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);

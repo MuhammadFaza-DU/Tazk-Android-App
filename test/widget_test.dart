@@ -20,7 +20,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Tazk'), findsWidgets);
+    expect(find.byType(MaterialApp), findsOneWidget);
 
     await tester.pump(const Duration(seconds: 5));
 

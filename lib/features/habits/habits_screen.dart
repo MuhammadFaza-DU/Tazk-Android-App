@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/completion_checkbox.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
@@ -61,11 +62,11 @@ class _HabitListTile extends ConsumerWidget {
         : habit.frequency.label(context);
 
     return ListTile(
-      leading: Checkbox(
+      leading: CompletionCheckbox(
         value: isCompleted,
-        onChanged: isCompleted
+        onComplete: isCompleted
             ? null
-            : (_) => ref.read(habitRepositoryProvider).completeHabitToday(habit.id),
+            : () => ref.read(habitRepositoryProvider).completeHabitToday(habit.id),
       ),
       title: Text(
         habit.name,

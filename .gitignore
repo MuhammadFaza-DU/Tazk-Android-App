@@ -30,8 +30,19 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
+.dart_appdata/
+.dart_server_local/
 /build/
+/android/build/
 /coverage/
+
+# Internal agent planning notes
+/docs/superpowers/
+
+# Android release signing secrets and shared APK artifacts
+/android/key.properties
+/android/*.jks
+/releases/*.apk
 
 # Symbolication related
 app.*.symbols

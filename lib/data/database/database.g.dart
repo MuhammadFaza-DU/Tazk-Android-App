@@ -908,6 +908,49 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _customDaysOfWeekMeta = const VerificationMeta(
+    'customDaysOfWeek',
+  );
+  @override
+  late final GeneratedColumn<int> customDaysOfWeek = GeneratedColumn<int>(
+    'custom_days_of_week',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _customIntervalMeta = const VerificationMeta(
+    'customInterval',
+  );
+  @override
+  late final GeneratedColumn<int> customInterval = GeneratedColumn<int>(
+    'custom_interval',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _customDayOfMonthMeta = const VerificationMeta(
+    'customDayOfMonth',
+  );
+  @override
+  late final GeneratedColumn<int> customDayOfMonth = GeneratedColumn<int>(
+    'custom_day_of_month',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _customFrequencyTypeMeta =
+      const VerificationMeta('customFrequencyType');
+  @override
+  late final GeneratedColumn<int> customFrequencyType = GeneratedColumn<int>(
+    'custom_frequency_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -918,6 +961,10 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
     targetMinutes,
     isActive,
     createdAt,
+    customDaysOfWeek,
+    customInterval,
+    customDayOfMonth,
+    customFrequencyType,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -981,6 +1028,42 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('custom_days_of_week')) {
+      context.handle(
+        _customDaysOfWeekMeta,
+        customDaysOfWeek.isAcceptableOrUnknown(
+          data['custom_days_of_week']!,
+          _customDaysOfWeekMeta,
+        ),
+      );
+    }
+    if (data.containsKey('custom_interval')) {
+      context.handle(
+        _customIntervalMeta,
+        customInterval.isAcceptableOrUnknown(
+          data['custom_interval']!,
+          _customIntervalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('custom_day_of_month')) {
+      context.handle(
+        _customDayOfMonthMeta,
+        customDayOfMonth.isAcceptableOrUnknown(
+          data['custom_day_of_month']!,
+          _customDayOfMonthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('custom_frequency_type')) {
+      context.handle(
+        _customFrequencyTypeMeta,
+        customFrequencyType.isAcceptableOrUnknown(
+          data['custom_frequency_type']!,
+          _customFrequencyTypeMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1024,6 +1107,22 @@ class $HabitsTable extends Habits with TableInfo<$HabitsTable, Habit> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      customDaysOfWeek: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}custom_days_of_week'],
+      ),
+      customInterval: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}custom_interval'],
+      ),
+      customDayOfMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}custom_day_of_month'],
+      ),
+      customFrequencyType: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}custom_frequency_type'],
+      ),
     );
   }
 
@@ -1045,6 +1144,10 @@ class Habit extends DataClass implements Insertable<Habit> {
   final int? targetMinutes;
   final bool isActive;
   final DateTime createdAt;
+  final int? customDaysOfWeek;
+  final int? customInterval;
+  final int? customDayOfMonth;
+  final int? customFrequencyType;
   const Habit({
     required this.id,
     required this.name,
@@ -1054,6 +1157,10 @@ class Habit extends DataClass implements Insertable<Habit> {
     this.targetMinutes,
     required this.isActive,
     required this.createdAt,
+    this.customDaysOfWeek,
+    this.customInterval,
+    this.customDayOfMonth,
+    this.customFrequencyType,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1074,6 +1181,18 @@ class Habit extends DataClass implements Insertable<Habit> {
     }
     map['is_active'] = Variable<bool>(isActive);
     map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || customDaysOfWeek != null) {
+      map['custom_days_of_week'] = Variable<int>(customDaysOfWeek);
+    }
+    if (!nullToAbsent || customInterval != null) {
+      map['custom_interval'] = Variable<int>(customInterval);
+    }
+    if (!nullToAbsent || customDayOfMonth != null) {
+      map['custom_day_of_month'] = Variable<int>(customDayOfMonth);
+    }
+    if (!nullToAbsent || customFrequencyType != null) {
+      map['custom_frequency_type'] = Variable<int>(customFrequencyType);
+    }
     return map;
   }
 
@@ -1091,6 +1210,18 @@ class Habit extends DataClass implements Insertable<Habit> {
           : Value(targetMinutes),
       isActive: Value(isActive),
       createdAt: Value(createdAt),
+      customDaysOfWeek: customDaysOfWeek == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customDaysOfWeek),
+      customInterval: customInterval == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customInterval),
+      customDayOfMonth: customDayOfMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customDayOfMonth),
+      customFrequencyType: customFrequencyType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customFrequencyType),
     );
   }
 
@@ -1110,6 +1241,12 @@ class Habit extends DataClass implements Insertable<Habit> {
       targetMinutes: serializer.fromJson<int?>(json['targetMinutes']),
       isActive: serializer.fromJson<bool>(json['isActive']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      customDaysOfWeek: serializer.fromJson<int?>(json['customDaysOfWeek']),
+      customInterval: serializer.fromJson<int?>(json['customInterval']),
+      customDayOfMonth: serializer.fromJson<int?>(json['customDayOfMonth']),
+      customFrequencyType: serializer.fromJson<int?>(
+        json['customFrequencyType'],
+      ),
     );
   }
   @override
@@ -1126,6 +1263,10 @@ class Habit extends DataClass implements Insertable<Habit> {
       'targetMinutes': serializer.toJson<int?>(targetMinutes),
       'isActive': serializer.toJson<bool>(isActive),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'customDaysOfWeek': serializer.toJson<int?>(customDaysOfWeek),
+      'customInterval': serializer.toJson<int?>(customInterval),
+      'customDayOfMonth': serializer.toJson<int?>(customDayOfMonth),
+      'customFrequencyType': serializer.toJson<int?>(customFrequencyType),
     };
   }
 
@@ -1138,6 +1279,10 @@ class Habit extends DataClass implements Insertable<Habit> {
     Value<int?> targetMinutes = const Value.absent(),
     bool? isActive,
     DateTime? createdAt,
+    Value<int?> customDaysOfWeek = const Value.absent(),
+    Value<int?> customInterval = const Value.absent(),
+    Value<int?> customDayOfMonth = const Value.absent(),
+    Value<int?> customFrequencyType = const Value.absent(),
   }) => Habit(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -1151,6 +1296,18 @@ class Habit extends DataClass implements Insertable<Habit> {
         : this.targetMinutes,
     isActive: isActive ?? this.isActive,
     createdAt: createdAt ?? this.createdAt,
+    customDaysOfWeek: customDaysOfWeek.present
+        ? customDaysOfWeek.value
+        : this.customDaysOfWeek,
+    customInterval: customInterval.present
+        ? customInterval.value
+        : this.customInterval,
+    customDayOfMonth: customDayOfMonth.present
+        ? customDayOfMonth.value
+        : this.customDayOfMonth,
+    customFrequencyType: customFrequencyType.present
+        ? customFrequencyType.value
+        : this.customFrequencyType,
   );
   Habit copyWithCompanion(HabitsCompanion data) {
     return Habit(
@@ -1168,6 +1325,18 @@ class Habit extends DataClass implements Insertable<Habit> {
           : this.targetMinutes,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      customDaysOfWeek: data.customDaysOfWeek.present
+          ? data.customDaysOfWeek.value
+          : this.customDaysOfWeek,
+      customInterval: data.customInterval.present
+          ? data.customInterval.value
+          : this.customInterval,
+      customDayOfMonth: data.customDayOfMonth.present
+          ? data.customDayOfMonth.value
+          : this.customDayOfMonth,
+      customFrequencyType: data.customFrequencyType.present
+          ? data.customFrequencyType.value
+          : this.customFrequencyType,
     );
   }
 
@@ -1181,7 +1350,11 @@ class Habit extends DataClass implements Insertable<Habit> {
           ..write('hasProgress: $hasProgress, ')
           ..write('targetMinutes: $targetMinutes, ')
           ..write('isActive: $isActive, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('customDaysOfWeek: $customDaysOfWeek, ')
+          ..write('customInterval: $customInterval, ')
+          ..write('customDayOfMonth: $customDayOfMonth, ')
+          ..write('customFrequencyType: $customFrequencyType')
           ..write(')'))
         .toString();
   }
@@ -1196,6 +1369,10 @@ class Habit extends DataClass implements Insertable<Habit> {
     targetMinutes,
     isActive,
     createdAt,
+    customDaysOfWeek,
+    customInterval,
+    customDayOfMonth,
+    customFrequencyType,
   );
   @override
   bool operator ==(Object other) =>
@@ -1208,7 +1385,11 @@ class Habit extends DataClass implements Insertable<Habit> {
           other.hasProgress == this.hasProgress &&
           other.targetMinutes == this.targetMinutes &&
           other.isActive == this.isActive &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.customDaysOfWeek == this.customDaysOfWeek &&
+          other.customInterval == this.customInterval &&
+          other.customDayOfMonth == this.customDayOfMonth &&
+          other.customFrequencyType == this.customFrequencyType);
 }
 
 class HabitsCompanion extends UpdateCompanion<Habit> {
@@ -1220,6 +1401,10 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
   final Value<int?> targetMinutes;
   final Value<bool> isActive;
   final Value<DateTime> createdAt;
+  final Value<int?> customDaysOfWeek;
+  final Value<int?> customInterval;
+  final Value<int?> customDayOfMonth;
+  final Value<int?> customFrequencyType;
   const HabitsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -1229,6 +1414,10 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
     this.targetMinutes = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.customDaysOfWeek = const Value.absent(),
+    this.customInterval = const Value.absent(),
+    this.customDayOfMonth = const Value.absent(),
+    this.customFrequencyType = const Value.absent(),
   });
   HabitsCompanion.insert({
     this.id = const Value.absent(),
@@ -1239,6 +1428,10 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
     this.targetMinutes = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.customDaysOfWeek = const Value.absent(),
+    this.customInterval = const Value.absent(),
+    this.customDayOfMonth = const Value.absent(),
+    this.customFrequencyType = const Value.absent(),
   }) : name = Value(name),
        frequency = Value(frequency);
   static Insertable<Habit> custom({
@@ -1250,6 +1443,10 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
     Expression<int>? targetMinutes,
     Expression<bool>? isActive,
     Expression<DateTime>? createdAt,
+    Expression<int>? customDaysOfWeek,
+    Expression<int>? customInterval,
+    Expression<int>? customDayOfMonth,
+    Expression<int>? customFrequencyType,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1260,6 +1457,11 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
       if (targetMinutes != null) 'target_minutes': targetMinutes,
       if (isActive != null) 'is_active': isActive,
       if (createdAt != null) 'created_at': createdAt,
+      if (customDaysOfWeek != null) 'custom_days_of_week': customDaysOfWeek,
+      if (customInterval != null) 'custom_interval': customInterval,
+      if (customDayOfMonth != null) 'custom_day_of_month': customDayOfMonth,
+      if (customFrequencyType != null)
+        'custom_frequency_type': customFrequencyType,
     });
   }
 
@@ -1272,6 +1474,10 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
     Value<int?>? targetMinutes,
     Value<bool>? isActive,
     Value<DateTime>? createdAt,
+    Value<int?>? customDaysOfWeek,
+    Value<int?>? customInterval,
+    Value<int?>? customDayOfMonth,
+    Value<int?>? customFrequencyType,
   }) {
     return HabitsCompanion(
       id: id ?? this.id,
@@ -1282,6 +1488,10 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
       targetMinutes: targetMinutes ?? this.targetMinutes,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
+      customDaysOfWeek: customDaysOfWeek ?? this.customDaysOfWeek,
+      customInterval: customInterval ?? this.customInterval,
+      customDayOfMonth: customDayOfMonth ?? this.customDayOfMonth,
+      customFrequencyType: customFrequencyType ?? this.customFrequencyType,
     );
   }
 
@@ -1314,6 +1524,18 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (customDaysOfWeek.present) {
+      map['custom_days_of_week'] = Variable<int>(customDaysOfWeek.value);
+    }
+    if (customInterval.present) {
+      map['custom_interval'] = Variable<int>(customInterval.value);
+    }
+    if (customDayOfMonth.present) {
+      map['custom_day_of_month'] = Variable<int>(customDayOfMonth.value);
+    }
+    if (customFrequencyType.present) {
+      map['custom_frequency_type'] = Variable<int>(customFrequencyType.value);
+    }
     return map;
   }
 
@@ -1327,7 +1549,11 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
           ..write('hasProgress: $hasProgress, ')
           ..write('targetMinutes: $targetMinutes, ')
           ..write('isActive: $isActive, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('customDaysOfWeek: $customDaysOfWeek, ')
+          ..write('customInterval: $customInterval, ')
+          ..write('customDayOfMonth: $customDayOfMonth, ')
+          ..write('customFrequencyType: $customFrequencyType')
           ..write(')'))
         .toString();
   }
@@ -4168,6 +4394,10 @@ typedef $$HabitsTableCreateCompanionBuilder =
       Value<int?> targetMinutes,
       Value<bool> isActive,
       Value<DateTime> createdAt,
+      Value<int?> customDaysOfWeek,
+      Value<int?> customInterval,
+      Value<int?> customDayOfMonth,
+      Value<int?> customFrequencyType,
     });
 typedef $$HabitsTableUpdateCompanionBuilder =
     HabitsCompanion Function({
@@ -4179,6 +4409,10 @@ typedef $$HabitsTableUpdateCompanionBuilder =
       Value<int?> targetMinutes,
       Value<bool> isActive,
       Value<DateTime> createdAt,
+      Value<int?> customDaysOfWeek,
+      Value<int?> customInterval,
+      Value<int?> customDayOfMonth,
+      Value<int?> customFrequencyType,
     });
 
 final class $$HabitsTableReferences
@@ -4251,6 +4485,26 @@ class $$HabitsTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get customDaysOfWeek => $composableBuilder(
+    column: $table.customDaysOfWeek,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get customInterval => $composableBuilder(
+    column: $table.customInterval,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get customDayOfMonth => $composableBuilder(
+    column: $table.customDayOfMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get customFrequencyType => $composableBuilder(
+    column: $table.customFrequencyType,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4328,6 +4582,26 @@ class $$HabitsTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get customDaysOfWeek => $composableBuilder(
+    column: $table.customDaysOfWeek,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get customInterval => $composableBuilder(
+    column: $table.customInterval,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get customDayOfMonth => $composableBuilder(
+    column: $table.customDayOfMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get customFrequencyType => $composableBuilder(
+    column: $table.customFrequencyType,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$HabitsTableAnnotationComposer
@@ -4368,6 +4642,26 @@ class $$HabitsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get customDaysOfWeek => $composableBuilder(
+    column: $table.customDaysOfWeek,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get customInterval => $composableBuilder(
+    column: $table.customInterval,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get customDayOfMonth => $composableBuilder(
+    column: $table.customDayOfMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get customFrequencyType => $composableBuilder(
+    column: $table.customFrequencyType,
+    builder: (column) => column,
+  );
 
   Expression<T> habitLogsRefs<T extends Object>(
     Expression<T> Function($$HabitLogsTableAnnotationComposer a) f,
@@ -4431,6 +4725,10 @@ class $$HabitsTableTableManager
                 Value<int?> targetMinutes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int?> customDaysOfWeek = const Value.absent(),
+                Value<int?> customInterval = const Value.absent(),
+                Value<int?> customDayOfMonth = const Value.absent(),
+                Value<int?> customFrequencyType = const Value.absent(),
               }) => HabitsCompanion(
                 id: id,
                 name: name,
@@ -4440,6 +4738,10 @@ class $$HabitsTableTableManager
                 targetMinutes: targetMinutes,
                 isActive: isActive,
                 createdAt: createdAt,
+                customDaysOfWeek: customDaysOfWeek,
+                customInterval: customInterval,
+                customDayOfMonth: customDayOfMonth,
+                customFrequencyType: customFrequencyType,
               ),
           createCompanionCallback:
               ({
@@ -4451,6 +4753,10 @@ class $$HabitsTableTableManager
                 Value<int?> targetMinutes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int?> customDaysOfWeek = const Value.absent(),
+                Value<int?> customInterval = const Value.absent(),
+                Value<int?> customDayOfMonth = const Value.absent(),
+                Value<int?> customFrequencyType = const Value.absent(),
               }) => HabitsCompanion.insert(
                 id: id,
                 name: name,
@@ -4460,6 +4766,10 @@ class $$HabitsTableTableManager
                 targetMinutes: targetMinutes,
                 isActive: isActive,
                 createdAt: createdAt,
+                customDaysOfWeek: customDaysOfWeek,
+                customInterval: customInterval,
+                customDayOfMonth: customDayOfMonth,
+                customFrequencyType: customFrequencyType,
               ),
           withReferenceMapper: (p0) => p0
               .map(

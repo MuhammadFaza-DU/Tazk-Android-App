@@ -452,6 +452,126 @@ abstract class AppLocalizations {
   /// **'Custom'**
   String get frequencyCustom;
 
+  /// No description provided for @customFrequencyConfigTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengaturan frekuensi kustom'**
+  String get customFrequencyConfigTitle;
+
+  /// No description provided for @customFrequencyTypeLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Jenis frekuensi kustom'**
+  String get customFrequencyTypeLabel;
+
+  /// No description provided for @customTypeWeeklyDays.
+  ///
+  /// In id, this message translates to:
+  /// **'Hari tertentu tiap minggu'**
+  String get customTypeWeeklyDays;
+
+  /// No description provided for @customTypeIntervalDays.
+  ///
+  /// In id, this message translates to:
+  /// **'Setiap N hari'**
+  String get customTypeIntervalDays;
+
+  /// No description provided for @customTypeMonthlyDay.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanggal tertentu tiap bulan'**
+  String get customTypeMonthlyDay;
+
+  /// No description provided for @customDaysOfWeekLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih hari'**
+  String get customDaysOfWeekLabel;
+
+  /// No description provided for @customDaysRequiredError.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih minimal satu hari'**
+  String get customDaysRequiredError;
+
+  /// No description provided for @customIntervalLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Interval (hari)'**
+  String get customIntervalLabel;
+
+  /// No description provided for @customIntervalHelper.
+  ///
+  /// In id, this message translates to:
+  /// **'cth: 2 = setiap 2 hari'**
+  String get customIntervalHelper;
+
+  /// No description provided for @customIntervalInvalidError.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan interval valid (1+)'**
+  String get customIntervalInvalidError;
+
+  /// No description provided for @customDayOfMonthLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanggal'**
+  String get customDayOfMonthLabel;
+
+  /// No description provided for @customDayOfMonthHelper.
+  ///
+  /// In id, this message translates to:
+  /// **'1-31 (dilewati jika bulan tidak punya tanggal ini)'**
+  String get customDayOfMonthHelper;
+
+  /// No description provided for @customDayOfMonthInvalidError.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan tanggal valid (1-31)'**
+  String get customDayOfMonthInvalidError;
+
+  /// No description provided for @weekdayMonShort.
+  ///
+  /// In id, this message translates to:
+  /// **'Sen'**
+  String get weekdayMonShort;
+
+  /// No description provided for @weekdayTueShort.
+  ///
+  /// In id, this message translates to:
+  /// **'Sel'**
+  String get weekdayTueShort;
+
+  /// No description provided for @weekdayWedShort.
+  ///
+  /// In id, this message translates to:
+  /// **'Rab'**
+  String get weekdayWedShort;
+
+  /// No description provided for @weekdayThuShort.
+  ///
+  /// In id, this message translates to:
+  /// **'Kam'**
+  String get weekdayThuShort;
+
+  /// No description provided for @weekdayFriShort.
+  ///
+  /// In id, this message translates to:
+  /// **'Jum'**
+  String get weekdayFriShort;
+
+  /// No description provided for @weekdaySatShort.
+  ///
+  /// In id, this message translates to:
+  /// **'Sab'**
+  String get weekdaySatShort;
+
+  /// No description provided for @weekdaySunShort.
+  ///
+  /// In id, this message translates to:
+  /// **'Min'**
+  String get weekdaySunShort;
+
   /// No description provided for @fieldScheduledTimeOptionalLabel.
   ///
   /// In id, this message translates to:
