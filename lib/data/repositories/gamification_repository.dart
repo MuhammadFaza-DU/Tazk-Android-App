@@ -189,8 +189,9 @@ class GamificationRepository {
 
   Future<void> _unlockBadgeIfNeeded(int streakDays) async {
     final rank = streakRankForDays(streakDays);
-    await _db.into(_db.badgeUnlocks).insertOnConflictUpdate(
+    await _db.into(_db.badgeUnlocks).insert(
           BadgeUnlocksCompanion.insert(rank: rank),
+          onConflict: DoNothing(target: [_db.badgeUnlocks.rank]),
         );
   }
 

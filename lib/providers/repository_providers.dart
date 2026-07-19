@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/repositories/daily_maintenance_service.dart';
 import '../data/repositories/gamification_repository.dart';
 import '../data/repositories/habit_repository.dart';
 import '../data/repositories/settings_repository.dart';
@@ -37,6 +38,15 @@ final habitRepositoryProvider = Provider<HabitRepository>((ref) {
     ref.watch(gamificationRepositoryProvider),
     ref.watch(notificationServiceProvider),
     ref.watch(settingsRepositoryProvider),
+    ref.watch(homeWidgetServiceProvider),
+  );
+});
+
+final dailyMaintenanceServiceProvider = Provider<DailyMaintenanceService>((ref) {
+  return DailyMaintenanceService(
+    ref.watch(taskRepositoryProvider),
+    ref.watch(habitRepositoryProvider),
+    ref.watch(gamificationRepositoryProvider),
     ref.watch(homeWidgetServiceProvider),
   );
 });

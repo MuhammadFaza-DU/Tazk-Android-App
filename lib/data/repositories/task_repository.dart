@@ -148,4 +148,21 @@ class TaskRepository {
     await _gamification.refreshStreakWarningNotification();
     await _widget.refreshAll();
   }
+
+  /// Re-arms reminders for every incomplete task from today onward. Idempotent:
+  /// [_scheduleReminder]/[NotificationService.scheduleTaskReminder] cancel before
+  /// scheduling. Used by daily maintenance so reminders don't run dry when the
+  /// app stays alive across midnight.
+  Future<void> rescheduleAllReminders() async {
+    final today = DateTime.now();
+    final startOfToday = DateTime(today.year, today.month, today.day);
+    final tasks = await (_db.select(_db.tasks)
+          ..where((t) =>
+              t.isCompleted.equals(false) &
+              t.date.isBiggerOrEqualValue(startOfToday)))
+        .get();
+    for (final task in tasks) {
+      await _scheduleReminder(task);
+    }
+  }
 }

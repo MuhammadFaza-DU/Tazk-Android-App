@@ -49,7 +49,7 @@ The shared APK is a signed release build for Android:
 
 - Package name: `com.tazk.tazk`
 - Minimum Android SDK: `29`
-- Current version: `1.0.1`
+- Current version: `1.0.2`
 
 If you previously installed a debug build of Tazk, uninstall it before installing the release APK because debug and release builds use different signing certificates.
 

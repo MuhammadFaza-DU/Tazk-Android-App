@@ -3,6 +3,10 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Required so scheduled task/habit/streak reminders survive a device reboot. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Exact alarms for on-time reminders and the midnight day-rollover job (Android 12+). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- Lets the midnight background job hold the CPU awake long enough to refresh. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <application
         android:label="Tazk"
         android:name="${applicationName}"
@@ -98,6 +102,25 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/tazk_calendar_tasks_habits_widget_info" />
+        </receiver>
+
+        <!-- Midnight day-rollover job (android_alarm_manager_plus). The plugin does
+             NOT auto-merge these — they must be declared, or arming an alarm with
+             rescheduleOnReboot throws "Component class ... does not exist". -->
+        <service
+            android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false"/>
+        <receiver
+            android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmBroadcastReceiver"
+            android:exported="false"/>
+        <receiver
+            android:name="dev.fluttercommunity.plus.androidalarmmanager.RebootBroadcastReceiver"
+            android:enabled="false"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
         </receiver>
 
         <!-- Lets widget checkbox taps run Dart code in the background (home_widget plugin). -->

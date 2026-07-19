@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/database/database.dart';
+import 'current_date_provider.dart';
 import 'repository_providers.dart';
 
 final todayTasksProvider = StreamProvider<List<Task>>((ref) {
-  return ref.watch(taskRepositoryProvider).watchTasksForDate(DateTime.now());
+  final today = ref.watch(currentDateProvider);
+  return ref.watch(taskRepositoryProvider).watchTasksForDate(today);
 });
 
 final taskSubtasksProvider = StreamProvider.family<List<Subtask>, int>((ref, taskId) {

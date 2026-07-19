@@ -16,6 +16,7 @@ class NotificationService {
 
   final _plugin = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
+  bool _exactAlarmsAllowed = false;
 
   static const _taskIdBase = 100000;
   static const _habitIdBase = 200000;
@@ -53,14 +54,48 @@ class NotificationService {
     } catch (error) {
       debugPrint('NotificationService: initialize failed: $error');
     }
+
+    // Sync current exact-alarm capability without prompting. Lets background
+    // isolates (which never call requestPermission) still pick exact mode when
+    // the user has already granted it.
+    try {
+      final canExact = await _plugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.canScheduleExactNotifications();
+      _exactAlarmsAllowed = canExact ?? true;
+    } catch (error) {
+      debugPrint('NotificationService: canScheduleExactNotifications failed: $error');
+    }
+  }
+
+  /// Whether the OS currently allows exact alarms. Queried live (not cached)
+  /// since the user can revoke "Alarms & reminders" at any time. Returns true on
+  /// pre-31 devices where exact alarms need no permission. Used by the midnight
+  /// scheduler to decide exact vs inexact — the alarm plugin silently no-ops an
+  /// exact request when the permission is revoked, so we must never ask for one
+  /// we can't get.
+  Future<bool> canScheduleExactAlarms() async {
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      final can = await android?.canScheduleExactNotifications();
+      return can ?? true;
+    } catch (error) {
+      debugPrint('NotificationService: canScheduleExactAlarms failed: $error');
+      return false;
+    }
   }
 
   Future<void> requestPermission() async {
     try {
-      await _plugin
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.requestNotificationsPermission();
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      await android?.requestNotificationsPermission();
+      // Opens the system "Alarms & reminders" page on Android 12+ (API 31+).
+      // Returns null on older versions, where exact alarms are always allowed.
+      final granted = await android?.requestExactAlarmsPermission();
+      _exactAlarmsAllowed = granted ?? true;
     } catch (error) {
       debugPrint('NotificationService: requestPermission failed: $error');
     }
@@ -258,7 +293,9 @@ class NotificationService {
             priority: Priority.defaultPriority,
           ),
         ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: _exactAlarmsAllowed
+            ? AndroidScheduleMode.exactAllowWhileIdle
+            : AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: matchDateTimeComponents,

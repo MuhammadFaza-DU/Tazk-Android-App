@@ -4,14 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 
 import 'core/theme/app_theme.dart';
+import 'background/midnight_scheduler.dart';
 import 'data/models/enums.dart';
 import 'features/pomodoro/pomodoro_controller.dart';
 import 'features/splash/splash_screen.dart';
 import 'l10n/app_localizations.dart';
+import 'providers/current_date_provider.dart';
+import 'providers/repository_providers.dart';
 import 'providers/settings_providers.dart';
 import 'widgets/home_widget_callback.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Best-effort: lets homescreen widget checkboxes complete tasks/habits
   // even while the app isn't running. No-op (and safe) if the platform
@@ -19,6 +22,10 @@ void main() {
   HomeWidget.registerInteractivityCallback(
     homeWidgetBackgroundCallback,
   ).catchError((_) => null);
+  // Arms the native midnight alarm so the widgets and reminders roll over to the
+  // new day even when the app is closed.
+  await MidnightScheduler.initialize();
+  await MidnightScheduler.armNextMidnight();
   runApp(const ProviderScope(child: TazkApp()));
 }
 
@@ -85,6 +92,14 @@ class _PomodoroLifecyclePauseState
         state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden) {
       ref.read(pomodoroControllerProvider).pauseForAppExit();
+    } else if (state == AppLifecycleState.resumed) {
+      // Returning to the foreground may cross a day boundary the in-app timer
+      // couldn't fire while suspended. Refresh "today", re-run the idempotent
+      // daily rollover, and re-arm the midnight alarm in case an aggressive
+      // battery manager killed it.
+      ref.read(currentDateProvider.notifier).refresh();
+      ref.read(dailyMaintenanceServiceProvider).runDailyRollover();
+      MidnightScheduler.armNextMidnight();
     }
   }
 

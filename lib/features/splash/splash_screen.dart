@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../core/theme/app_colors.dart';
-import '../../providers/home_widget_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/repository_providers.dart';
 import '../home/home_screen.dart';
@@ -56,13 +55,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Future<Widget> _prepareNextScreen() async {
     final gamification = ref.read(gamificationRepositoryProvider);
     final notifications = ref.read(notificationServiceProvider);
-    final widgetService = ref.read(homeWidgetServiceProvider);
+    final maintenance = ref.read(dailyMaintenanceServiceProvider);
 
     await notifications.initialize();
     await notifications.requestPermission();
-    await gamification.evaluateMissedDay();
-    await gamification.refreshStreakWarningNotification();
-    await widgetService.refreshAll();
+    await maintenance.runDailyRollover();
     final profile = await gamification.ensureProfile();
 
     return profile.name.trim().isEmpty

@@ -54,6 +54,10 @@ android {
             } else {
                 throw GradleException("Missing android/key.properties for release signing.")
             }
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

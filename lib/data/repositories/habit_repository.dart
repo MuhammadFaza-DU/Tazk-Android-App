@@ -48,12 +48,15 @@ class HabitRepository {
         .watch();
   }
 
-  Stream<HabitLog?> watchTodayLog(int habitId) {
-    final today = _dateOnly(DateTime.now());
+  Stream<HabitLog?> watchLogForDate(int habitId, DateTime date) {
+    final day = _dateOnly(date);
     return (_db.select(_db.habitLogs)
-          ..where((l) => l.habitId.equals(habitId) & l.date.equals(today)))
+          ..where((l) => l.habitId.equals(habitId) & l.date.equals(day)))
         .watchSingleOrNull();
   }
+
+  Stream<HabitLog?> watchTodayLog(int habitId) =>
+      watchLogForDate(habitId, DateTime.now());
 
   Stream<List<HabitLog>> watchHistory(int habitId) {
     return (_db.select(_db.habitLogs)
@@ -218,4 +221,16 @@ class HabitRepository {
   }
 
   DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+
+  /// Re-arms reminders for every active habit, sliding the non-daily reminder
+  /// window forward so it never runs out of scheduled occurrences. Idempotent:
+  /// [_scheduleReminder] cancels before scheduling.
+  Future<void> rescheduleAllReminders() async {
+    final habits = await (_db.select(_db.habits)
+          ..where((h) => h.isActive.equals(true)))
+        .get();
+    for (final habit in habits) {
+      await _scheduleReminder(habit);
+    }
+  }
 }
