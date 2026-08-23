@@ -67,6 +67,8 @@ class _TaskListTile extends ConsumerWidget {
       ),
       title: Text(
         task.title,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
         style: task.isCompleted
             ? const TextStyle(decoration: TextDecoration.lineThrough)
             : null,

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../core/utils/habit_due.dart' as habit_due;
 import '../../l10n/app_localizations.dart';
 import '../../notifications/notification_service.dart';
 import '../../widgets/home_widget_service.dart';
@@ -113,50 +114,7 @@ class HabitRepository {
     await _widget.refreshAll();
   }
 
-  /// Check if a habit is due on a specific date based on its frequency and custom settings
-  bool isDueOnDate(Habit habit, DateTime date) {
-    final checkDate = _dateOnly(date);
-    
-    switch (habit.frequency) {
-      case HabitFrequency.daily:
-        return true;
-      case HabitFrequency.weekly:
-        // Check if the date is the same weekday as the habit's creation day
-        return checkDate.weekday == habit.createdAt.weekday;
-      case HabitFrequency.monthly:
-        // Check if the date is the same day of month as the habit's creation day
-        return checkDate.day == habit.createdAt.day;
-      case HabitFrequency.custom:
-        return _isCustomDueOnDate(habit, checkDate);
-    }
-  }
-
-  bool _isCustomDueOnDate(Habit habit, DateTime date) {
-    final customType = habit.customFrequencyType ?? 0;
-    
-    switch (customType) {
-      case 0: // Weekly - specific days of week
-        final daysOfWeek = habit.customDaysOfWeek ?? 0;
-        if (daysOfWeek == 0) return false;
-        // Bitmask: 1=Mon(1), 2=Tue(2), 4=Wed(3), 8=Thu(4), 16=Fri(5), 32=Sat(6), 64=Sun(7)
-        final weekdayBit = 1 << (date.weekday - 1);
-        return (daysOfWeek & weekdayBit) != 0;
-      
-      case 1: // Interval - every N days
-        final interval = habit.customInterval ?? 1;
-        if (interval <= 0) return false;
-        final diffDays = date.difference(_dateOnly(habit.createdAt)).inDays;
-        return diffDays % interval == 0;
-      
-      case 2: // Monthly - specific day of month
-        final dayOfMonth = habit.customDayOfMonth ?? 1;
-        if (dayOfMonth < 1 || dayOfMonth > 31) return false;
-        return date.day == dayOfMonth;
-      
-      default:
-        return false;
-    }
-  }
+  bool isDueOnDate(Habit habit, DateTime date) => habit_due.isHabitDueOnDate(habit, date);
 
   /// Check if a habit is due today based on its frequency and custom settings
   bool isDueToday(Habit habit) {

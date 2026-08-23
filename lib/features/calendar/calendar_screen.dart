@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/theme/app_colors.dart';
 import '../../core/widgets/completion_checkbox.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -50,6 +51,10 @@ class CalendarScreen extends ConsumerStatefulWidget {
 class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   late DateTime _focusedDay;
   late DateTime _selectedDay;
+  // Memoize habitsByDay to avoid O(habits*days) recomputation every build.
+  DateTime? _cachedMonth;
+  List<Habit>? _cachedHabitsRef;
+  Map<DateTime, List<Habit>>? _cachedHabitsByDay;
 
   @override
   void initState() {
@@ -91,19 +96,25 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       tasksByDay.putIfAbsent(key, () => []).add(task);
     }
 
-    // Pre-compute habits due for each day in the month for calendar markers
-    final habitsByDay = <DateTime, List<Habit>>{};
-    for (final habit in activeHabits) {
-      // Check due days for this month
+    // Memoized habitsByDay: O(habits*days) but cached per month/habits ref.
+    final Map<DateTime, List<Habit>> habitsByDay;
+    if (_cachedMonth == monthKey && identical(_cachedHabitsRef, activeHabits) && _cachedHabitsByDay != null) {
+      habitsByDay = _cachedHabitsByDay!;
+    } else {
+      habitsByDay = <DateTime, List<Habit>>{};
+      final repo = ref.read(habitRepositoryProvider);
       final startOfMonth = DateTime(_focusedDay.year, _focusedDay.month, 1);
       final endOfMonth = DateTime(_focusedDay.year, _focusedDay.month + 1, 0);
-      for (DateTime d = startOfMonth; d.isBefore(endOfMonth.add(const Duration(days: 1))); d = d.add(const Duration(days: 1))) {
-        // Check if habit is due on this day
-        final repo = ref.read(habitRepositoryProvider);
-        if (repo.isDueOnDate(habit, d)) {
-          habitsByDay.putIfAbsent(_dateOnly(d), () => []).add(habit);
+      for (final habit in activeHabits) {
+        for (DateTime d = startOfMonth; d.isBefore(endOfMonth.add(const Duration(days: 1))); d = d.add(const Duration(days: 1))) {
+          if (repo.isDueOnDate(habit, d)) {
+            habitsByDay.putIfAbsent(_dateOnly(d), () => []).add(habit);
+          }
         }
       }
+      _cachedMonth = monthKey;
+      _cachedHabitsRef = activeHabits;
+      _cachedHabitsByDay = habitsByDay;
     }
 
     List<Object> eventsForDay(DateTime day) {
@@ -156,6 +167,38 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               setState(() => _focusedDay = _dateOnly(focusedDay));
             },
             calendarBuilders: CalendarBuilders<Object>(
+              markerBuilder: (context, day, events) {
+                final taskCount = events.whereType<Task>().length;
+                final habitCount = events.whereType<Habit>().length;
+                if (taskCount == 0 && habitCount == 0) return null;
+                return Positioned(
+                  bottom: 4,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (taskCount > 0)
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primaryLight,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      if (taskCount > 0 && habitCount > 0) const SizedBox(width: 3),
+                      if (habitCount > 0)
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: AppColors.accentLight,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
               dowBuilder: (context, day) => Center(
                 child: Text(_weekdayAbbrev(AppLocalizations.of(context)!)[day.weekday - 1]),
               ),
@@ -332,6 +375,8 @@ class _HabitRow extends ConsumerWidget {
       ),
       title: Text(
         habit.name,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
         style: isCompleted
             ? const TextStyle(decoration: TextDecoration.lineThrough)
             : null,
@@ -359,7 +404,7 @@ class _TaskRow extends StatelessWidget {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: const Icon(Icons.drag_indicator_rounded),
-      title: Text(task.title),
+      title: Text(task.title, maxLines: 2, overflow: TextOverflow.ellipsis),
       subtitle: Text(_priorityLabel(AppLocalizations.of(context)!)),
       trailing: task.isCompleted ? const Icon(Icons.check_circle_rounded) : null,
       onTap: () {

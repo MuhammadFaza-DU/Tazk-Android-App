@@ -69,6 +69,8 @@ class _HabitListTile extends ConsumerWidget {
       ),
       title: Text(
         habit.name,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
         style: isCompleted
             ? const TextStyle(decoration: TextDecoration.lineThrough)
             : null,

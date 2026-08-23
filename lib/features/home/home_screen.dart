@@ -24,8 +24,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  StreakRank? _previousRank;
-
   @override
   void initState() {
     super.initState();
@@ -49,18 +47,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final todayHabits = ref.watch(todayHabitsProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    // PRD "Animasi Khusus": full-screen celebration on new streak/rank milestone.
-    final streakDays = streak?.currentStreak ?? 0;
-    final currentRank = streakDays > 0 ? streakRankForDays(streakDays) : null;
-    if (currentRank != null) {
-      if (_previousRank != null && currentRank.index > _previousRank!.index) {
+    ref.listen(streakStateProvider, (previous, next) {
+      final prevDays = previous?.valueOrNull?.currentStreak ?? 0;
+      final nextDays = next.valueOrNull?.currentStreak ?? 0;
+      final prevRank = prevDays > 0 ? streakRankForDays(prevDays) : null;
+      final nextRank = nextDays > 0 ? streakRankForDays(nextDays) : null;
+      if (prevRank != null && nextRank != null && nextRank.index > prevRank.index) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          showRankCelebration(context, rankLabel: currentRank.label(context));
+          showRankCelebration(context, rankLabel: nextRank.label(context));
         });
       }
-      _previousRank = currentRank;
-    }
+    });
 
     return AppScaffold(
       title: (profile == null || profile.name.trim().isEmpty)
@@ -171,11 +169,13 @@ class _TaskTile extends ConsumerWidget {
       ),
       title: Text(
         task.title,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
         style: task.isCompleted
             ? const TextStyle(decoration: TextDecoration.lineThrough)
             : null,
       ),
-      subtitle: Text(subtitleParts.join(' · ')),
+      subtitle: Text(subtitleParts.join(' · '), maxLines: 1, overflow: TextOverflow.ellipsis),
     );
   }
 }
@@ -198,6 +198,8 @@ class _HabitTile extends ConsumerWidget {
       ),
       title: Text(
         habit.name,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
         style: isCompleted
             ? const TextStyle(decoration: TextDecoration.lineThrough)
             : null,

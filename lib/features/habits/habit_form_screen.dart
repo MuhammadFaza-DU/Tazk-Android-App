@@ -267,6 +267,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                             return FilterChip(
                               label: Text(dayName),
                               selected: isSelected,
+                              materialTapTargetSize: MaterialTapTargetSize.padded,
                               onSelected: (_) => _toggleDayOfWeek(dayValue),
                             );
                           }),
