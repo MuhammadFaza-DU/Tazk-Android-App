@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../providers/exact_alarm_permission_provider.dart';
+import '../../providers/notification_permission_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/repository_providers.dart';
 import '../home/home_screen.dart';
@@ -15,20 +17,34 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen>
+    with SingleTickerProviderStateMixin {
   static const _videoAsset = 'assets/videos/tazk_growth_splash.mp4';
   static const _transitionDuration = Duration(milliseconds: 450);
 
   late final Future<Widget> _nextScreenFuture;
   VideoPlayerController? _videoController;
+  late final AnimationController _fallbackController;
   bool _videoReady = false;
+  bool _showFallback = false;
+  bool _showBranding = false;
   bool _isNavigating = false;
 
   @override
   void initState() {
     super.initState();
+    _fallbackController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
     _nextScreenFuture = _prepareNextScreen();
     _initializeVideo();
+    // If video takes > 900ms to become ready, show the fallback tree so
+    // users never stare at a blank screen (tests and broken assets included).
+    Future<void>.delayed(const Duration(milliseconds: 900), () {
+      if (!mounted || _videoReady) return;
+      setState(() => _showFallback = true);
+    });
   }
 
   Future<void> _initializeVideo() async {
@@ -58,7 +74,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final maintenance = ref.read(dailyMaintenanceServiceProvider);
 
     await notifications.initialize();
-    await notifications.requestPermission();
+    final granted = await notifications.requestPermission();
+    // PRD "Error States": surface a denied permission via the Home banner and
+    // the passive Settings indicator instead of failing silently.
+    ref
+        .read(notificationPermissionProvider.notifier)
+        .applyRequestResult(granted);
+    // Exact alarm status drives its own banner; surface revocation early.
+    ref.read(exactAlarmProvider.notifier).check();
     await maintenance.runDailyRollover();
     final profile = await gamification.ensureProfile();
 
@@ -72,8 +95,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (controller == null || !controller.value.isInitialized) return;
     final duration = controller.value.duration;
     if (duration == Duration.zero) return;
-    final almostDone = controller.value.position >=
-        duration - const Duration(milliseconds: 120);
+    final position = controller.value.position;
+    // Reveal branding for the final ~35% of the clip (PRD: logo appears at end).
+    if (!_showBranding && position >= duration * 0.65) {
+      setState(() => _showBranding = true);
+    }
+    final almostDone = position >= duration - const Duration(milliseconds: 120);
     if (almostDone && !_isNavigating) {
       _navigateNext();
     }
@@ -99,6 +126,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void dispose() {
     _videoController?.removeListener(_handleVideoProgress);
     _videoController?.dispose();
+    _fallbackController.dispose();
     super.dispose();
   }
 
@@ -113,6 +141,49 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         fit: StackFit.expand,
         children: [
           if (_videoReady) _SplashVideo(controller: _videoController!),
+          if (_showFallback && !_videoReady)
+            _FallbackTree(animation: _fallbackController),
+          // Branding reveal at the tail end of the splash (growth metaphor).
+          AnimatedOpacity(
+            opacity: _showBranding || _showFallback ? 1 : 0,
+            duration: const Duration(milliseconds: 420),
+            curve: Curves.easeOut,
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              padding: const EdgeInsets.only(bottom: 64),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    (isDark ? AppColors.backgroundDark : AppColors.backgroundLight)
+                        .withValues(alpha: 0.72),
+                  ],
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Tazk',
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Tumbuh setiap hari',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: (isDark ? Colors.white70 : Colors.black54),
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -136,4 +207,63 @@ class _SplashVideo extends StatelessWidget {
       ),
     );
   }
+}
+
+class _FallbackTree extends StatelessWidget {
+  const _FallbackTree({required this.animation});
+
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, _) => CustomPaint(
+          size: const Size(140, 180),
+          painter: _TreePainter(t: animation.value),
+        ),
+      ),
+    );
+  }
+}
+
+class _TreePainter extends CustomPainter {
+  _TreePainter({required this.t});
+
+  final double t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final trunkPaint = Paint()
+      ..color = AppColors.terracotta
+      ..style = PaintingStyle.fill;
+    final foliagePaint = Paint()
+      ..color = AppColors.primaryLight.withValues(alpha: 0.9)
+      ..style = PaintingStyle.fill;
+    final cx = size.width / 2;
+    final trunkH = 64 * (0.72 + 0.28 * t);
+    final trunkW = 16.0;
+    final trunkTop = size.height * 0.58 - trunkH * 0.5;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(cx, trunkTop + trunkH * 0.5), width: trunkW, height: trunkH),
+        const Radius.circular(6),
+      ),
+      trunkPaint,
+    );
+    final foliageCenter = Offset(cx, trunkTop - 8 - 4 * t);
+    final r = 34 + 6 * t;
+    canvas.drawCircle(foliageCenter.translate(-16, 10), r * 0.72, foliagePaint);
+    canvas.drawCircle(foliageCenter.translate(16, 10), r * 0.72, foliagePaint);
+    canvas.drawCircle(foliageCenter, r, foliagePaint..color = AppColors.primaryLight);
+    // Sparkle
+    final sparklePaint = Paint()
+      ..color = AppColors.accentLight.withValues(alpha: 0.55 + 0.25 * t)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(foliageCenter.translate(0, -r * 0.35), 3 + t, sparklePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _TreePainter oldDelegate) => oldDelegate.t != t;
 }

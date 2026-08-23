@@ -532,6 +532,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifFreezeLabel => 'Freeze';
 
   @override
+  String get permissionBannerMessage =>
+      'Notifications are off. Turn them on so task & habit reminders work.';
+
+  @override
+  String get permissionBannerAction => 'Turn On';
+
+  @override
+  String get notifStatusLabel => 'Notification status';
+
+  @override
+  String get notifStatusEnabled => 'On';
+
+  @override
+  String get notifStatusDisabled => 'Off';
+
+  @override
+  String get dbResetMessage =>
+      'Local data got corrupted, so Tazk safely started fresh.';
+
+  @override
+  String get widgetStreakActiveLabel => 'Active streak';
+
+  @override
+  String get widgetStreakDaysSuffix => 'days';
+
+  @override
+  String get exactAlarmBannerMessage =>
+      'Exact alarm permission is off. Reminders may be up to 15 minutes late.';
+
+  @override
+  String get exactAlarmBannerAction => 'Turn On';
+
+  @override
   String get aboutScreenTitle => 'About App';
 
   @override

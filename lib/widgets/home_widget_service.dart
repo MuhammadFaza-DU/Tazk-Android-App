@@ -256,8 +256,14 @@ class HomeWidgetService {
     );
     final rankLabel = days > 0 ? _rankLabel(streakRankForDays(days), l10n) : '-';
 
+    // PRD 3.7 + gap D2: streak widget must respect the app language, not
+    // hardcode Indonesian. Push fully-localized strings for the launcher.
+    final daysText = '$days ${l10n.widgetStreakDaysSuffix}';
+    final activeText = l10n.widgetStreakActiveLabel;
     await HomeWidget.saveWidgetData('tazk_streak_days', days);
+    await HomeWidget.saveWidgetData('tazk_streak_days_text', daysText);
     await HomeWidget.saveWidgetData('tazk_streak_rank', rankLabel);
+    await HomeWidget.saveWidgetData('tazk_streak_active_text', activeText);
     await HomeWidget.updateWidget(androidName: streakProviderName);
   }
 

@@ -28,8 +28,18 @@ class TazkStreakWidgetProvider : HomeWidgetProvider() {
                 R.id.widget_container,
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java))
 
-            val days = widgetData.getInt("tazk_streak_days", 0)
-            setTextViewText(R.id.streak_days, "$days hari")
+            // PRD gap D2: respect the in-app language, not hardcoded Indonesian.
+            val localizedDays = widgetData.getString("tazk_streak_days_text", null)
+            if (localizedDays != null) {
+                setTextViewText(R.id.streak_days, localizedDays)
+            } else {
+                val days = widgetData.getInt("tazk_streak_days", 0)
+                setTextViewText(R.id.streak_days, "$days hari")
+            }
+            val activeText = widgetData.getString("tazk_streak_active_text", null)
+            if (activeText != null) {
+                setTextViewText(R.id.streak_active, activeText)
+            }
             setTextViewText(R.id.streak_rank, widgetData.getString("tazk_streak_rank", "-"))
           }
       appWidgetManager.updateAppWidget(widgetId, views)

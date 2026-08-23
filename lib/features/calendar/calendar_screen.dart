@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/widgets/completion_checkbox.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../core/widgets/app_scaffold.dart';
@@ -312,15 +314,22 @@ class _HabitRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final habitLogAsync = ref.watch(habitTodayLogProvider(habit.id));
+    final habitLogAsync =
+        ref.watch(habitLogForDateProvider((habitId: habit.id, date: date)));
     final isCompleted = habitLogAsync.valueOrNull?.isCompleted ?? false;
 
-    return CheckboxListTile(
-      value: isCompleted,
-      onChanged: isCompleted
-          ? null
-          : (_) => ref.read(habitRepositoryProvider).completeHabitToday(habit.id),
-      controlAffinity: ListTileControlAffinity.leading,
+    return ListTile(
+      leading: CompletionCheckbox(
+        value: isCompleted,
+        // Calendar habit tiles must distinguish days: completing 2026-07-11
+        // must not affect 2026-07-12 even for the same habit (per-date log).
+        onComplete: () => ref
+            .read(habitRepositoryProvider)
+            .completeHabitOnDate(habit.id, date),
+        onUncomplete: () => ref
+            .read(habitRepositoryProvider)
+            .uncompleteHabitOnDate(habit.id, date),
+      ),
       title: Text(
         habit.name,
         style: isCompleted

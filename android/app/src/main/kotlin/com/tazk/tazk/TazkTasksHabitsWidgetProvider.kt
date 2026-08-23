@@ -89,10 +89,18 @@ internal fun bindTaskRow(
   views.setViewVisibility(rowId, View.VISIBLE)
   views.setTextViewText(titleId, widgetData.getString("tazk_task_${index}_title", ""))
   views.setImageViewResource(checkId, R.drawable.ic_checkbox_unchecked)
-  views.setOnClickPendingIntent(
-      checkId,
-      HomeWidgetBackgroundIntent.getBroadcast(
-          context, Uri.parse("homeWidget://completeTask?id=$id")))
+  // Unique requestCode per task so Android does not collapse the 3 row
+  // PendingIntents into one (see HomeWidgetBackgroundIntent always using 0).
+  val taskIntent = android.content.Intent(context, es.antonborri.home_widget.HomeWidgetBackgroundReceiver::class.java).apply {
+    data = Uri.parse("homeWidget://completeTask?id=$id")
+    action = "es.antonborri.home_widget.action.BACKGROUND"
+  }
+  var taskFlags = android.app.PendingIntent.FLAG_UPDATE_CURRENT
+  if (android.os.Build.VERSION.SDK_INT >= 23) {
+    taskFlags = taskFlags or android.app.PendingIntent.FLAG_IMMUTABLE
+  }
+  val taskPending = android.app.PendingIntent.getBroadcast(context, 100000 + id, taskIntent, taskFlags)
+  views.setOnClickPendingIntent(checkId, taskPending)
 }
 
 /** Same as [bindTaskRow], but habits can already be checked for today. */
@@ -115,8 +123,14 @@ internal fun bindHabitRow(
   val done = widgetData.getBoolean("tazk_habit_${index}_done", false)
   views.setImageViewResource(
       checkId, if (done) R.drawable.ic_checkbox_checked else R.drawable.ic_checkbox_unchecked)
-  views.setOnClickPendingIntent(
-      checkId,
-      HomeWidgetBackgroundIntent.getBroadcast(
-          context, Uri.parse("homeWidget://completeHabit?id=$id")))
+  val habitIntent = android.content.Intent(context, es.antonborri.home_widget.HomeWidgetBackgroundReceiver::class.java).apply {
+    data = Uri.parse("homeWidget://completeHabit?id=$id")
+    action = "es.antonborri.home_widget.action.BACKGROUND"
+  }
+  var habitFlags = android.app.PendingIntent.FLAG_UPDATE_CURRENT
+  if (android.os.Build.VERSION.SDK_INT >= 23) {
+    habitFlags = habitFlags or android.app.PendingIntent.FLAG_IMMUTABLE
+  }
+  val habitPending = android.app.PendingIntent.getBroadcast(context, 200000 + id, habitIntent, habitFlags)
+  views.setOnClickPendingIntent(checkId, habitPending)
 }

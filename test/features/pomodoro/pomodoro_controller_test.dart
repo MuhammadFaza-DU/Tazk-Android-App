@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tazk/data/database/database.dart';
 import 'package:tazk/data/models/enums.dart';
@@ -56,24 +59,81 @@ void main() {
   });
 
   test(
-    'pauseForAppExit pauses a running session and preserves remaining time',
-    () async {
-      var now = DateTime(2026, 7, 12, 10);
-      final controller = _controller(now: () => now);
+    'session keeps running while the app is backgrounded and completes '
+    'once the clock passes its end time',
+    () {
+      fakeAsync((async) {
+        var now = DateTime(2026, 7, 12, 10);
+        final controller = _controller(now: () => now);
 
-      controller.setDurationMinutes(10);
-      await controller.start(
-        completionTitle: 'Selesai',
-        completionBody: 'Done',
-      );
-      now = now.add(const Duration(minutes: 3));
+        controller.setDurationMinutes(10);
+        unawaited(
+          controller.start(completionTitle: 'Selesai', completionBody: 'Done'),
+        );
+        async.flushMicrotasks();
+        expect(controller.status, PomodoroSessionStatus.running);
 
-      await controller.pauseForAppExit();
+        // App gets backgrounded: wall-clock time advances but nothing in the
+        // app pauses or cancels the session (PRD 3.4 "timer tetap jalan").
+        now = now.add(const Duration(minutes: 9));
+        async.elapse(const Duration(seconds: 1));
+        expect(controller.status, PomodoroSessionStatus.running);
+        expect(controller.remaining, const Duration(minutes: 1));
 
-      expect(controller.status, PomodoroSessionStatus.paused);
-      expect(controller.remaining, const Duration(minutes: 7));
+        // Still suspended, the end time passes entirely.
+        now = now.add(const Duration(minutes: 5));
+        async.elapse(const Duration(seconds: 1));
+
+        // First tick after returning to the foreground settles the session.
+        expect(controller.status, PomodoroSessionStatus.idle);
+      });
     },
   );
+
+  test('manual pause keeps remaining time and resume re-arms the timer', () {
+    fakeAsync((async) {
+      var now = DateTime(2026, 7, 12, 10);
+      final notificationsCancelled = <int>[];
+      final notificationsScheduled = <DateTime>[];
+      final controller = PomodoroController(
+        now: () => now,
+        scheduleCompletionNotification: (endTime, _, _) async {
+          notificationsScheduled.add(endTime);
+        },
+        cancelCompletionNotification: () async {
+          notificationsCancelled.add(notificationsCancelled.length);
+        },
+        completeHabitToday: (_) async {},
+        logHabitProgress: (_, _) async {},
+      );
+
+      controller.setDurationMinutes(10);
+      unawaited(
+        controller.start(completionTitle: 'Selesai', completionBody: 'Done'),
+      );
+      async.flushMicrotasks();
+
+      now = now.add(const Duration(minutes: 3));
+      async.elapse(const Duration(seconds: 1));
+      unawaited(controller.pause());
+      async.flushMicrotasks();
+      expect(controller.status, PomodoroSessionStatus.paused);
+      expect(controller.remaining, const Duration(minutes: 7));
+      expect(notificationsCancelled, hasLength(1));
+
+      now = now.add(const Duration(minutes: 2));
+      unawaited(
+        controller.resume(completionTitle: 'Selesai', completionBody: 'Done'),
+      );
+      async.flushMicrotasks();
+      expect(controller.status, PomodoroSessionStatus.running);
+      // Resume must push the OS notification to the NEW end time.
+      expect(
+        notificationsScheduled.last,
+        now.add(const Duration(minutes: 7)),
+      );
+    });
+  });
 
   test(
     'completing a habit session logs progress and completes the habit today',

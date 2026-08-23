@@ -1,11 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../l10n/app_localizations.dart';
 
-const _appVersion = '1.0.1';
+// Fallback matches pubspec.yaml version so the screen never shows a hard-coded
+// lie when the platform channel is unavailable (e.g. in widget tests).
+const _fallbackVersion = '1.0.2';
 
-class AboutScreen extends StatelessWidget {
+class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
+
+  @override
+  State<AboutScreen> createState() => _AboutScreenState();
+}
+
+class _AboutScreenState extends State<AboutScreen> {
+  String _version = _fallbackVersion;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (!mounted) return;
+      final v = info.version;
+      final b = info.buildNumber;
+      setState(() => _version = b.isEmpty ? v : '$v+$b');
+    } catch (_) {
+      // Keep fallback — the plugin's MethodChannel doesn't exist in tests or
+      // on unusual platforms. Showing the pubspec version is still truthful.
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +51,7 @@ class AboutScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(l10n.splashTagline, style: Theme.of(context).textTheme.bodyMedium),
                 const SizedBox(height: 12),
-                Text(l10n.aboutVersionLabel(_appVersion)),
+                Text(l10n.aboutVersionLabel(_version)),
               ],
             ),
           ),

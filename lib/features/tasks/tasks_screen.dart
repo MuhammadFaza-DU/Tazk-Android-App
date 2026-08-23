@@ -62,9 +62,8 @@ class _TaskListTile extends ConsumerWidget {
     return ListTile(
       leading: CompletionCheckbox(
         value: task.isCompleted,
-        onComplete: task.isCompleted
-            ? null
-            : () => ref.read(taskRepositoryProvider).completeTask(task.id),
+        onComplete: () => ref.read(taskRepositoryProvider).completeTask(task.id),
+        onUncomplete: () => ref.read(taskRepositoryProvider).uncompleteTask(task.id),
       ),
       title: Text(
         task.title,

@@ -27,6 +27,11 @@ final habitTodayLogProvider = StreamProvider.family<HabitLog?, int>((ref, habitI
   return ref.watch(habitRepositoryProvider).watchLogForDate(habitId, today);
 });
 
+final habitLogForDateProvider =
+    StreamProvider.family<HabitLog?, ({int habitId, DateTime date})>((ref, args) {
+  return ref.watch(habitRepositoryProvider).watchLogForDate(args.habitId, args.date);
+});
+
 final habitHistoryProvider = StreamProvider.family<List<HabitLog>, int>((ref, habitId) {
   return ref.watch(habitRepositoryProvider).watchHistory(habitId);
 });

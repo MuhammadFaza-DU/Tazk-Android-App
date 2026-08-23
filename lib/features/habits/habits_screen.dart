@@ -64,9 +64,8 @@ class _HabitListTile extends ConsumerWidget {
     return ListTile(
       leading: CompletionCheckbox(
         value: isCompleted,
-        onComplete: isCompleted
-            ? null
-            : () => ref.read(habitRepositoryProvider).completeHabitToday(habit.id),
+        onComplete: () => ref.read(habitRepositoryProvider).completeHabitToday(habit.id),
+        onUncomplete: () => ref.read(habitRepositoryProvider).uncompleteHabitToday(habit.id),
       ),
       title: Text(
         habit.name,

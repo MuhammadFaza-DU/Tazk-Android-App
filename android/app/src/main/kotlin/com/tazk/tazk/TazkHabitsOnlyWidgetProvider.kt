@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
-import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 
@@ -58,9 +57,13 @@ class TazkHabitsOnlyWidgetProvider : HomeWidgetProvider() {
     val done = widgetData.getBoolean("tazk_habit_${index}_done", false)
     views.setImageViewResource(
         checkId, if (done) R.drawable.ic_checkbox_checked else R.drawable.ic_checkbox_unchecked)
-    views.setOnClickPendingIntent(
-        checkId,
-        HomeWidgetBackgroundIntent.getBroadcast(
-            context, Uri.parse("homeWidget://completeHabit?id=$id")))
+    val intent = android.content.Intent(context, es.antonborri.home_widget.HomeWidgetBackgroundReceiver::class.java).apply {
+      data = Uri.parse("homeWidget://completeHabit?id=$id")
+      action = "es.antonborri.home_widget.action.BACKGROUND"
+    }
+    var flags = android.app.PendingIntent.FLAG_UPDATE_CURRENT
+    if (android.os.Build.VERSION.SDK_INT >= 23) flags = flags or android.app.PendingIntent.FLAG_IMMUTABLE
+    val pending = android.app.PendingIntent.getBroadcast(context, 200000 + id, intent, flags)
+    views.setOnClickPendingIntent(checkId, pending)
   }
 }

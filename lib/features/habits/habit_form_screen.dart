@@ -108,6 +108,19 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    // PRD: a custom weekly habit with zero selected days would never be due,
+    // so the save must be blocked (the inline warning alone is not enough).
+    if (_isCustomFrequency &&
+        _customFrequencyType == 0 &&
+        _customDaysOfWeek.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text(AppLocalizations.of(context)!.customDaysRequiredError),
+        ),
+      );
+      return;
+    }
 
     final repo = ref.read(habitRepositoryProvider);
     final name = _nameController.text.trim();

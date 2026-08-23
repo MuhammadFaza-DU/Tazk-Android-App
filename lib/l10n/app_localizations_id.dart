@@ -531,6 +531,39 @@ class AppLocalizationsId extends AppLocalizations {
   String get notifFreezeLabel => 'Freeze';
 
   @override
+  String get permissionBannerMessage =>
+      'Notifikasi dimatikan. Aktifkan supaya pengingat task & habit berfungsi.';
+
+  @override
+  String get permissionBannerAction => 'Aktifkan';
+
+  @override
+  String get notifStatusLabel => 'Status notifikasi';
+
+  @override
+  String get notifStatusEnabled => 'Aktif';
+
+  @override
+  String get notifStatusDisabled => 'Mati';
+
+  @override
+  String get dbResetMessage =>
+      'Data lokal sempat rusak, jadi Tazk amankan dengan mulai dari awal.';
+
+  @override
+  String get widgetStreakActiveLabel => 'Streak aktif';
+
+  @override
+  String get widgetStreakDaysSuffix => 'hari';
+
+  @override
+  String get exactAlarmBannerMessage =>
+      'Izin alarm presisi dimatikan. Pengingat bisa telat hingga 15 menit.';
+
+  @override
+  String get exactAlarmBannerAction => 'Aktifkan';
+
+  @override
   String get aboutScreenTitle => 'Tentang App';
 
   @override

@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
-import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 
@@ -27,14 +26,8 @@ class TazkCalendarTasksHabitsWidgetProvider : HomeWidgetProvider() {
             setTextViewText(
                 R.id.calendar_selected_label,
                 widgetData.getString("tazk_calendar_selected_label", ""))
-            setOnClickPendingIntent(
-                R.id.calendar_prev,
-                HomeWidgetBackgroundIntent.getBroadcast(
-                    context, Uri.parse("homeWidget://calendarPreviousMonth")))
-            setOnClickPendingIntent(
-                R.id.calendar_next,
-                HomeWidgetBackgroundIntent.getBroadcast(
-                    context, Uri.parse("homeWidget://calendarNextMonth")))
+            views.setOnClickPendingIntent(R.id.calendar_prev, backgroundPending(context, "homeWidget://calendarPreviousMonth", 600001))
+            views.setOnClickPendingIntent(R.id.calendar_next, backgroundPending(context, "homeWidget://calendarNextMonth", 600002))
             setOnClickPendingIntent(
                 R.id.calendar_go_to_app,
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java))
@@ -46,6 +39,16 @@ class TazkCalendarTasksHabitsWidgetProvider : HomeWidgetProvider() {
       appWidgetManager.updateAppWidget(widgetId, views)
     }
   }
+}
+
+private fun backgroundPending(context: Context, uriString: String, requestCode: Int): android.app.PendingIntent {
+  val intent = android.content.Intent(context, es.antonborri.home_widget.HomeWidgetBackgroundReceiver::class.java).apply {
+    data = Uri.parse(uriString)
+    action = "es.antonborri.home_widget.action.BACKGROUND"
+  }
+  var flags = android.app.PendingIntent.FLAG_UPDATE_CURRENT
+  if (android.os.Build.VERSION.SDK_INT >= 23) flags = flags or android.app.PendingIntent.FLAG_IMMUTABLE
+  return android.app.PendingIntent.getBroadcast(context, requestCode, intent, flags)
 }
 
 private fun bindCalendarDays(
@@ -110,10 +113,7 @@ private fun bindCalendarDays(
     views.setTextViewText(viewId, displayLabel)
     views.setTextColor(viewId, colorForDay(inMonth, isToday, isSelected))
     views.setInt(viewId, "setBackgroundResource", backgroundForDay(isToday, isSelected))
-    views.setOnClickPendingIntent(
-        viewId,
-        HomeWidgetBackgroundIntent.getBroadcast(
-            context, Uri.parse("homeWidget://calendarSelectDate?millis=$millis")))
+    views.setOnClickPendingIntent(viewId, backgroundPending(context, "homeWidget://calendarSelectDate?millis=$millis", 500000 + index))
   }
 }
 
@@ -143,10 +143,7 @@ private fun bindCalendarTaskRows(
     views.setViewVisibility(ids.first, View.VISIBLE)
     views.setTextViewText(ids.third, widgetData.getString("tazk_calendar_task_${index}_title", ""))
     views.setImageViewResource(ids.second, R.drawable.ic_checkbox_unchecked)
-    views.setOnClickPendingIntent(
-        ids.second,
-        HomeWidgetBackgroundIntent.getBroadcast(
-            context, Uri.parse("homeWidget://calendarCompleteTask?id=$id")))
+    views.setOnClickPendingIntent(ids.second, backgroundPending(context, "homeWidget://calendarCompleteTask?id=$id", 300000 + id))
   }
 }
 
@@ -179,9 +176,7 @@ private fun bindCalendarHabitRows(
     views.setTextViewText(ids.third, widgetData.getString("tazk_calendar_habit_${index}_title", ""))
     views.setImageViewResource(ids.second, R.drawable.ic_checkbox_unchecked)
     views.setOnClickPendingIntent(
-        ids.second,
-        HomeWidgetBackgroundIntent.getBroadcast(
-            context, Uri.parse("homeWidget://calendarCompleteHabit?id=$id&selectedMillis=$selectedMillis")))
+        ids.second, backgroundPending(context, "homeWidget://calendarCompleteHabit?id=$id&selectedMillis=$selectedMillis", 400000 + id))
   }
 }
 

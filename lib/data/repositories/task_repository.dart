@@ -137,6 +137,9 @@ class TaskRepository {
   }
 
   Future<void> completeTask(int taskId) async {
+    final existing = await (_db.select(_db.tasks)..where((t) => t.id.equals(taskId)))
+        .getSingleOrNull();
+    if (existing == null || existing.isCompleted) return;
     await _db.transaction(() async {
       await (_db.update(_db.tasks)..where((t) => t.id.equals(taskId)))
           .write(const TasksCompanion(isCompleted: Value(true)));
@@ -146,6 +149,23 @@ class TaskRepository {
     });
     await _notifications.cancelTaskReminder(taskId);
     await _gamification.refreshStreakWarningNotification();
+    await _widget.refreshAll();
+  }
+
+  /// PRD gap F: allow unchecking a completed task (toggle).
+  Future<void> uncompleteTask(int taskId) async {
+    final task = await (_db.select(_db.tasks)..where((t) => t.id.equals(taskId)))
+        .getSingleOrNull();
+    if (task == null || !task.isCompleted) return;
+    await _db.transaction(() async {
+      await (_db.update(_db.tasks)..where((t) => t.id.equals(taskId)))
+          .write(const TasksCompanion(isCompleted: Value(false)));
+      await (_db.update(_db.subtasks)..where((s) => s.taskId.equals(taskId)))
+          .write(const SubtasksCompanion(isCompleted: Value(false)));
+      await _gamification.onTaskUncompleted();
+    });
+    // Incomplete again — re-arm its reminder if the date is still upcoming.
+    await _scheduleReminder(task.copyWith(isCompleted: false));
     await _widget.refreshAll();
   }
 

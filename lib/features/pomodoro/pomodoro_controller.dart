@@ -154,8 +154,6 @@ class PomodoroController extends ChangeNotifier {
     await cancelCompletionNotification();
   }
 
-  Future<void> pauseForAppExit() => pause();
-
   Future<void> resume({
     required String completionTitle,
     required String completionBody,

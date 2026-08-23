@@ -222,7 +222,7 @@ class _GamificationSummary extends StatelessWidget {
           children: [
             Text(l10n.levelLabel(level), style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
-      AnimatedXpProgress(value: needed == 0 ? 0 : xp / needed),
+      AnimatedXpProgress(value: needed == 0 ? 0 : xp / needed, level: level),
             const SizedBox(height: 4),
             Text(l10n.xpProgress(xp, needed)),
             const SizedBox(height: 12),
@@ -284,7 +284,7 @@ class _AvatarGrid extends StatelessWidget {
   }
 }
 
-class _CollectionSlot extends StatelessWidget {
+class _CollectionSlot extends StatefulWidget {
   const _CollectionSlot({
     required this.isUnlocked,
     required this.icon,
@@ -296,22 +296,120 @@ class _CollectionSlot extends StatelessWidget {
   final String label;
 
   @override
+  State<_CollectionSlot> createState() => _CollectionSlotState();
+}
+
+class _CollectionSlotState extends State<_CollectionSlot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _flip;
+  late final Animation<double> _shine;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 620),
+    );
+    _flip = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0, end: 0.5), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 0.5, end: 1), weight: 50),
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _shine = Tween<double>(begin: -1.2, end: 1.2).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.45, 1, curve: Curves.easeOut)),
+    );
+    if (widget.isUnlocked) {
+      // Already unlocked on first build — no entrance animation.
+      _controller.value = 1;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _CollectionSlot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isUnlocked && widget.isUnlocked) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CircleAvatar(
-          radius: 28,
-          backgroundColor: isUnlocked
-              ? AppColors.accentLight.withAlpha(60)
-              : Theme.of(context).disabledColor.withAlpha(30),
-          child: Icon(
-            isUnlocked ? icon : Icons.lock_outline_rounded,
-            color: isUnlocked ? AppColors.terracotta : Theme.of(context).disabledColor,
-          ),
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, _) {
+            final angle = _flip.value * 3.14159;
+            final isFront = _flip.value < 0.5
+                ? !widget.isUnlocked
+                : widget.isUnlocked;
+            return Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.001)
+                ..rotateY(angle),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: isFront
+                        ? (widget.isUnlocked
+                            ? AppColors.accentLight.withAlpha(60)
+                            : Theme.of(context).disabledColor.withAlpha(30))
+                        : AppColors.accentLight.withAlpha(60),
+                    child: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.identity()..rotateY(_flip.value < 0.5 ? 0 : 3.14159),
+                      child: Icon(
+                        isFront
+                            ? (widget.isUnlocked ? widget.icon : Icons.lock_outline_rounded)
+                            : widget.icon,
+                        color: isFront
+                            ? (widget.isUnlocked
+                                ? AppColors.terracotta
+                                : Theme.of(context).disabledColor)
+                            : AppColors.terracotta,
+                      ),
+                    ),
+                  ),
+                  if (_shine.value > -1 && _shine.value < 1 && widget.isUnlocked)
+                    Positioned.fill(
+                      child: ClipOval(
+                        child: Align(
+                          alignment: Alignment(_shine.value, 0),
+                          child: Container(
+                            width: 18,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white.withValues(alpha: 0),
+                                  Colors.white.withValues(alpha: 0.55),
+                                  Colors.white.withValues(alpha: 0),
+                                ],
+                              ),
+                            ),
+                            transform: Matrix4.skewX(-0.25),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
         ),
         const SizedBox(height: 4),
-        Text(label, style: Theme.of(context).textTheme.labelSmall),
+        Text(widget.label, style: Theme.of(context).textTheme.labelSmall),
       ],
     );
   }

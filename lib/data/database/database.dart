@@ -2,13 +2,20 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../models/enums.dart';
+import 'database_recovery.dart';
 import 'tables.dart';
 
 part 'database.g.dart';
+
+/// Set to true once per app run when the database file was found corrupt and
+/// had to be moved aside so a fresh one could start. The UI reads this to
+/// explain the reset to the user (PRD "Error States").
+final databaseRecoveredFromCorruption = ValueNotifier<bool>(false);
 
 @DriftDatabase(tables: [
   Tasks,
@@ -61,6 +68,14 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'tazk.sqlite'));
+    final recovery = await ensureHealthyDatabaseFile(file.path);
+    if (recovery.quarantined) {
+      debugPrint(
+        'AppDatabase: corrupt database quarantined, starting fresh '
+        '(backup at ${p.basename(file.path)}.corrupt-*)',
+      );
+      databaseRecoveredFromCorruption.value = true;
+    }
     return NativeDatabase.createInBackground(file);
   });
 }

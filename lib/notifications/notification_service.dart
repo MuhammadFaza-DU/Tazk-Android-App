@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
@@ -87,17 +88,68 @@ class NotificationService {
     }
   }
 
-  Future<void> requestPermission() async {
+  /// Requests the POST_NOTIFICATIONS runtime permission (Android 13+) and the
+  /// exact-alarm special access (Android 12+). Returns whether regular
+  /// notifications ended up enabled; used to drive the PRD permission banner.
+  Future<bool> requestPermission() async {
     try {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
-      await android?.requestNotificationsPermission();
+      final granted = await android?.requestNotificationsPermission();
       // Opens the system "Alarms & reminders" page on Android 12+ (API 31+).
       // Returns null on older versions, where exact alarms are always allowed.
-      final granted = await android?.requestExactAlarmsPermission();
-      _exactAlarmsAllowed = granted ?? true;
+      final exactGranted = await android?.requestExactAlarmsPermission();
+      _exactAlarmsAllowed = exactGranted ?? true;
+      return granted ?? true;
     } catch (error) {
       debugPrint('NotificationService: requestPermission failed: $error');
+      return false;
+    }
+  }
+
+  /// Whether the OS currently allows showing notifications. Queried live so
+  /// the Home banner / Settings indicator stay truthful when the user flips
+  /// the toggle in system settings. Defaults to true when unknown.
+  Future<bool> areNotificationsEnabled() async {
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      final enabled = await android?.areNotificationsEnabled();
+      return enabled ?? true;
+    } catch (error) {
+      debugPrint(
+        'NotificationService: areNotificationsEnabled failed: $error',
+      );
+      return true;
+    }
+  }
+
+  Future<bool> requestExactAlarmPermission() async {
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      final granted = await android?.requestExactAlarmsPermission();
+      _exactAlarmsAllowed = granted ?? true;
+      return _exactAlarmsAllowed;
+    } catch (error) {
+      debugPrint('NotificationService: requestExactAlarmPermission failed: $error');
+      return false;
+    }
+  }
+
+  static const _appSettingsChannel =
+      MethodChannel('com.tazk.tazk/app_settings');
+
+  /// Opens this app's notification page in the Android system settings, so
+  /// the user can flip the toggle from the PRD permission banner/indicator.
+  Future<void> openOsNotificationSettings() async {
+    try {
+      await _appSettingsChannel
+          .invokeMethod<void>('openNotificationSettings');
+    } catch (error) {
+      debugPrint(
+        'NotificationService: openOsNotificationSettings failed: $error',
+      );
     }
   }
 
@@ -279,6 +331,10 @@ class NotificationService {
     required String channelName,
     DateTimeComponents? matchDateTimeComponents,
   }) async {
+    final canExact = await canScheduleExactAlarms();
+    // Keep the cached flag in sync for callers that still read it (e.g.
+    // midnight scheduler's fallback check).
+    _exactAlarmsAllowed = canExact;
     try {
       await _plugin.zonedSchedule(
         id,
@@ -293,7 +349,7 @@ class NotificationService {
             priority: Priority.defaultPriority,
           ),
         ),
-        androidScheduleMode: _exactAlarmsAllowed
+        androidScheduleMode: canExact
             ? AndroidScheduleMode.exactAllowWhileIdle
             : AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:

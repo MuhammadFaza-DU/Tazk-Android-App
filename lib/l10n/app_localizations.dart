@@ -1064,6 +1064,66 @@ abstract class AppLocalizations {
   /// **'Freeze'**
   String get notifFreezeLabel;
 
+  /// No description provided for @permissionBannerMessage.
+  ///
+  /// In id, this message translates to:
+  /// **'Notifikasi dimatikan. Aktifkan supaya pengingat task & habit berfungsi.'**
+  String get permissionBannerMessage;
+
+  /// No description provided for @permissionBannerAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktifkan'**
+  String get permissionBannerAction;
+
+  /// No description provided for @notifStatusLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Status notifikasi'**
+  String get notifStatusLabel;
+
+  /// No description provided for @notifStatusEnabled.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktif'**
+  String get notifStatusEnabled;
+
+  /// No description provided for @notifStatusDisabled.
+  ///
+  /// In id, this message translates to:
+  /// **'Mati'**
+  String get notifStatusDisabled;
+
+  /// No description provided for @dbResetMessage.
+  ///
+  /// In id, this message translates to:
+  /// **'Data lokal sempat rusak, jadi Tazk amankan dengan mulai dari awal.'**
+  String get dbResetMessage;
+
+  /// No description provided for @widgetStreakActiveLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak aktif'**
+  String get widgetStreakActiveLabel;
+
+  /// No description provided for @widgetStreakDaysSuffix.
+  ///
+  /// In id, this message translates to:
+  /// **'hari'**
+  String get widgetStreakDaysSuffix;
+
+  /// No description provided for @exactAlarmBannerMessage.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin alarm presisi dimatikan. Pengingat bisa telat hingga 15 menit.'**
+  String get exactAlarmBannerMessage;
+
+  /// No description provided for @exactAlarmBannerAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktifkan'**
+  String get exactAlarmBannerAction;
+
   /// No description provided for @aboutScreenTitle.
   ///
   /// In id, this message translates to:

@@ -220,6 +220,29 @@ class HabitRepository {
     await _widget.refreshAll();
   }
 
+  /// PRD gap F: allow toggling a completed habit back to incomplete for a
+  /// specific date (calendar vs today).
+  Future<void> uncompleteHabitOnDate(int habitId, DateTime date) async {
+    final targetDate = _dateOnly(date);
+    final existing = await (_db.select(_db.habitLogs)
+          ..where((l) => l.habitId.equals(habitId) & l.date.equals(targetDate)))
+        .getSingleOrNull();
+    if (existing == null || !existing.isCompleted) return;
+    await _db.transaction(() async {
+      await (_db.update(_db.habitLogs)..where((l) => l.id.equals(existing.id)))
+          .write(const HabitLogsCompanion(isCompleted: Value(false)));
+      final today = _dateOnly(DateTime.now());
+      if (targetDate == today) {
+        await _gamification.onHabitUncompleted();
+      }
+    });
+    await _widget.refreshAll();
+  }
+
+  Future<void> uncompleteHabitToday(int habitId) async {
+    await uncompleteHabitOnDate(habitId, DateTime.now());
+  }
+
   DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
   /// Re-arms reminders for every active habit, sliding the non-daily reminder

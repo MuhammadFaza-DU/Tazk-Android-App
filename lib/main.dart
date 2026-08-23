@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,12 +8,16 @@ import 'package:home_widget/home_widget.dart';
 import 'core/theme/app_theme.dart';
 import 'background/midnight_scheduler.dart';
 import 'data/models/enums.dart';
-import 'features/pomodoro/pomodoro_controller.dart';
 import 'features/splash/splash_screen.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/current_date_provider.dart';
+import 'providers/exact_alarm_permission_provider.dart';
+import 'providers/gamification_providers.dart';
+import 'providers/habit_providers.dart';
+import 'providers/notification_permission_provider.dart';
 import 'providers/repository_providers.dart';
 import 'providers/settings_providers.dart';
+import 'providers/task_providers.dart';
 import 'widgets/home_widget_callback.dart';
 
 void main() async {
@@ -74,25 +80,45 @@ class _PomodoroLifecyclePause extends ConsumerStatefulWidget {
 class _PomodoroLifecyclePauseState
     extends ConsumerState<_PomodoroLifecyclePause>
     with WidgetsBindingObserver {
+  // Widget taps while the app is foregrounded arrive via this stream rather
+  // than the background isolate, so the foreground Drift cache never sees the
+  // write until we re-query. Listening here gives instant in-app reflection.
+  StreamSubscription<Uri?>? _widgetClickSub;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _widgetClickSub = HomeWidget.widgetClicked.listen((uri) {
+      if (uri == null) return;
+      // Re-query the streams that the widget can mutate. The background
+      // isolate already wrote the DB; we just need the foreground cache to
+      // pick it up. A microtask delay lets that isolate finish first.
+      Future<void>.delayed(const Duration(milliseconds: 350), () {
+        if (!mounted) return;
+        ref.invalidate(todayTasksProvider);
+        ref.invalidate(activeHabitsProvider);
+        ref.invalidate(habitTodayLogProvider);
+        ref.invalidate(habitLogForDateProvider);
+        ref.invalidate(streakStateProvider);
+      });
+    });
   }
 
   @override
   void dispose() {
+    _widgetClickSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden) {
-      ref.read(pomodoroControllerProvider).pauseForAppExit();
-    } else if (state == AppLifecycleState.resumed) {
+    // PRD 3.4: the Pomodoro timer deliberately keeps running while the app is
+    // backgrounded — no auto-pause on inactive/paused/hidden. Its completion
+    // notification was scheduled at start() with the exact end time, and the
+    // ticker self-corrects from the absolute end time once we're resumed.
+    if (state == AppLifecycleState.resumed) {
       // Returning to the foreground may cross a day boundary the in-app timer
       // couldn't fire while suspended. Refresh "today", re-run the idempotent
       // daily rollover, and re-arm the midnight alarm in case an aggressive
@@ -100,6 +126,18 @@ class _PomodoroLifecyclePauseState
       ref.read(currentDateProvider.notifier).refresh();
       ref.read(dailyMaintenanceServiceProvider).runDailyRollover();
       MidnightScheduler.armNextMidnight();
+      // Cross-isolate widget taps (home_widget_callback runs in a separate
+      // isolate with its own DB connection) are invisible to this isolate's
+      // Drift stream cache until we re-query.
+      ref.invalidate(todayTasksProvider);
+      ref.invalidate(activeHabitsProvider);
+      ref.invalidate(habitTodayLogProvider);
+      ref.invalidate(habitLogForDateProvider);
+      ref.invalidate(streakStateProvider);
+      // The user may have toggled notifications or exact-alarm in system
+      // settings while we were backgrounded — keep banners truthful (PRD 5).
+      ref.read(notificationPermissionProvider.notifier).check();
+      ref.read(exactAlarmProvider.notifier).check();
     }
   }
 

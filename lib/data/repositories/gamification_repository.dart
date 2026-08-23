@@ -94,9 +94,17 @@ class GamificationRepository {
     await _registerActiveDay();
   }
 
+  Future<void> onTaskUncompleted() async {
+    await _deductXp(taskXp);
+  }
+
   Future<void> onHabitCompleted() async {
     await _awardXp(habitXp);
     await _registerActiveDay();
+  }
+
+  Future<void> onHabitUncompleted() async {
+    await _deductXp(habitXp);
   }
 
   Future<void> _awardXp(int amount) async {
@@ -114,6 +122,20 @@ class GamificationRepository {
             );
       }
     }
+    await (_db.update(_db.userProfile)..where((u) => u.id.equals(profile.id)))
+        .write(UserProfileCompanion(xp: Value(xp), level: Value(level)));
+  }
+
+  Future<void> _deductXp(int amount) async {
+    final profile = await ensureProfile();
+    var xp = profile.xp - amount;
+    var level = profile.level;
+    while (xp < 0 && level > 1) {
+      level -= 1;
+      final needed = 100 * level;
+      xp += needed;
+    }
+    if (xp < 0) xp = 0;
     await (_db.update(_db.userProfile)..where((u) => u.id.equals(profile.id)))
         .write(UserProfileCompanion(xp: Value(xp), level: Value(level)));
   }
@@ -195,8 +217,9 @@ class GamificationRepository {
         );
   }
 
-  /// Breaks the streak (or consumes a freeze) when a full day has passed
-  /// with no task/habit completion. Call once when the app opens.
+  /// Breaks the streak (or consumes freezes) when full days have passed
+  /// with no task/habit completion. Call once when the app opens. Each missed
+  /// day needs its own freeze; one freeze cannot forgive a multi-day gap.
   Future<void> evaluateMissedDay() async {
     final today = _dateOnly(DateTime.now());
     final state = await ensureStreakState();
@@ -205,30 +228,40 @@ class GamificationRepository {
     final daysSinceActive = today.difference(lastActive).inDays;
     if (daysSinceActive <= 1) return;
 
-    if (state.freezeCount > 0) {
+    final missedDays = daysSinceActive - 1;
+    final freezesToUse = missedDays < state.freezeCount ? missedDays : state.freezeCount;
+    final remainingMissed = missedDays - freezesToUse;
+    final newFreezeCount = state.freezeCount - freezesToUse;
+
+    if (remainingMissed > 0) {
+      // Not enough freezes to cover the gap — streak breaks.
       await (_db.update(_db.streakState)..where((s) => s.id.equals(state.id)))
           .write(
         StreakStateCompanion(
-          freezeCount: Value(state.freezeCount - 1),
+          currentStreak: const Value(0),
+          freezeProgressDays: const Value(0),
+          freezeCount: Value(newFreezeCount),
+        ),
+      );
+    } else {
+      // All missed days covered by freezes — streak survives.
+      await (_db.update(_db.streakState)..where((s) => s.id.equals(state.id)))
+          .write(
+        StreakStateCompanion(
+          freezeCount: Value(newFreezeCount),
           lastActiveDate: Value(today.subtract(const Duration(days: 1))),
         ),
       );
-      final settings = await _settings.ensureSettings();
-      if (settings.notifyFreezeUsed) {
-        final l10n = await _l10n();
-        await _notifications.showFreezeUsedNotification(
-          title: l10n.notifFreezeUsedTitle,
-          body: l10n.notifFreezeUsedBody,
-        );
+      if (freezesToUse > 0) {
+        final settings = await _settings.ensureSettings();
+        if (settings.notifyFreezeUsed) {
+          final l10n = await _l10n();
+          await _notifications.showFreezeUsedNotification(
+            title: l10n.notifFreezeUsedTitle,
+            body: l10n.notifFreezeUsedBody,
+          );
+        }
       }
-    } else {
-      await (_db.update(_db.streakState)..where((s) => s.id.equals(state.id)))
-          .write(
-        const StreakStateCompanion(
-          currentStreak: Value(0),
-          freezeProgressDays: Value(0),
-        ),
-      );
     }
     await _widget.refreshAll();
   }
