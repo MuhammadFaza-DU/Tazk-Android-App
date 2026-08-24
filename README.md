@@ -23,6 +23,7 @@ After downloading the APK on Android, open the file and allow installation from 
 - Local reminders for tasks, habits, streak warnings, and focus sessions.
 - Lightweight gamification with XP, levels, streaks, freezes, badges, and cosmetic unlocks.
 - Indonesian and English localization.
+- Toggle check/uncheck for tasks & habits with per-date distinction (calendar vs today) and micro-confetti + celebration animations.
 
 ## Privacy
 
@@ -35,13 +36,14 @@ Tazk is built around local-first usage:
 
 ## Tech Stack
 
-- Flutter
+- Flutter 3.44.6 / Dart 3.12.2
 - Riverpod
-- Drift + SQLite
-- Flutter Local Notifications
-- Home Widget
+- Drift + SQLite (with DB recovery & per-date habit logs)
+- Flutter Local Notifications + timezone
+- Home Widget (with per-row unique PendingIntents & i18n streak)
 - Table Calendar
-- Video Player
+- Video Player + package_info_plus
+- Midnight alarm via android_alarm_manager_plus
 
 ## Android APK Notes
 
@@ -49,7 +51,7 @@ The shared APK is a signed release build for Android:
 
 - Package name: `com.tazk.tazk`
 - Minimum Android SDK: `29`
-- Current version: `1.0.2`
+- Current version: `1.1.5+4`
 
 If you previously installed a debug build of Tazk, uninstall it before installing the release APK because debug and release builds use different signing certificates.
 
