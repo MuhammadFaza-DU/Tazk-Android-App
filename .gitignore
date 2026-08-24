@@ -57,3 +57,5 @@ app.*.map.json
 
 graphify-out/cache/
 graphify-out/cost.json
+
+strix_runs/

@@ -5,7 +5,7 @@ import '../../l10n/app_localizations.dart';
 
 // Fallback matches pubspec.yaml version so the screen never shows a hard-coded
 // lie when the platform channel is unavailable (e.g. in widget tests).
-const _fallbackVersion = '1.0.2';
+const _fallbackVersion = '1.1.5';
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});

@@ -26,8 +26,8 @@ class TazkCalendarTasksHabitsWidgetProvider : HomeWidgetProvider() {
             setTextViewText(
                 R.id.calendar_selected_label,
                 widgetData.getString("tazk_calendar_selected_label", ""))
-            views.setOnClickPendingIntent(R.id.calendar_prev, backgroundPending(context, "homeWidget://calendarPreviousMonth", 600001))
-            views.setOnClickPendingIntent(R.id.calendar_next, backgroundPending(context, "homeWidget://calendarNextMonth", 600002))
+            setOnClickPendingIntent(R.id.calendar_prev, backgroundPending(context, "homeWidget://calendarPreviousMonth", 600001))
+            setOnClickPendingIntent(R.id.calendar_next, backgroundPending(context, "homeWidget://calendarNextMonth", 600002))
             setOnClickPendingIntent(
                 R.id.calendar_go_to_app,
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java))
