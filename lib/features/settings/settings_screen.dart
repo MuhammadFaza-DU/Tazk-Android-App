@@ -67,6 +67,7 @@ class SettingsScreen extends ConsumerWidget {
           Consumer(builder: (context, ref, _) {
             final exact = ref.watch(exactAlarmProvider);
             final allowed = exact.status != ExactAlarmStatus.denied;
+            final l10n2 = AppLocalizations.of(context)!;
             return ListTile(
               leading: Icon(
                 allowed ? Icons.alarm_on_rounded : Icons.alarm_off_rounded,
@@ -74,8 +75,8 @@ class SettingsScreen extends ConsumerWidget {
                     ? Theme.of(context).colorScheme.primary
                     : Theme.of(context).colorScheme.error,
               ),
-              title: const Text('Alarm presisi'),
-              subtitle: Text(allowed ? 'Aktif' : 'Mati — pengingat bisa telat'),
+              title: Text(l10n2.exactAlarmSettingsTitle),
+              subtitle: Text(allowed ? l10n2.exactAlarmActive : l10n2.exactAlarmInactive),
               onTap: () async {
                 await ref
                     .read(notificationServiceProvider)

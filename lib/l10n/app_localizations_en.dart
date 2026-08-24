@@ -565,6 +565,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exactAlarmBannerAction => 'Turn On';
 
   @override
+  String get exactAlarmSettingsTitle => 'Exact alarm';
+
+  @override
+  String get exactAlarmActive => 'On';
+
+  @override
+  String get exactAlarmInactive => 'Off — reminders may be late';
+
+  @override
   String get aboutScreenTitle => 'About App';
 
   @override

@@ -257,6 +257,9 @@
   "widgetStreakDaysSuffix": "hari",
   "exactAlarmBannerMessage": "Izin alarm presisi dimatikan. Pengingat bisa telat hingga 15 menit.",
   "exactAlarmBannerAction": "Aktifkan",
+  "exactAlarmSettingsTitle": "Alarm presisi",
+  "exactAlarmActive": "Aktif",
+  "exactAlarmInactive": "Mati — pengingat bisa telat",
   "aboutScreenTitle": "Tentang App",
   "aboutVersionLabel": "Versi {version}",
   "@aboutVersionLabel": {

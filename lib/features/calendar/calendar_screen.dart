@@ -270,9 +270,9 @@ class _DayCell extends StatelessWidget {
             color: isSelected
                 ? colorScheme.primary
                 : isDropTarget
-                    ? colorScheme.primary.withAlpha(60)
+                    ? colorScheme.primary.withValues(alpha: 0.24)
                     : isToday
-                        ? colorScheme.primary.withAlpha(30)
+                        ? colorScheme.primary.withValues(alpha: 0.12)
                         : null,
             border: isToday && !isSelected
                 ? Border.all(color: colorScheme.primary)

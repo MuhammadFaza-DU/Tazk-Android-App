@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/exact_alarm_permission_provider.dart';
 import '../../providers/notification_permission_provider.dart';
 import '../../providers/notification_provider.dart';
@@ -53,11 +54,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     try {
       await controller.initialize();
+      if (!mounted) return;
       await controller.setLooping(false);
+      if (!mounted) return;
       await controller.setVolume(0);
       if (!mounted) return;
       setState(() => _videoReady = true);
       controller.addListener(_handleVideoProgress);
+      if (!mounted) return;
       await controller.play();
     } catch (error) {
       debugPrint('SplashScreen: failed to play $_videoAsset: $error');
@@ -175,7 +179,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Tumbuh setiap hari',
+                    AppLocalizations.of(context)!.splashTagline,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: (isDark ? Colors.white70 : Colors.black54),
                         ),

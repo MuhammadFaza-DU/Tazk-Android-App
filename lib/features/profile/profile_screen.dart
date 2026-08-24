@@ -66,7 +66,7 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 48,
-                  backgroundColor: AppColors.primaryLight.withAlpha(40),
+                  backgroundColor: AppColors.primaryLight.withValues(alpha: 0.16),
                   child: Icon(
                     _avatarIconFor(profile?.avatarId ?? 'default'),
                     size: 48,
@@ -183,8 +183,8 @@ class ProfileScreen extends ConsumerWidget {
                   child: CircleAvatar(
                     radius: 32,
                     backgroundColor: avatarId == currentAvatarId
-                        ? AppColors.primaryLight.withAlpha(80)
-                        : AppColors.primaryLight.withAlpha(30),
+                        ? AppColors.primaryLight.withValues(alpha: 0.31)
+                        : AppColors.primaryLight.withValues(alpha: 0.12),
                     child: Icon(_avatarIconFor(avatarId), color: AppColors.primaryLight),
                   ),
                 ),
@@ -265,7 +265,9 @@ class _AvatarGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final sorted = [...unlockedMilestones]..sort();
     final lastUnlocked = sorted.isEmpty ? 0 : sorted.last;
-    final nextLocked = [lastUnlocked + 10, lastUnlocked + 20];
+    final nextLocked = [lastUnlocked + 10, lastUnlocked + 20]
+        .where((m) => m <= 100)
+        .toList();
 
     return Wrap(
       spacing: 12,
@@ -363,9 +365,9 @@ class _CollectionSlotState extends State<_CollectionSlot>
                     radius: 28,
                     backgroundColor: isFront
                         ? (widget.isUnlocked
-                            ? AppColors.accentLight.withAlpha(60)
-                            : Theme.of(context).disabledColor.withAlpha(30))
-                        : AppColors.accentLight.withAlpha(60),
+                            ? AppColors.accentLight.withValues(alpha: 0.24)
+                            : Theme.of(context).disabledColor.withValues(alpha: 0.12))
+                        : AppColors.accentLight.withValues(alpha: 0.24),
                     child: Transform(
                       alignment: Alignment.center,
                       transform: Matrix4.identity()..rotateY(_flip.value < 0.5 ? 0 : 3.14159),

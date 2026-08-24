@@ -87,7 +87,7 @@ class _AnimatedXpProgressState extends State<AnimatedXpProgress>
                   return LinearProgressIndicator(
                     value: animatedValue,
                     minHeight: 10,
-                    backgroundColor: AppColors.terracotta.withAlpha(40),
+                    backgroundColor: AppColors.terracotta.withValues(alpha: 0.16),
                     valueColor: const AlwaysStoppedAnimation(AppColors.accentLight),
                   );
                 },

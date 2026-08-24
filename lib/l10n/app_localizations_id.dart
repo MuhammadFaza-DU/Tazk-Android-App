@@ -564,6 +564,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get exactAlarmBannerAction => 'Aktifkan';
 
   @override
+  String get exactAlarmSettingsTitle => 'Alarm presisi';
+
+  @override
+  String get exactAlarmActive => 'Aktif';
+
+  @override
+  String get exactAlarmInactive => 'Mati — pengingat bisa telat';
+
+  @override
   String get aboutScreenTitle => 'Tentang App';
 
   @override

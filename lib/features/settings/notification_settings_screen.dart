@@ -21,18 +21,29 @@ class NotificationSettingsScreen extends ConsumerWidget {
           SwitchListTile(
             title: Text(l10n.notifTaskLabel),
             value: settings?.notifyTasks ?? true,
-            onChanged: (value) => repo.updateNotificationPref(notifyTasks: value),
+            onChanged: (value) {
+              repo.updateNotificationPref(notifyTasks: value);
+              ref.read(dailyMaintenanceServiceProvider).rescheduleAllReminders();
+            },
           ),
           SwitchListTile(
             title: Text(l10n.notifHabitLabel),
             value: settings?.notifyHabits ?? true,
-            onChanged: (value) => repo.updateNotificationPref(notifyHabits: value),
+            onChanged: (value) {
+              repo.updateNotificationPref(notifyHabits: value);
+              ref.read(dailyMaintenanceServiceProvider).rescheduleAllReminders();
+            },
           ),
           SwitchListTile(
             title: Text(l10n.notifStreakWarningLabel),
             value: settings?.notifyStreakWarning ?? true,
-            onChanged: (value) =>
-                repo.updateNotificationPref(notifyStreakWarning: value),
+            onChanged: (value) {
+              repo.updateNotificationPref(notifyStreakWarning: value);
+              ref.read(dailyMaintenanceServiceProvider).rescheduleAllReminders();
+              ref
+                  .read(gamificationRepositoryProvider)
+                  .refreshStreakWarningNotification();
+            },
           ),
           SwitchListTile(
             title: Text(l10n.notifFreezeLabel),

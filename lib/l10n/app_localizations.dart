@@ -1124,6 +1124,24 @@ abstract class AppLocalizations {
   /// **'Aktifkan'**
   String get exactAlarmBannerAction;
 
+  /// No description provided for @exactAlarmSettingsTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Alarm presisi'**
+  String get exactAlarmSettingsTitle;
+
+  /// No description provided for @exactAlarmActive.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktif'**
+  String get exactAlarmActive;
+
+  /// No description provided for @exactAlarmInactive.
+  ///
+  /// In id, this message translates to:
+  /// **'Mati — pengingat bisa telat'**
+  String get exactAlarmInactive;
+
   /// No description provided for @aboutScreenTitle.
   ///
   /// In id, this message translates to:
