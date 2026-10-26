@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tazk — Eksplorasi Arah Visual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&family=Bricolage+Grotesque:wght@500;600;700&family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c1a17; --muted:#6b665e; --line:#e6e1d7; --page:#f4f1ea;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--page); color:var(--ink);
+    font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1320px;margin:0 auto;padding:40px 28px 80px}
+  h1{font-family:"Fredoka",sans-serif;font-weight:600;font-size:34px;margin:0 0 6px;letter-spacing:-.01em}
+  .lede{color:var(--muted);font-size:15.5px;line-height:1.6;max-width:78ch;margin:0 0 8px}
+  .note{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:18px 0 34px;font-size:14px;color:#4b4740;line-height:1.6}
+  .note b{color:var(--ink)}
+  h2{font-family:"Fredoka",sans-serif;font-weight:600;font-size:22px;margin:46px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 22px}
+  .row{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+  .dir{flex:1 1 380px;min-width:340px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;display:flex;gap:20px}
+  .dircol{flex:1;min-width:0}
+  .dname{font-family:"Fredoka",sans-serif;font-weight:600;font-size:18px;margin:0}
+  .dmeta{font-size:12.5px;color:var(--muted);margin:2px 0 12px;line-height:1.5}
+  .swatches{display:flex;gap:6px;margin:10px 0 12px}
+  .sw{width:30px;height:30px;border-radius:9px;border:1px solid rgba(0,0,0,.08)}
+  .dlist{margin:0;padding-left:16px;font-size:12.5px;color:#4b4740;line-height:1.65}
+  .dlist li{margin-bottom:3px}
+
+  /* ---- phone frame ---- */
+  .phone{
+    width:300px;height:620px;border-radius:38px;padding:10px;background:#15140f;
+    box-shadow:0 22px 46px -18px rgba(20,18,12,.5), 0 3px 10px rgba(0,0,0,.18);
+    flex:0 0 auto;
+  }
+  .screen{
+    width:100%;height:100%;border-radius:29px;overflow:hidden;display:flex;flex-direction:column;
+    font-size:12px;position:relative;
+  }
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px 2px;font-size:10.5px;font-weight:600;opacity:.75}
+  .sbody{padding:6px 14px 14px;overflow:hidden;display:flex;flex-direction:column;gap:11px;flex:1}
+  .appbar{display:flex;align-items:center;gap:10px}
+  .hamb{width:26px;height:26px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .greet{font-family:var(--display);font-weight:600;font-size:15.5px;line-height:1.15}
+  .greet small{display:block;font-family:var(--body);font-weight:500;font-size:10px;opacity:.7;letter-spacing:.02em}
+
+  .hero{border-radius:18px;padding:13px 14px}
+  .hero .top{display:flex;justify-content:space-between;align-items:baseline}
+  .lvl{font-family:var(--display);font-weight:600;font-size:13px}
+  .chip{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px}
+  .xpbar{height:8px;border-radius:999px;margin:10px 0 6px;overflow:hidden}
+  .xpfill{height:100%;width:62%;border-radius:999px}
+  .xptext{font-size:9.5px;opacity:.78;font-weight:600}
+  .streak{margin-top:9px;display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:600}
+
+  .sechead{display:flex;justify-content:space-between;align-items:center;margin-top:3px}
+  .sechead span{font-family:var(--display);font-weight:600;font-size:12.5px}
+  .sechead em{font-style:normal;font-size:9.5px;opacity:.6;font-weight:600}
+
+  .card{border-radius:14px;padding:10px 11px;display:flex;align-items:center;gap:10px}
+  .box{width:19px;height:19px;border-radius:7px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+  .card .txt{flex:1;min-width:0}
+  .card .t{font-size:11.5px;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card .m{font-size:9.5px;opacity:.66;margin-top:2px;display:flex;gap:6px;align-items:center}
+  .tag{font-size:8.5px;font-weight:700;padding:1.5px 6px;border-radius:999px;letter-spacing:.02em}
+  .done .t{text-decoration:line-through;opacity:.55}
+
+  .cta{margin-top:auto;border-radius:15px;padding:12px;text-align:center;font-family:var(--display);font-weight:600;font-size:12.5px}
+
+  /* direction palettes */
+  .a{--display:"Fredoka";--body:"Plus Jakarta Sans";
+     background:#FBF7EF;color:#22271F}
+  .a .hamb{background:#EDE6D6;color:#2C3A2A}
+  .a .hero{background:linear-gradient(150deg,#22402C,#2E5238);color:#F4EFE2}
+  .a .chip{background:#E9A13B;color:#2A1F08}
+  .a .xpbar{background:rgba(255,255,255,.20)}
+  .a .xpfill{background:linear-gradient(90deg,#F0B24A,#E9A13B)}
+  .a .card{background:#fff;border:1px solid #EFE7D7;box-shadow:0 1px 2px rgba(40,32,16,.05)}
+  .a .box{border:1.8px solid #C9BEA3;background:#fff}
+  .a .box.on{background:#2E5238;border-color:#2E5238;color:#fff}
+  .a .tag.p-high{background:#FBE3DC;color:#A5432A}
+  .a .tag.p-med{background:#FCEFD4;color:#8A6212}
+  .a .tag.p-low{background:#E6EDE2;color:#456148}
+  .a .cta{background:#2E5238;color:#F4EFE2}
+  .a .sechead span{color:#2C3A2A}
+
+  .b{--display:"Bricolage Grotesque";--body:"Manrope";
+     background:#F2EDE3;color:#2B2A26}
+  .b .hamb{background:#E5DECF;color:#3D4A38}
+  .b .hero{background:#FBF9F4;border:1px solid #E2DACB;color:#2B2A26}
+  .b .hero .streak{color:#4A5A44}
+  .b .chip{background:#C97B5A;color:#FDF7F1}
+  .b .xpbar{background:#E6DECD}
+  .b .xpfill{background:#4A5A44}
+  .b .card{background:#FBF9F4;border:1px solid #E4DCCD}
+  .b .box{border:1.8px solid #BDB4A1;background:transparent}
+  .b .box.on{background:#4A5A44;border-color:#4A5A44;color:#FBF9F4}
+  .b .tag.p-high{background:#F0DAD1;color:#9A5237}
+  .b .tag.p-med{background:#ECE5D3;color:#7C6636}
+  .b .tag.p-low{background:#DFE4D8;color:#4E5C48}
+  .b .cta{background:#4A5A44;color:#FBF9F4}
+  .b .sechead span{color:#3D4A38}
+
+  .c{--display:"Baloo 2";--body:"Nunito Sans";
+     background:#0F1A14;color:#E8F0E7}
+  .c .hamb{background:#1C2C21;color:#9FE3B4}
+  .c .hero{background:linear-gradient(150deg,#16281C,#1D3524);border:1px solid #2A4433;color:#EAF3E8}
+  .c .chip{background:#8FE0A9;color:#0E2417}
+  .c .xpbar{background:rgba(255,255,255,.13)}
+  .c .xpfill{background:linear-gradient(90deg,#8FE0A9,#F2C765)}
+  .c .card{background:#152219;border:1px solid #23382A}
+  .c .box{border:1.8px solid #3D5B47;background:transparent}
+  .c .box.on{background:#8FE0A9;border-color:#8FE0A9;color:#0E2417}
+  .c .tag.p-high{background:#3A2320;color:#F0A48C}
+  .c .tag.p-med{background:#3A3220;color:#EBCB7E}
+  .c .tag.p-low{background:#20301F;color:#9CC79B}
+  .c .cta{background:#8FE0A9;color:#0E2417}
+  .c .sechead span{color:#CFE7D3}
+
+  /* font pairing strip */
+  .fonts{display:flex;gap:20px;flex-wrap:wrap}
+  .fp{flex:1 1 320px;min-width:300px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}
+  .fp .big{font-size:26px;font-weight:700;margin:0 0 2px;letter-spacing:-.01em}
+  .fp .body-t{font-size:13px;color:#4b4740;line-height:1.55;margin:8px 0 12px}
+  .fp .lab{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .fp .f1{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px;display:flex;gap:8px;align-items:center;font-size:11.5px;color:#4b4740}
+  .f1 .dot{width:22px;height:22px;border-radius:7px;background:#2E5238;display:inline-block}
+  footer{margin-top:52px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:18px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tazk — 3 arah visual</h1>
+  <p class="lede">Semua mockup di bawah memakai <b>layout yang sama</b> seperti Home sekarang (sapaan, kartu XP/streak, daftar tugas, daftar habit, tombol Pomodoro). Yang berbeda hanya <b>warna, mood, bentuk, dan tipografi</b> — supaya kamu menilai rasa visualnya, bukan tata letaknya.</p>
+  <div class="note">
+    Cara lihat: perhatikan 3 kartu di bawah. Tiap kartu = 1 arah. Kamu juga bisa lihat <b>strip komponen</b> (tugas, tag prioritas, checkbox, tombol) di bagian bawah halaman, dan 3 <b>pasangan font</b>.
+    <br><br>Arah yang kamu pilih akan jadi dasar <b>design system</b> — jadi wajar kalau kamu suka warna dari satu arah tapi bentuk dari arah lain. Bilang saja kombinasinya ("warna A, tapi radiusnya lebih seperti B").
+  </div>
+
+  <div class="row">
+
+    <!-- ================= A ================= -->
+    <div class="dir">
+      <div class="dircol">
+        <p class="dname">A · Forest &amp; Honey</p>
+        <p class="dmeta">Evolusi dari "Warna Alam" sekarang, tapi dinaikkan kelasnya: hijau pinus dalam, krem hangat, madu amber. Hangat &amp; tenang, terasa "app yang sudah dewasa".</p>
+        <div class="swatches">
+          <div class="sw" style="background:#22402C"></div>
+          <div class="sw" style="background:#2E5238"></div>
+          <div class="sw" style="background:#E9A13B"></div>
+          <div class="sw" style="background:#FBF7EF"></div>
+          <div class="sw" style="background:#EDE6D6"></div>
+        </div>
+        <ul class="dlist">
+          <li>Radius besar, sudut membulat lembut</li>
+          <li>Shadow halus, bukan tebal</li>
+          <li>Kartu hero hijau gelap + teks krem</li>
+          <li>Amber khusus momen reward</li>
+          <li>Paling dekat dengan identitas sekarang</li>
+        </ul>
+      </div>
+
+      <div class="phone">
+        <div class="screen a" style="--display:'Fredoka';--body:'Plus Jakarta Sans'">
+          <div class="statusbar"><span>09:41</span><span>▲ ▮▮ 94%</span></div>
+          <div class="sbody">
+            <div class="appbar">
+              <div class="hamb">☰</div>
+              <div class="greet">Halo, Faza<small>Rabu, 26 Okt</small></div>
+            </div>
+            <div class="hero">
+              <div class="top"><span class="lvl">Level 12</span><span class="chip">🔥 15 hari</span></div>
+              <div class="xpbar"><div class="xpfill"></div></div>
+              <div class="xptext">620 / 1200 XP · Petarung</div>
+            </div>
+            <div class="sechead"><span>Tugas Hari Ini</span><em>3 sisa</em></div>
+            <div class="card"><div class="box on">✓</div><div class="txt"><div class="t">Tugas Kuliah A</div><div class="m"><span class="tag p-high">High</span><span>08:00</span></div></div></div>
+            <div class="card"><div class="box"></div><div class="txt"><div class="t">Rapat Organisasi</div><div class="m"><span class="tag p-med">Med</span><span>13:00</span></div></div></div>
+            <div class="card"><div class="box"></div><div class="txt"><div class="t">Belanja bulanan</div><div class="m"><span class="tag p-low">Low</span></div></div></div>
+            <div class="sechead"><span>Habits Hari Ini</span></div>
+            <div class="card"><div class="box on">✓</div><div class="txt"><div class="t">Olahraga pagi</div></div></div>
+            <div class="card"><div class="box"></div><div class="txt"><div class="t">Baca buku</div><div class="m"><span>15 / 30 menit</span></div></div></div>
+            <div class="cta">▶ Mulai Pomodoro</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= B ================= -->
+    <div class="dir">
+      <div class="dircol">
+        <p class="dname">B · Sage &amp; Sand</p>
+        <p class="dmeta">Editorial kalem. Hijau sage yang ditumpulkan, pasir, dan clay. Paling tenang dan "premium" — warna hampir monokrom, aksen hanya di momen penting.</p>
+        <div class="swatches">
+          <div class="sw" style="background:#4A5A44"></div>
+          <div class="sw" style="background:#6B7F5E"></div>
+          <div class="sw" style="background:#C97B5A"></div>
+          <div class="sw" style="background:#F2EDE3"></div>
+          <div class="sw" style="background:#2B2A26"></div>
+        </div>
+        <ul class="dlist">
+          <li>Paling kalem &amp; tenang dari ketiganya</li>
+          <li>Kartu putih hangat, border tipis, shadow minim</li>
+          <li>Hierarki lewat berat huruf &amp; jarak, bukan warna</li>
+          <li>Terasa seperti majalah / jurnal premium</li>
+          <li>Sinyal gamifikasi lebih halus (muted)</li>
+        </ul>
+      </div>
+
+      <div class="phone">
+        <div class="screen b" style="--display:'Bricolage Grotesque';--body:'Manrope'">
+          <div class="statusbar"><span>09:41</span><span>▲ ▮▮ 94%</span></div>
+          <div class="sbody">
+            <div class="appbar">
+              <div class="hamb">☰</div>
+              <div class="greet">Halo, Faza<small>Rabu, 26 Okt</small></div>
+            </div>
+            <div class="hero">
+              <div class="top"><span class="lvl">Level 12</span><span class="chip">🔥 15 hari</span></div>
+              <div class="xpbar"><div class="xpfill"></div></div>
+              <div class="xptext">620 / 1200 XP · Petarung</div>
+            </div>
+            <div class="sechead"><span>Tugas Hari Ini</span><em>3 sisa</em></div>
+            <div class="card"><div class="box on">✓</div><div class="txt"><div class="t">Tugas Kuliah A</div><div class="m"><span class="tag p-high">High</span><span>08:00</span></div></div></div>
+            <div class="card"><div class="box"></div><div class="txt"><div class="t">Rapat Organisasi</div><div class="m"><span class="tag p-med">Med</span><span>13:00</span></div></div></div>
+            <div class="card"><div class="box"></div><div class="txt"><div class="t">Belanja bulanan</div><div class="m"><span class="tag p-low">Low</span></div></div></div>
+            <div class="sechead"><span>Habits Hari Ini</span></div>
+            <div class="card"><div class="box on">✓</div><div class="txt"><div class="t">Olahraga pagi</div></div></div>
+            <div class="card"><div class="box"></div><div class="txt"><div class="t">Baca buku</div><div class="m"><span>15 / 30 menit</span></div></div></div>
+            <div class="cta">▶ Mulai Pomodoro</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= C ================= -->
+    <div class="dir">
+      <div class="dircol">
+        <p class="dname">C · Dusk Forest (dark-first)</p>
+        <p class="dmeta">Dibangun dari dark mode dulu, baru diturunkan ke light. Forest dalam + hijau mint bercahaya + madu. Terasa lembut di mata malam hari, tetap hangat dan "hidup".</p>
+        <div class="swatches">
+          <div class="sw" style="background:#0F1A14"></div>
+          <div class="sw" style="background:#16281C"></div>
+          <div class="sw" style="background:#8FE0A9"></div>
+          <div class="sw" style="background:#F2C765"></div>
+          <div class="sw" style="background:#E8F0E7"></div>
+        </div>
+        <ul class="dlist">
+          <li>Dark mode jadi bintang utama, bukan tempelan</li>
+          <li>Aksen mint bercahaya untuk progress &amp; reward</li>
+          <li>Kontras tinggi tapi tetap lembut (bukan hitam pekat)</li>
+          <li>Bagus untuk dipakai malam / sesi fokus</li>
+          <li>Paling "bed a" dari tampilan sekarang</li>
+        </ul>
+      </div>
+
+      <div class="phone">
+        <div class="screen c" style="--display:'Baloo 2';--body:'Nunito Sans'">
+          <div class="statusbar"><span>09:41</span><span>▲ ▮▮ 94%</span></div>
+          <div class="sbody">
+            <div class="appbar">
+              <div class="hamb">☰</div>
+              <div class="greet">Halo, Faza<small>Rabu, 26 Okt</small></div>
+            </div>
+            <div class="hero">
+              <div class="top"><span class="lvl">Level 12</span><span class="chip">🔥 15 hari</span></div>
+              <div class="xpbar"><div class="xpfill"></div></div>
+              <div class="xptext">620 / 1200 XP · Petarung</div>
+            </div>
+            <div class="sechead"><span>Tugas Hari Ini</span><em>3 sisa</em></div>
+            <div class="card"><div class="box on">✓</div><div class="txt"><div class="t">Tugas Kuliah A</div><div class="m"><span class="tag p-high">High</span><span>08:00</span></div></div></div>
+            <div class="card"><div class="box"></div><div class="txt"><div class="t">Rapat Organisasi</div><div class="m"><span class="tag p-med">Med</span><span>13:00</span></div></div></div>
+            <div class="card"><div class="box"></div><div class="txt"><div class="t">Belanja bulanan</div><div class="m"><span class="tag p-low">Low</span></div></div></div>
+            <div class="sechead"><span>Habits Hari Ini</span></div>
+            <div class="card"><div class="box on">✓</div><div class="txt"><div class="t">Olahraga pagi</div></div></div>
+            <div class="card"><div class="box"></div><div class="txt"><div class="t">Baca buku</div><div class="m"><span>15 / 30 menit</span></div></div></div>
+            <div class="cta">▶ Mulai Pomodoro</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>Tipografi</h2>
+  <p class="sub">Kamu minta: judul tetap playful, body lebih mudah dibaca. Tiga pasangan di bawah semuanya gratis &amp; bisa dibundel offline. Perhatikan hurufnya, bukan warnanya.</p>
+  <div class="fonts">
+    <div class="fp">
+      <p class="lab">Pasangan 1 · Rounded friendly</p>
+      <p class="big" style="font-family:'Fredoka',sans-serif">Selesaikan harimu, satu langkah kecil.</p>
+      <p class="body-t" style="font-family:'Plus Jakarta Sans',sans-serif">Judul Fredoka — membulat, ramah, playful tapi jauh lebih bersih dari Spicy Rice. Body Plus Jakarta Sans — modern, mudah dibaca untuk teks panjang seperti nama tugas dan deskripsi habit.</p>
+      <div class="f1"><span class="dot"></span> <b>Fredoka</b> + Plus Jakarta Sans</div>
+    </div>
+    <div class="fp">
+      <p class="lab">Pasangan 2 · Bold playful + netral</p>
+      <p class="big" style="font-family:'Baloo 2',sans-serif">Selesaikan harimu, satu langkah kecil.</p>
+      <p class="body-t" style="font-family:'Nunito Sans',sans-serif">Judul Baloo 2 — tebal, ceria, terasa seperti maskot/game. Body Nunito Sans — membulat &amp; ramah, sangat mudah dibaca di layar kecil.</p>
+      <div class="f1"><span class="dot" style="background:#C97B5A"></span> <b>Baloo 2</b> + Nunito Sans</div>
+    </div>
+    <div class="fp">
+      <p class="lab">Pasangan 3 · Playful halus + editorial</p>
+      <p class="big" style="font-family:'Fraunces',serif">Selesaikan harimu, satu langkah kecil.</p>
+      <p class="body-t" style="font-family:'Manrope',sans-serif">Judul Fraunces — serif lembut dengan karakter; terasa premium &amp; tenang, playful-nya halus. Body Manrope — sangat rapi, angka &amp; label tampil jelas (bagus untuk XP, streak, waktu).</p>
+      <div class="f1"><span class="dot" style="background:#2B2A26"></span> <b>Fraunces</b> + Manrope</div>
+    </div>
+  </div>
+
+  <footer>
+    Catatan: mockup ini HTML/CSS, jadi hanya mendekati tampilan Flutter asli — cukup untuk menilai warna, mood, bentuk, dan huruf.
+    Setelah kamu pilih arah + font, aku susun <b>design system</b>-nya (token warna, tint/shade, spacing, komponen) lalu tulis rencana kerjanya sebelum menyentuh kode aplikasi.
+  </footer>
+</div>
+</body>
+</html>

@@ -39,6 +39,14 @@ migrate_working_dir/
 # Internal agent planning notes
 /docs/superpowers/
 
+# Local secrets & environment files (NEVER commit real keys)
+.env
+.env.*
+!.env.example
+
+# Brainstorm/visual companion scratch space
+/.superpowers/
+
 # Android release signing secrets and shared APK artifacts
 /android/key.properties
 /android/*.jks
