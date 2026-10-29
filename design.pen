@@ -2300,7 +2300,7 @@
               "type": "text",
               "id": "tEmXn",
               "name": "Label",
-              "fill": "$warning",
+              "fill": "$warning-strong",
               "content": "Med",
               "fontFamily": "$font-body",
               "fontSize": 10,
@@ -3739,7 +3739,7 @@
                       "type": "text",
                       "id": "V6oM9",
                       "name": "initials",
-                      "fill": "$warning",
+                      "fill": "$warning-strong",
                       "content": "F",
                       "fontFamily": "$font-display",
                       "fontSize": 17,
@@ -4059,7 +4059,7 @@
                                   "type": "text",
                                   "id": "oA01h",
                                   "name": "p",
-                                  "fill": "$warning",
+                                  "fill": "$warning-strong",
                                   "content": "Med",
                                   "fontFamily": "$font-body",
                                   "fontSize": 9,
@@ -4656,7 +4656,7 @@
                       "type": "text",
                       "id": "fNbdE",
                       "name": "initials",
-                      "fill": "$warning",
+                      "fill": "$warning-strong",
                       "content": "F",
                       "fontFamily": "$font-display",
                       "fontSize": 17,
@@ -4976,7 +4976,7 @@
                                   "type": "text",
                                   "id": "oWpnX",
                                   "name": "p",
-                                  "fill": "$warning",
+                                  "fill": "$warning-strong",
                                   "content": "Med",
                                   "fontFamily": "$font-body",
                                   "fontSize": 9,
@@ -7235,7 +7235,7 @@
                                   "type": "text",
                                   "id": "Ju17h",
                                   "name": "p",
-                                  "fill": "$warning",
+                                  "fill": "$warning-strong",
                                   "content": "Med",
                                   "fontFamily": "$font-body",
                                   "fontSize": 9,
@@ -9949,7 +9949,7 @@
                                   "type": "text",
                                   "id": "j7ubu6",
                                   "name": "p",
-                                  "fill": "$warning",
+                                  "fill": "$warning-strong",
                                   "content": "Task",
                                   "fontFamily": "$font-body",
                                   "fontSize": 9,
@@ -14948,7 +14948,7 @@
                           "type": "text",
                           "id": "Y1wNu",
                           "name": "t",
-                          "fill": "$warning",
+                          "fill": "$warning-strong",
                           "content": "Medium",
                           "fontFamily": "$font-body",
                           "fontSize": 12,
@@ -16418,7 +16418,7 @@
               "type": "text",
               "id": "s09Cd",
               "name": "a",
-              "fill": "$warning",
+              "fill": "$warning-strong",
               "content": "Catatan",
               "fontFamily": "$font-body",
               "fontSize": 10,
@@ -17313,7 +17313,7 @@
                               "type": "text",
                               "id": "JD6Hl",
                               "name": "p",
-                              "fill": "$warning",
+                              "fill": "$warning-strong",
                               "content": "Med",
                               "fontFamily": "$font-body",
                               "fontSize": 8,
@@ -24339,6 +24339,23 @@
     "radius-pill": {
       "type": "number",
       "value": 999
+    },
+    "warning-strong": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#8A5A12",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#EBCB7E",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     }
   },
   "fileToken": "11a98d07-7390-4d61-90a0-3f54c126e563"

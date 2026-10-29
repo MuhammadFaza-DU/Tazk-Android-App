@@ -141,6 +141,11 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 
 ## Cara memverifikasi kondisi sekarang
 
+> ⚠️ **Jebakan `design.pen`:** pen.dev menulis file ke disk **dengan jeda**, bukan saat
+> perintah selesai. Kalau commit dilakukan tepat setelah mengubah kanvas, perubahan itu
+> bisa tertinggal. Selalu jalankan `git status` lagi beberapa saat setelah edit kanvas,
+> dan pastikan `design.pen` tidak muncul sebagai `M` sebelum menganggap kanvas tersimpan.
+
 ```powershell
 # 1. App masih jalan?
 flutter pub get
