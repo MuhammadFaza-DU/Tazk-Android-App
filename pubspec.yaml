@@ -112,17 +112,9 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
+  # v2 assets. v1 fonts and splash video are archived in archive/v1/assets/.
+  # v2 font families (Fredoka, Plus Jakarta Sans) are not bundled yet; they are
+  # declared here only once their .ttf files exist under assets/fonts/.
   assets:
-    - assets/fonts/
-    - assets/videos/
-
-  fonts:
-    - family: SpicyRice
-      fonts:
-        - asset: assets/fonts/SpicyRice-Regular.ttf
-    - family: SourGummy
-      fonts:
-        - asset: assets/fonts/SourGummy-Regular.ttf
-    - family: Unkempt
-      fonts:
-        - asset: assets/fonts/Unkempt-Regular.ttf
+    - assets/mascot/
+    - assets/logo/

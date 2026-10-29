@@ -105,7 +105,7 @@ Karakter dasar (tempel di awal tiap prompt pose):
 
 ## 6. Splash screen
 
-Splash sekarang pakai video pohon tumbuh (`assets/videos/tazk_growth_splash.mp4`). Kalau mau ilustrasi statis cadangan yang menampilkan maskot:
+Splash sekarang memakai maskot + wordmark. Video pohon tumbuh lama (`tazk_growth_splash.mp4`) sudah **diarsipkan** di `archive/v1/assets/videos/`. Kalau mau ilustrasi statis cadangan yang menampilkan maskot:
 
 > A calm premium splash screen illustration, the cute chubby otter mascot sitting beside a small growing sprout on a soft mound of soil, watching it with gentle wonder, 3D clay render pastel, sage green `#4A5A44` and honey `#D69A3C` on warm cream `#F4F1EA`, generous empty space at the top for an app title, no text, no watermark, vertical portrait composition 1080x1920.
 
