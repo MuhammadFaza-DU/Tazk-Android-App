@@ -12,7 +12,8 @@ colors:
   primary: "#4A5A44"
   primary-soft: "#6B7F5E"
   primary-container: "#DDE3D6"
-  on-primary: "#DDE3D6"
+  on-primary: "#FBF9F4"
+  on-primary-muted: "#DDE3D6"
   clay: "#C97B5A"
   clay-container: "#F2DCD1"
   honey: "#D69A3C"
@@ -75,6 +76,11 @@ components:
     textColor: "{colors.on-primary}"
     rounded: "{rounded.md}"
     padding: "{spacing.md}"
+  button-primary-quiet:
+    backgroundColor: "{colors.primary-container}"
+    textColor: "{colors.primary}"
+    rounded: "{rounded.md}"
+    padding: "{spacing.md}"
   card:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
@@ -90,6 +96,11 @@ components:
     textColor: "{colors.danger}"
     rounded: "{rounded.pill}"
     padding: "{spacing.xs}"
+  progress-card:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary-muted}"
+    rounded: "{rounded.xl}"
+    padding: "{spacing.lg}"
   divider:
     backgroundColor: "{colors.border}"
     height: 1px
@@ -122,6 +133,8 @@ Tazk is a daily productivity tool for Gen Z students and young workers, used in 
 
 `primary` is the sage action color. `primary-container` is its tinted background for selected states and quiet buttons. `primary-soft` exists for fills and icons only: it is never a text color on a colored surface.
 
+Two colors carry text on `primary`: `on-primary` for the main label and `on-primary-muted` for a secondary line beneath it. `on-primary` measures 7.03:1 against `primary` and `on-primary-muted` measures 5.65:1, so the muted step is a deliberate hierarchy, not a faded copy.
+
 `honey` marks progress and reward: XP, streaks, and badges. `clay` is the secondary accent and its container backs high-priority signals. `danger` labels destructive actions and `warning` marks attention states.
 
 `warning` is not a text color. It measures 3.27:1 on `canvas`, 3.50:1 on `surface`, and 2.95:1 on `honey-container`, so it clears only the large-text threshold and never the small-text one. Use it for icons, dots, and borders; use `warning-strong` for any warning text at body size.
@@ -141,7 +154,8 @@ The specification in use has no theme-aware token syntax, so the values above ar
 | `primary` | `#4A5A44` | `#8FE0A9` |
 | `primary-soft` | `#6B7F5E` | `#5FAE7C` |
 | `primary-container` | `#DDE3D6` | `#20362A` |
-| `on-primary` | `#DDE3D6` | `#0F1A14` |
+| `on-primary` | `#FBF9F4` | `#0F1A14` |
+| `on-primary-muted` | `#DDE3D6` | `#20362A` |
 | `clay` | `#C97B5A` | `#E0A183` |
 | `clay-container` | `#F2DCD1` | `#3A2620` |
 | `honey` | `#D69A3C` | `#F2C765` |
@@ -178,7 +192,7 @@ Radius is a hierarchy tool, not a default. `sm` is for compact cells inside a ca
 ## Do's and Don'ts
 
 - Do verify every text pairing with a contrast calculation before shipping it. Small text needs 4.5:1 and large text 3:1.
-- Do use `on-primary` for any text sitting on `primary`.
+- Do use `on-primary` for the main label on `primary`, and `on-primary-muted` only for a secondary line beneath it.
 - Don't use `primary-soft` as a text color on `primary` or any dark surface; it measures 1.70:1 against `primary` and fails both thresholds.
 - Don't use `warning` for small text on any surface; use `warning-strong`.
 - Don't rely on color alone to mark a completed task or habit; pair it with a shape or icon change.

@@ -1,5 +1,9 @@
 # Tazk
 
+> **Status:** v2 sedang dibangun. Kondisi terkini, keputusan final, dan isu terbuka ada di
+> [`docs/STATUS.md`](docs/STATUS.md). Design system kanonik ada di [`DESIGN.md`](DESIGN.md).
+> Arsip v1 ada di [`archive/v1/`](archive/v1/README.md).
+
 Tazk is a warm, offline-first Android productivity app built with Flutter. It combines tasks, habits, calendar planning, Pomodoro focus sessions, reminders, home screen widgets, and lightweight progress rewards into one calm daily workspace.
 
 The app is designed for short everyday check-ins: see what matters today, complete tasks and habits, keep focus sessions moving, and track progress without needing an account or internet connection.
