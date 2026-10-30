@@ -18,11 +18,78 @@ Aturan global WAJIB dipatuhi tanpa kecuali. Yang paling sering relevan di projec
 
 ---
 
-## 2. Selalu gunakan skill yang menunjang
+## 2. WAJIB gunakan skill semaksimal mungkin (announce → pakai → laporkan)
 
-- Jalankan **context matching** (Step 0 cek `graphify-out` → Step 1 baca konteks → Step 2 load parent skill → Step 3 load sub-skill → Step 4 kerja). Project ini **sudah punya graph** (`graphify-out/`) — **jangan setup ulang**.
-- Load skill yang relevan via skill tool **sebelum** eksekusi. Contoh: UI → `software-engineering/frontend`; planning → `writing-plans`; debug → `systematic-debugging`; PRD → `prd`; riset/analisis → `knowledge-graph` + sub-skill.
-- **LAPOR pemakaian skill** di akhir kerja (apa yang di-load + keputusan kunci + hasil verifikasi + yang belum ter-verifikasi).
+**Prinsip:** skill bukan opsional "kalau ingat". Setiap task **wajib** punya *Skill Plan* yang diumumkan, dieksekusi, lalu dilaporkan. Jumlah skill yang relevan = **lantai minimum**, bukan plafon. Ragu apakah sebuah skill relevan → **load** (lebih baik kelebihan konteks daripada melewatkan aturan).
+
+### 2.1 Context matching (tetap wajib)
+
+Step 0 cek `graphify-out` → Step 1 baca konteks → Step 2 load parent skill → Step 3 load sub-skill → Step 4 kerja.
+Project ini **sudah punya graph** (`graphify-out/`) — **jangan setup ulang**.
+
+### 2.2 ANNOUNCE "Skill Plan" di AWAL task (wajib, terlihat)
+
+Sebelum menyentuh kode/file, tulis blok ini di chat:
+
+```
+Skill Plan:
+- <skill-id> → <peran konkretnya di task ini>
+- <skill-id> → <peran konkretnya di task ini>
+```
+
+Contoh untuk task UI:
+```
+Skill Plan:
+- software-engineering/frontend → protokol GROUND→BUILD→MOTION→VERIFY
+- impeccable                  → jaga arah desain + lint deterministik
+- antislop + antislop-ui      → filter AI-slop (Delivery Gate)
+- emil-design-eng             → craft interaksi & keputusan animate/don't
+- animate                     → spec motion (trigger, property, durasi, easing)
+- mobile-native               → perilaku touch/HP (tap target, hover, viewport)
+- break-ui                    → stress data (nama panjang, list kosong, emoji)
+```
+
+**Aturan:** kalau task masuk salah satu baris matriks §2.3, skill di kolom "WAJIB" **tidak boleh dilewati**. Melewati wajib dengan alasan tertulis (1 baris) + disetujui owner, atau jangan dikerjakan.
+
+### 2.3 Matriks skill per jenis task (lantai minimum)
+
+| Jenis task | Skill WAJIB | Peran |
+|---|---|---|
+| **UI / layar / komponen / styling** | `software-engineering/frontend`, `impeccable`, `antislop`, `antislop-ui`, `emil-design-eng` | protokol 4 fase · arah desain + lint · filter slop · craft interaksi |
+| **Animasi / motion / transisi** | `animate`, `animation-performance`, `review-animations`, `emil-design-eng` | desain gerak · budget frame · rubrik review · keputusan animate/don't |
+| **Audit motion / "bikin lebih hidup"** | `find-animation-opportunities`, `improve-animations`, `review-animations` | cari peluang · rencana perbaikan · review |
+| **Copy / teks UI / microcopy** | `antislop-copywriting` | tone, CTA, anti-AI-writing |
+| **Aksesibilitas / kontras** | `antislop-human` (+ `contrast-check.py`) | kontras AA, keyboard, state, affordance |
+| **Layout mobile / responsif** | `antislop-layoutmobile` | reflow 320→desktop, overflow, tap target |
+| **Kode Dart/Flutter (fitur/logika)** | `test-driven-development`, `antislop-code` | test dulu · kebersihan komentar |
+| **Debug / bug / error** | `systematic-debugging` | isolate → reproduce → root cause → fix → verify |
+| **Perencanaan / spec** | `brainstorming`, `writing-plans` | discovery · dokumen plan |
+| **Eksekusi plan (paralel/subagent)** | `subagent-driven-development`, `dispatching-parallel-agents` | delegasi + review + integrasi |
+| **Sebelum klaim selesai** | `verification-before-completion` | bukti sebelum klaim |
+| **Review kode** | `requesting-code-review`, `receiving-code-review` | minta review · terima review dengan rigor |
+| **PRD / requirement** | `prd` (+ `brainstorming` untuk discovery) | skema PRD |
+| **Dokumentasi library/API** | `context7` | docs terkini, bukan hafalan |
+| **Baca gambar/PDF/dokumen** | `mcp-ocr` | teks/layout/warna dari gambar |
+| **Analisis codebase / arsitektur** | `knowledge-graph` + `codebase-analysis` | peta project, god node, komunitas |
+| **Trace "kenapa/sebelumnya"** | `cross-reference` | lacak akar lintas modul + riwayat |
+| **Keamanan / pre-deploy** | `security-testing` (+ 4 skill Strix) | pentest/audit, scan |
+| **Design system / DESIGN.md** | `create-design-md`, `impeccable` | dokumentasi design language · arah + lint |
+
+### 2.4 LAPOR di AKHIR kerja (wajib)
+
+Tulis blok ini:
+
+```
+Skill Report:
+- Dipakai: <skill-id> (<peran>) , ...
+- Dilewati : <skill-id> (<alasan 1 baris>)   ← hanya bila ada
+- Hasil verifikasi: <perintah + hasil nyata>
+- Belum terverifikasi: <...>
+```
+
+### 2.5 Kalau skill gagal di-load
+
+Laporkan `skills: NOT LOADED (<nama>)` + jalankan **baseline manual** (mis. untuk UI: kontras, tap target, state lengkap, tanpa font default/gradient ungu-biru). **Jangan diam-diam melewati.**
 
 ---
 

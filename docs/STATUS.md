@@ -8,7 +8,8 @@ Terakhir diperbarui: **2026-10-30**
 ## Log Perubahan (terbaru duluan)
 
 - 2026-10-30 — Menambah file aturan project `AGENTS.md` (root) + section log ini (mekanisme "selalu update STATUS.md") — commit `06d48a9`
-- 2026-10-30 — Menambah `PRD-v2.md` (scope & requirement v2, disetujui owner) — *(commit ini)*
+- 2026-10-30 — Menambah `PRD-v2.md` (scope & requirement v2, disetujui owner) — commit `65afac8`
+- 2026-10-30 — Perketat §2 `AGENTS.md`: wajib *Skill Plan* (announce di awal) + matriks skill per jenis task + *Skill Report* di akhir — *(commit ini)*
 
 ---
 
