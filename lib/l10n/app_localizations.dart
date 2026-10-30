@@ -146,6 +146,18 @@ abstract class AppLocalizations {
   /// **'Pengaturan'**
   String get navSettings;
 
+  /// No description provided for @navMore.
+  ///
+  /// In id, this message translates to:
+  /// **'Lainnya'**
+  String get navMore;
+
+  /// No description provided for @navAbout.
+  ///
+  /// In id, this message translates to:
+  /// **'Tentang'**
+  String get navAbout;
+
   /// No description provided for @comingSoonMessage.
   ///
   /// In id, this message translates to:

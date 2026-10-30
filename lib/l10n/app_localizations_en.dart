@@ -33,6 +33,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSettings => 'Settings';
 
   @override
+  String get navMore => 'More';
+
+  @override
+  String get navAbout => 'About';
+
+  @override
   String comingSoonMessage(String title) {
     return '$title — coming soon';
   }

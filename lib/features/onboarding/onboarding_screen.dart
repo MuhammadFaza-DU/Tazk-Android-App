@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/app_shell.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/repository_providers.dart';
-import '../home/home_screen.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -29,7 +29,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         .updateName(_nameController.text.trim());
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(builder: (_) => const AppShell()),
     );
   }
 

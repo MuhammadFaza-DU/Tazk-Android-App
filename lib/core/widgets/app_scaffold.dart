@@ -2,9 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/dev/component_preview_screen.dart';
-import 'app_drawer.dart';
 
-/// Shared shell for all main screens: hamburger + sidebar nav (PRD section 4).
+/// Shared scaffold for PUSHED screens (Pomodoro, Task/Habit form & detail,
+/// Profile, Settings, About): AppBar + body only.
+///
+/// The main navigation lives in `AppShell` (tab bar + "Lainnya" sheet), so
+/// there is no drawer here anymore.
 class AppScaffold extends StatelessWidget {
   const AppScaffold({
     super.key,
@@ -26,16 +29,15 @@ class AppScaffold extends StatelessWidget {
         title: Text(title),
         actions: [
           ...?actions,
-          if (kDebugMode) _debugPreviewAction(context), // dev-only (relocated in T3)
+          if (kDebugMode) _debugPreviewAction(context), // dev-only
         ],
       ),
-      drawer: const AppDrawer(),
       body: body,
       floatingActionButton: floatingActionButton,
     );
   }
 
-  // dev-only (relocated in T3)
+  // dev-only
   Widget _debugPreviewAction(BuildContext context) {
     return IconButton(
       tooltip: 'Component preview (debug)',

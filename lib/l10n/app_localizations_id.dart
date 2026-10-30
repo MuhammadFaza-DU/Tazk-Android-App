@@ -33,6 +33,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get navSettings => 'Pengaturan';
 
   @override
+  String get navMore => 'Lainnya';
+
+  @override
+  String get navAbout => 'Tentang';
+
+  @override
   String comingSoonMessage(String title) {
     return '$title — segera hadir';
   }

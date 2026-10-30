@@ -10,7 +10,7 @@ import '../../providers/exact_alarm_permission_provider.dart';
 import '../../providers/notification_permission_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/repository_providers.dart';
-import '../home/home_screen.dart';
+import '../../core/widgets/app_shell.dart';
 import '../onboarding/onboarding_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -99,7 +99,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     return profile.name.trim().isEmpty
         ? const OnboardingScreen()
-        : const HomeScreen();
+        : const AppShell();
   }
 
   void _handleVideoProgress() {

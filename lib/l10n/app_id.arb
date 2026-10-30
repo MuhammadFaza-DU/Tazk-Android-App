@@ -9,6 +9,8 @@
   "navPomodoro": "Pomodoro",
   "navProfile": "Profil",
   "navSettings": "Pengaturan",
+  "navMore": "Lainnya",
+  "navAbout": "Tentang",
 
   "comingSoonMessage": "{title} — segera hadir",
   "@comingSoonMessage": {
