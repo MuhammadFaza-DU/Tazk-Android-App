@@ -7,7 +7,8 @@ Terakhir diperbarui: **2026-10-30**
 
 ## Log Perubahan (terbaru duluan)
 
-- 2026-10-30 — Menambah file aturan project `AGENTS.md` (root) + section log ini (mekanisme "selalu update STATUS.md") — *(belum commit)*
+- 2026-10-30 — Menambah file aturan project `AGENTS.md` (root) + section log ini (mekanisme "selalu update STATUS.md") — commit `06d48a9`
+- 2026-10-30 — Menambah `PRD-v2.md` (scope & requirement v2, disetujui owner) — *(commit ini)*
 
 ---
 
@@ -80,6 +81,7 @@ Tag stabil sebelumnya: `stable-2026-10-30-v1`, `stable-2026-10-29-v1`, `stable-2
 |---|---|
 | `DESIGN.md` | Design system kanonik, format DESIGN.md spec v0.4.0. 19 warna, 6 skala tipografi, 5 radius, 7 spacing, 13 komponen. Lint **0 error**, export dtcg exit 0 |
 | `PRODUCT.md` | Product doc v2 |
+| `PRD-v2.md` | PRD v2 — scope & requirement v2 (disetujui owner) |
 | `docs/STATUS.md` | Dokumen ini |
 | `docs/superpowers/specs/2026-10-26-tazk-v2-upgrade-design.md` | Rencana upgrade lengkap 16 tahap |
 | `docs/design/2026-10-26-arahan-visual.html` | Mockup 3 arah visual awal |
