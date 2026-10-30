@@ -563,6 +563,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get widgetStreakDaysSuffix => 'hari';
 
   @override
+  String get streakDaySingular => 'hari';
+
+  @override
   String get exactAlarmBannerMessage =>
       'Izin alarm presisi dimatikan. Pengingat bisa telat hingga 15 menit.';
 

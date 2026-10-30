@@ -67,7 +67,7 @@ class _HabitList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16), // spacing.lg — satu wrapper, vertikal dr gap
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96), // bottom 96 = ruang FAB
       children: [
         AppCard(
           padding: EdgeInsets.zero,

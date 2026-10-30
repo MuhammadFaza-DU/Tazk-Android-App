@@ -1124,6 +1124,12 @@ abstract class AppLocalizations {
   /// **'hari'**
   String get widgetStreakDaysSuffix;
 
+  /// No description provided for @streakDaySingular.
+  ///
+  /// In id, this message translates to:
+  /// **'hari'**
+  String get streakDaySingular;
+
   /// No description provided for @exactAlarmBannerMessage.
   ///
   /// In id, this message translates to:

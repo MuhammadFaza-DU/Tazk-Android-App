@@ -309,7 +309,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String deleteHabitDialogContent(String name) {
-    return '\"$name\"\'s history and streak stay saved, but this habit will no longer be active.';
+    return 'The history and streak of \"$name\" stay saved, but this habit will no longer be active.';
   }
 
   @override
@@ -562,6 +562,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetStreakDaysSuffix => 'days';
+
+  @override
+  String get streakDaySingular => 'day';
 
   @override
   String get exactAlarmBannerMessage =>

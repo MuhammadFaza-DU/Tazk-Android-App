@@ -7,6 +7,8 @@ Terakhir diperbarui: **2026-10-31**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-10-31 — Verifikasi visual HP (Galaxy A52, 24 screenshot) + fix bug: FAB menutupi baris terakhir (Habits), plural "1 days", kalimat dialog hapus (ICU apostrophe), tombol Delete jadi `danger`, XP bar Profile disamakan (AnimatedXpProgress). **Aturan baru AGENTS §11: gerbang fidelity kanvas.** 60fps terukur (0 jank/126 frame) — *(commit ini)*
+
 - 2026-10-31 — T4 Motion tuntas: token motion di kode (`AppMotion` + `context.reduceMotion`) + `AppPageRoute`; press scale 0.97; checkbox pop/confetti reduced-motion; XP glow composite-only; celebration `repeat()`→one-shot; progress fill `Transform.scale`; sheet/dialog motion; badge shine sweep; entrance EmptyState/Onboarding; splash sway tergerbangi — commit `714d14d` (+ `dfd17b8`, `ec348dc`), 111/111 test
 
 - 2026-10-30 — T3 tuntas: app shell (tab bar 5 + sheet "Lainnya", tanpa drawer) + redesign 12 layar ke design system v2 + migrasi shared-widget (0 `AppColors.*` deprecated tersisa) — commit `622801a` (+ batch 38d4328, 7e0a744)
@@ -145,6 +147,14 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 | T16 Docs final + rilis | ⬜ belum | |
 
 ### Isu terbuka yang harus diingat
+
+0. **DEVIASI FIDELITY KANVAS (ditemukan 2026-10-31, gerbang baru AGENTS §11)** — implementasi belum dibandingkan dengan board `design.pen`:
+   - **Splash** masih memakai **video v1** + pohon gambar tangan (`_TreePainter`). DESIGN: *`otter-with-sprout` carries the splash*. → **belum diperbaiki**, menunggu board 22 Splash.
+   - **Empty state** hanya menempel PNG maskot yang **berlatar krem opaque** → kotak terang di tema gelap. Butuh PNG transparan (aset) atau perlakuan kanvas (board 11 States). → **belum diperbaiki**.
+   - **History grid habit** menampilkan X untuk hari yang belum terjadi. → ditunda (butuh keputusan produk, T13).
+   - **Kalender** memberi judul "Habits (daily)" padahal berisi habit *Custom*. → ditunda (l10n/logika, T13).
+   - **Profil** menampilkan "Level 4" dua kali (kartu avatar + kartu XP) → menunggu konfirmasi board 06 Profil.
+   - Status: **semua belum diverifikasi terhadap kanvas**; `execute` pencil MCP di mesin ini tidak mengekspos API (`Get`/`TakeScreenshot` missing) → butuh export board dari owner.
 
 1. ~~Font v2 belum diunduh.~~ **Selesai di T2** — `assets/fonts/` berisi Fredoka + Plus Jakarta Sans (3 file), terdaftar di `pubspec.yaml`.
 2. **Ikon app persegi belum ada.** Yang ada baru wordmark horizontal (`assets/logo/tazk-logo.png`) yang **terpotong** kalau dipakai di kotak persegi. Prompt ada di `docs/design/ikon-logo-prompts.md` §2.

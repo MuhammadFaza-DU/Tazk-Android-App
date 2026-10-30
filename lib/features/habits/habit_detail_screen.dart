@@ -106,7 +106,7 @@ class HabitDetailScreen extends ConsumerWidget {
           label: l10n.cancelButton,
           onPressed: () => Navigator.of(context).pop(false),
         ),
-        AppButton.ghost(
+        AppButton.danger(
           label: l10n.deleteButton,
           onPressed: () => Navigator.of(context).pop(true),
         ),

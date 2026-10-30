@@ -12,7 +12,7 @@ import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_text_field.dart';
-import '../../core/widgets/progress_bar.dart';
+import '../../core/widgets/animated_xp_progress.dart';
 import '../../core/widgets/section_header.dart';
 import '../../core/widgets/shine_sweep.dart';
 import '../../core/widgets/stat_tile.dart';
@@ -286,8 +286,9 @@ class _GamificationSummary extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12), // spacing.md
-              ProgressBar(
+              AnimatedXpProgress(
                 value: needed == 0 ? 0 : (xp / needed).clamp(0.0, 1.0),
+                level: level,
               ),
               const SizedBox(height: 8), // spacing.sm
               Text(
@@ -300,7 +301,8 @@ class _GamificationSummary extends StatelessWidget {
         const SizedBox(height: 12), // spacing.md
         StatTile(
           label: l10n.widgetStreakActiveLabel,
-          value: '$streakDays ${l10n.widgetStreakDaysSuffix}',
+          value:
+              '$streakDays ${streakDays == 1 ? l10n.streakDaySingular : l10n.widgetStreakDaysSuffix}',
           icon: Icons.local_fire_department_rounded,
         ),
       ],

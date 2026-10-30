@@ -211,3 +211,19 @@ Tambahan kualitas: kontras AA (4.5:1 body / 3:1 large) light+dark; tap target �
 | T16 | Docs final + rilis v2.0 | ⬜ belum |
 
 > Sumber kebenaran status terkini: `docs/STATUS.md` (bukan tabel di atas — tabel ini ringkasan).
+
+---
+
+## 11. Gerbang Fidelity Kanvas (WAJIB — pelajaran insiden 2026-10-31)
+
+**Insiden:** T2–T4 dinyatakan "sesuai design system" hanya karena *token* (warna/radius/motion) cocok, padahal **layout, komposisi, dan aset menyimpang dari kanvas**: splash masih memakai video v1 + pohon gambar tangan (DESIGN: *`otter-with-sprout` carries the splash*), empty state hanya menempel PNG berlatar krem. Ini **pelanggaran**, bukan detail.
+
+**Aturan yang mengikat:**
+
+1. **`DESIGN.md` = token saja** (warna, tipografi, radius, spacing, motion). Token cocok **bukan** bukti layout benar.
+2. **Sumber kebenaran UI = board di `design.pen`**, dibaca lewat pencil MCP (`get_app_state` + screenshot/export board). File `.pen` terenkripsi → **dilarang** membaca dengan Read/Grep; selalu via MCP.
+3. **Sebelum mulai task UI:** buka kanvas, baca board layar terkait, tulis **checklist fidelity** (elemen → ada/tidak → selisih) di `docs/STATUS.md` atau ledger.
+4. **Sebelum klaim selesai:** render di HP (screenshot `adb`) dan bandingkan berdampingan dengan board; laporkan tabel **board vs implementasi vs selisih**.
+5. **Dilarang:** memakai aset v1 (`archive/v1`), menempel gambar sebagai pengganti komposisi, mengarang layout saat board tersedia, atau menyebut "sesuai design" tanpa screenshot pembanding.
+6. **Kalau akses kanvas gagal** (Pen tidak terbuka, tool MCP error): **minta owner membukakan / export board**. Menunggu izin ≠ izin jalan tanpa fidelity.
+7. Setiap deviasi dicatat di `docs/STATUS.md` dengan status **diperbaiki** atau **ditunda + alasan** — tidak boleh hilang.

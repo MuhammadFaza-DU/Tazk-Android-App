@@ -67,3 +67,6 @@ graphify-out/cache/
 graphify-out/cost.json
 
 strix_runs/
+
+# Local QA evidence (screenshots) — kept out of git on purpose
+docs/verify/
