@@ -7,6 +7,7 @@ Terakhir diperbarui: **2026-10-30**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-10-30 — T3 tuntas: app shell (tab bar 5 + sheet "Lainnya", tanpa drawer) + redesign 12 layar ke design system v2 + migrasi shared-widget (0 `AppColors.*` deprecated tersisa) — commit `622801a` (+ batch 38d4328, 7e0a744)
 - 2026-10-30 — T2-B: widget kit 12 komponen + preview dev-only — commit `5989955`
 - 2026-10-30 — T2-A: font Fredoka+PJS + 19 token ThemeExtension + ColorScheme eksplisit — commit `69587d2`
 - 2026-10-30 — T1 Performa tuntas (batch 2): checkbox tulis DB langsung (buang delay 380ms) + home lazy sliver & satu query log habit — commit `9cc313e`
@@ -20,10 +21,10 @@ Terakhir diperbarui: **2026-10-30**
 
 ## Ringkas satu paragraf
 
-Tazk sedang diupgrade dari v1 ke v2. **Fase desain selesai** (design system, 27 board
-kanvas, DESIGN.md). **T1 Performa selesai** (8/8 sub-task) & **T2 design system ke kode
-selesai** (font Fredoka+Plus Jakarta Sans, 19 token ThemeExtension, ColorScheme eksplisit,
-widget kit 12 komponen + preview dev-only). Fase berikutnya: T3 — redesign 12 layar + navigasi.
+Tazk sedang diupgrade dari v1 ke v2. **Fase desain selesai**. **T1 Performa selesai** (8/8),
+**T2 design system selesai** (font, 19 token, ColorScheme, widget kit 12), dan **T3 redesign
+layar selesai** (tab bar 5 + sheet "Lainnya" tanpa drawer, 12 layar pakai widget kit + token,
+shared-widget dimigrasi). Fase berikutnya: T4 — animasi & micro-interaction.
 
 ---
 
@@ -125,7 +126,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 | T0 Fondasi | 🟡 sebagian | Arsip v1 selesai, `.gitignore` dirapikan. Belum ada gate CI |
 | T1 Performa (lag) | ✅ selesai | 8/8: index DB, push coalesce+gate, checkbox DB-langsung, home lazy sliver, pomodoro label-only, startup non-blocking, splash decouple, minify+split ABI |
 | T2 Design system | ✅ selesai | font Fredoka+PJS, 19 token `ThemeExtension`, `ColorScheme` eksplisit (bukan fromSeed), widget kit 12 komponen + preview dev-only |
-| T3 Redesign layar | 🟡 desain selesai, kode belum | 12 layar di kanvas, kode masih v1 |
+| T3 Redesign layar | ✅ selesai | app shell tab bar 5 + sheet "Lainnya" (tanpa drawer); 12 layar pakai widget kit + token; shared-widget & 0 `AppColors.*` deprecated |
 | T4 Animasi | ⬜ belum | Motion token sudah didefinisikan |
 | T5 Statistik | 🟡 desain selesai | Layar 07 digambar, fitur belum |
 | T6 Subtask & Lokasi | ⬜ belum | |
