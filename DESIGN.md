@@ -218,6 +218,7 @@ The token schema has no motion category, so these normative values live here.
 | `celebration` | 600–900ms | Level up, badge unlock, streak milestone |
 | `easeStandard` | `cubic-bezier(0.2, 0, 0, 1)` | Default |
 | `easeGentle` | `cubic-bezier(0.4, 0, 0.2, 1)` | Enter and exit |
+| `springPop` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Rare reward moments only (complete pop, badge unlock) |
 
 Entrances use `easeStandard`; `ease-in` never appears in UI motion. Honor `MediaQuery.disableAnimations` by replacing celebration with an instant state change. No ticker runs while the app is idle.
 
