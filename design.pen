@@ -5457,12 +5457,21 @@
           "children": [
             {
               "type": "frame",
-              "id": "BXez7",
-              "name": "grab",
-              "width": 40,
+              "id": "q5MV3",
+              "name": "grabWrap",
+              "width": "fill_container",
               "height": 4,
-              "fill": "$border",
-              "cornerRadius": 999
+              "layout": "none",
+              "children": [
+                {
+                  "id": "bwmZY",
+                  "type": "ref",
+                  "ref": "KOoxU",
+                  "name": "handle",
+                  "x": 175,
+                  "y": 0
+                }
+              ]
             },
             {
               "type": "frame",
@@ -24003,6 +24012,18 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "KOoxU",
+      "x": 0,
+      "y": 0,
+      "name": "Sheet/Handle",
+      "reusable": true,
+      "width": 40,
+      "height": 4,
+      "fill": "$border",
+      "cornerRadius": 999
     }
   ],
   "themes": {

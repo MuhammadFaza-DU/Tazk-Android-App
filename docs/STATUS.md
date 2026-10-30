@@ -53,7 +53,7 @@ Tag stabil sebelumnya: `stable-2026-10-29-v1`, `stable-2026-08-23-v1..v3`, `stab
 
 | File | Isi |
 |---|---|
-| `DESIGN.md` | Design system kanonik, format DESIGN.md spec v0.4.0. 19 warna, 6 skala tipografi, 5 radius, 7 spacing, 12 komponen. Lint **0 error**, export dtcg exit 0 |
+| `DESIGN.md` | Design system kanonik, format DESIGN.md spec v0.4.0. 19 warna, 6 skala tipografi, 5 radius, 7 spacing, 13 komponen. Lint **0 error**, export dtcg exit 0 |
 | `PRODUCT.md` | Product doc v2 |
 | `docs/STATUS.md` | Dokumen ini |
 | `docs/superpowers/specs/2026-10-26-tazk-v2-upgrade-design.md` | Rencana upgrade lengkap 16 tahap |
@@ -91,7 +91,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 |---|---|---|
 | T0 Fondasi | 🟡 sebagian | Arsip v1 selesai, `.gitignore` dirapikan. Belum ada gate CI |
 | T1 Performa (lag) | ⬜ belum | Audit sudah ada (8 temuan), belum dieksekusi |
-| T2 Design system | 🟡 desain selesai, kode belum | `DESIGN.md` + kanvas selesai; `app_colors.dart`/`app_typography.dart` **masih v1** |
+| T2 Design system | 🟡 desain selesai, kode belum | `DESIGN.md` + kanvas selesai (13 komponen termasuk `Sheet/Handle`); `app_colors.dart`/`app_typography.dart` **masih v1** |
 | T3 Redesign layar | 🟡 desain selesai, kode belum | 12 layar di kanvas, kode masih v1 |
 | T4 Animasi | ⬜ belum | Motion token sudah didefinisikan |
 | T5 Statistik | 🟡 desain selesai | Layar 07 digambar, fitur belum |

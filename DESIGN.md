@@ -113,6 +113,11 @@ components:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.pill}"
     height: 62px
+  sheet-handle:
+    backgroundColor: "{colors.border}"
+    rounded: "{rounded.pill}"
+    size: 40px
+    height: 4px
   progress-track:
     backgroundColor: "{colors.primary-soft}"
     rounded: "{rounded.pill}"
@@ -183,11 +188,13 @@ Home-screen widgets keep a fixed grid height even when they hold one item, and c
 
 ## Shapes
 
-Radius is a hierarchy tool, not a default. `sm` is for compact cells inside a card, `md` for cards and buttons, `lg` for grouped panels, `xl` for the main progress card and sheets, and `pill` for chips, toggles, and the tab bar.
+Radius is a hierarchy tool, not a default. `sm` is for compact cells inside a card, `md` for cards and buttons, `lg` for grouped panels, `xl` for the main progress card and sheets, and `pill` for chips, toggles, the sheet handle, and the tab bar.
 
 ## Components
 
 `button-primary` uses `primary` with `on-primary` text; that pairing is the only safe text-on-primary combination. `card` separates itself with `border` and the `divider` token, so cards never nest inside cards. `chip-priority` and `chip-high` use `pill` radius with a container/text pair that clears AA at small sizes. `input-field` uses `ink-muted` for placeholder text, which measures 5.09:1 on `surface`.
+
+`sheet-handle` marks a draggable bottom sheet. It is centered on the sheet's full width, not inside the content padding, so its visual center matches the sheet's center.
 
 ## Do's and Don'ts
 
