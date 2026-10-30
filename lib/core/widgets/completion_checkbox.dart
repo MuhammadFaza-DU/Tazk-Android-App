@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_motion.dart';
 
 class CompletionCheckbox extends StatefulWidget {
   const CompletionCheckbox({
@@ -24,9 +26,19 @@ class _CompletionCheckboxState extends State<CompletionCheckbox> {
   bool _pressed = false;
   bool _burst = false;
 
+  Timer? _pressTimer;
+  Timer? _burstTimer;
+
   bool get _canToggleOn => !widget.value && widget.onComplete != null;
   bool get _canToggleOff => widget.value && widget.onUncomplete != null;
   bool get _enabled => _canToggleOn || _canToggleOff;
+
+  @override
+  void dispose() {
+    _pressTimer?.cancel();
+    _burstTimer?.cancel();
+    super.dispose();
+  }
 
   Future<void> _handleChanged(bool? value) async {
     final isCheck = value == true;
@@ -35,14 +47,19 @@ class _CompletionCheckboxState extends State<CompletionCheckbox> {
     if (isCheck && !_canToggleOn) return;
     if (!isCheck && !_canToggleOff) return;
     if (isCheck) {
+      if (context.reduceMotion) {
+        // Reduced motion: state instan, tanpa pop/confetti.
+        await widget.onComplete!();
+        return;
+      }
       setState(() {
         _pressed = true;
         _burst = true;
       });
-      Future<void>.delayed(const Duration(milliseconds: 140), () {
+      _pressTimer = Timer(AppMotion.fast, () {
         if (mounted) setState(() => _pressed = false);
       });
-      Future<void>.delayed(const Duration(milliseconds: 380), () {
+      _burstTimer = Timer(const Duration(milliseconds: 380), () {
         if (mounted) setState(() => _burst = false);
       });
       await widget.onComplete!();
@@ -58,9 +75,9 @@ class _CompletionCheckboxState extends State<CompletionCheckbox> {
       alignment: Alignment.center,
       children: [
         AnimatedScale(
-          scale: _pressed ? 1.18 : 1,
-          duration: const Duration(milliseconds: 140),
-          curve: Curves.easeOutCubic,
+          scale: _pressed ? 1.15 : 1,
+          duration: context.motion(AppMotion.fast),
+          curve: AppMotion.easeStandard,
           child: Checkbox(
             value: widget.value,
             onChanged: _enabled ? _handleChanged : null,

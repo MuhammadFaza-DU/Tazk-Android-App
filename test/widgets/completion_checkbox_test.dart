@@ -54,4 +54,61 @@ void main() {
 
     expect(called, 1);
   });
+
+  testWidgets('reduced motion completes instantly without confetti', (
+    tester,
+  ) async {
+    var called = 0;
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: Scaffold(
+            body: CompletionCheckbox(
+              value: false,
+              onComplete: () async {
+                called++;
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(Checkbox));
+    await tester.pump();
+
+    expect(called, 1);
+    expect(find.byKey(const Key('micro_confetti')), findsNothing);
+  });
+
+  testWidgets('show confetti burst once on complete (normal motion)', (
+    tester,
+  ) async {
+    var called = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: Scaffold(
+          body: CompletionCheckbox(
+            value: false,
+            onComplete: () async {
+              called++;
+            },
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(Checkbox));
+    await tester.pump();
+
+    expect(called, 1);
+    expect(find.byKey(const Key('micro_confetti')), findsOneWidget);
+
+    // Burst clears at 380ms; no timer should remain afterwards.
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const Key('micro_confetti')), findsNothing);
+  });
 }
