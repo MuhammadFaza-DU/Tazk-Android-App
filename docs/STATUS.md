@@ -7,18 +7,20 @@ Terakhir diperbarui: **2026-10-30**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-10-30 — T1 Performa (batch 1): coalesce + gate push widget, pomodoro label-only rebuild, startup non-blocking + rollover 1×/hari, splash decouple video, minify+shrink+split ABI (176→~30 MB/ABI) — commit `7e902bc`
+- 2026-10-30 — T1-A: 4 index DB + migrasi schema v3 — commit `bfbdd72`
 - 2026-10-30 — Menambah file aturan project `AGENTS.md` (root) + section log ini (mekanisme "selalu update STATUS.md") — commit `06d48a9`
 - 2026-10-30 — Menambah `PRD-v2.md` (scope & requirement v2, disetujui owner) — commit `65afac8`
-- 2026-10-30 — Perketat §2 `AGENTS.md`: wajib *Skill Plan* (announce di awal) + matriks skill per jenis task + *Skill Report* di akhir — *(commit ini)*
+- 2026-10-30 — Perketat §2 `AGENTS.md`: wajib *Skill Plan* (announce di awal) + matriks skill per jenis task + *Skill Report* di akhir — commit `707c283`
 
 ---
 
 ## Ringkas satu paragraf
 
-Tazk sedang diupgrade dari v1 ke v2. **Fase desain sudah selesai** (design system,
-27 board kanvas, DESIGN.md). **Fase kode belum mulai** — app yang jalan sekarang masih
-v1 dengan aset v1 yang sudah diarsipkan, jadi tipografi app jatuh ke font sistem.
-Langkah berikutnya: migrasi design system ke kode (Tahap 2).
+Tazk sedang diupgrade dari v1 ke v2. **Fase desain selesai** (design system, 27 board
+kanvas, DESIGN.md). **T1 Performa hampir selesai** (6/8 sub-task dieksekusi: index DB,
+push widget coalesce+gate, pomodoro label-only, startup non-blocking, splash decouple,
+minify+split ABI). Fase kode berikutnya: migrasi design system ke kode (Tahap 2).
 
 ---
 
@@ -118,7 +120,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 | Tahap | Status | Catatan |
 |---|---|---|
 | T0 Fondasi | 🟡 sebagian | Arsip v1 selesai, `.gitignore` dirapikan. Belum ada gate CI |
-| T1 Performa (lag) | ⬜ belum | Audit sudah ada (8 temuan), belum dieksekusi |
+| T1 Performa (lag) | 🟡 sebagian | 6/8 sub-task selesai (index DB, push coalesce+gate, pomodoro, startup/rollover, splash, build ABI); tersisa T1-C checkbox & T1-D home lazy |
 | T2 Design system | 🟡 desain selesai, kode belum | `DESIGN.md` + kanvas selesai (13 komponen termasuk `Sheet/Handle`); `app_colors.dart`/`app_typography.dart` **masih v1** |
 | T3 Redesign layar | 🟡 desain selesai, kode belum | 12 layar di kanvas, kode masih v1 |
 | T4 Animasi | ⬜ belum | Motion token sudah didefinisikan |
