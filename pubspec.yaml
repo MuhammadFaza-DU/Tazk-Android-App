@@ -113,8 +113,21 @@ flutter:
   # https://flutter.dev/to/asset-from-package
 
   # v2 assets. v1 fonts and splash video are archived in archive/v1/assets/.
-  # v2 font families (Fredoka, Plus Jakarta Sans) are not bundled yet; they are
-  # declared here only once their .ttf files exist under assets/fonts/.
   assets:
     - assets/mascot/
     - assets/logo/
+
+  # v2 font families (DESIGN.md typography).
+  # Fredoka carries display/title/headline (weight 600); Plus Jakarta Sans
+  # carries body/label/caption (weights 400 and 600).
+  fonts:
+    - family: Fredoka
+      fonts:
+        - asset: assets/fonts/Fredoka-Variable.ttf
+          weight: 600
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
+          weight: 600
