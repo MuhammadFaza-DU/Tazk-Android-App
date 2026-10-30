@@ -3,9 +3,7 @@
 Dokumen penanda posisi kerja. Baca ini dulu sebelum melanjutkan, supaya tidak
 mengulang keputusan yang sudah diambil atau mengerjakan hal yang sudah selesai.
 
-Terakhir diperbarui: **2026-10-30**
-
----
+Terakhir diperbarui: **2026-10-30**---
 
 ## Ringkas satu paragraf
 
@@ -21,12 +19,23 @@ Langkah berikutnya: migrasi design system ke kode (Tahap 2).
 | Item | Nilai |
 |---|---|
 | Branch | `main` |
-| Commit terakhir | `04fa0df` — chore: arsipkan v1 + design system v2 + perbaikan kontras kanvas |
-| Tag stabil terakhir | `stable-2026-10-29-v2` |
-| Status push | **3 commit belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
+| Commit terakhir | `8627cf7` — fix(canvas): tengahkan sheet grab handle + jadikan komponen |
+| Tag stabil terakhir | `stable-2026-10-30-v2` |
+| Status push | **6 commit belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
 | Working tree | bersih |
 
-Tag stabil sebelumnya: `stable-2026-10-29-v1`, `stable-2026-08-23-v1..v3`, `stable-2026-10-26-v1`
+Tag stabil sebelumnya: `stable-2026-10-30-v1`, `stable-2026-10-29-v1`, `stable-2026-10-29-v2`, `stable-2026-10-26-v1`, `stable-2026-08-23-v1..v3`
+
+**Riwayat commit sesi ini (lokal, belum di-push):**
+
+| Commit | Isi |
+|---|---|
+| `8627cf7` | Tengahkan sheet grab handle + jadikan komponen `Sheet/Handle` |
+| `b1ed785` | Commit perbaikan `warning-strong` di kanvas yang tertinggal |
+| `8b281b5` | Tambah `docs/STATUS.md` + pecah token `on-primary` / `on-primary-muted` |
+| `04fa0df` | Arsipkan v1 ke `archive/v1/` + `DESIGN.md` v2 + perbaikan kontras |
+| `07fbe14` | Maskot otter + prompt aset + design system v2 di kanvas |
+| `9aa7c7c` | Dokumen desain upgrade v2 + mockup 3 arah visual |
 
 ---
 
@@ -34,14 +43,19 @@ Tag stabil sebelumnya: `stable-2026-10-29-v1`, `stable-2026-08-23-v1..v3`, `stab
 
 ### Fase desain (kanvas `design.pen`)
 
-**27 board**, 2.195 node, 0 placeholder tersisa:
+**27 board**, 2.145 node, 0 placeholder tersisa, **18 komponen reusable** (31 token):
 
 | Kelompok | Board |
 |---|---|
-| Fondasi | Foundations (30 token), Components, Library, Dark Preview |
+| Fondasi | Foundations (31 token), Components, Library, Dark Preview |
 | Layar utama | 01 Home, 01b Home-Sheet, 12 Home-Dark, 02 Tasks, 03 Habits, 04 Kalender, 05 Pomodoro |
 | Layar sekunder | 06 Profil, 07 Statistik, 08 Pengaturan, 09 Onboarding, 10 Task Form, 24 Habit Form, 25 Habit Detail |
 | Pelengkap | 11 States, 15 Navigation Map, 16 App Icon, 20 Widgets, 21 Notifikasi, 22 Splash, 23 Tentang, 26 Backup & Pencarian, 27 Celebration |
+
+**Perbaikan kanvas terakhir (2026-10-30):**
+- **Sheet grab handle ditengahkan.** Sebelumnya meleset 18px (= persis padding kiri sheet): handle center 177 vs sheet center 195. Sekarang **center 195 = 195, selisih 0**.
+- Dijadikan **komponen reusable `Sheet/Handle`** (40×4, radius pill), bukan node lepas.
+- Anak lain sheet (judul + 4 item) tidak tersentuh, tetap rata kiri.
 
 **Design system final:**
 - Palet: **Sage & Sand** (light) / **Dusk Forest** (dark)
@@ -117,6 +131,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 6. **Kode masih merujuk aset terarsip** — sengaja dibiarkan (punya fallback, tidak crash). Akan hilang di T2/T3.
 7. **Provider `.env` lama mati** (`vyceai.com` HTTP 503). Sudah diganti ke SEKAI `/v2` (`ds/deepseek-v4.1-flash`). Nebius juga 401.
 8. **Kanvas masih pakai 3 warna untuk "teks di atas primary"** — `$surface` (17×), `$canvas` (9×), `#DDE3D6` (3×). Semua lolos kontras (7.03 / 6.56 / 5.65:1), tapi `DESIGN.md` sekarang mendeklarasikan dua: `on-primary` (`#FBF9F4`) dan `on-primary-muted` (`#DDE3D6`). **Perlu normalisasi kanvas**: 9 node `$canvas` → `$surface`.
+9. **Kontras grab handle masih 1.32:1** (`#E2DACB` di atas `#FBF9F4`) — hampir tak terlihat. Owner minta hanya ditengahkan, jadi kontras sengaja dibiarkan. Kalau mau dibuat terlihat, standar elemen non-teks = 3:1; kandidat `#918A7C` (3.26:1) / dark `#6A7A6E` (3.63:1).
 
 ---
 
@@ -145,6 +160,15 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 > perintah selesai. Kalau commit dilakukan tepat setelah mengubah kanvas, perubahan itu
 > bisa tertinggal. Selalu jalankan `git status` lagi beberapa saat setelah edit kanvas,
 > dan pastikan `design.pen` tidak muncul sebagai `M` sebelum menganggap kanvas tersimpan.
+>
+> **Terbukti 2×:** (1) perbaikan `warning-strong` tertinggal dari commit `04fa0df`;
+> (2) grab handle tertahan **~90 detik** sebelum muncul di file. Cara aman: cek isi file,
+> bukan hanya ukurannya — mis. `Select-String design.pen -Pattern "namaNodeBaru"`.
+
+> ⚠️ **Jebakan pen.dev: `justifyContent: center` tidak bekerja pada node `ref`.**
+> Menengahkan instance komponen di dalam frame flexbox tidak bereaksi. Solusi yang
+> terbukti: beri wrapper `layout: "none"` lalu set `x` eksplisit pada instance.
+> Terverifikasi pada `Sheet/Handle` (x=175 → center 195 = center sheet 195).
 
 ```powershell
 # 1. App masih jalan?
@@ -163,8 +187,9 @@ python "C:\Users\LENOVO\.agents\skills\antislop-human\contrast-check.py" "#TEXT"
 # buka design.pen di pen.dev, cek get_app_state
 ```
 
-**Baseline terakhir terverifikasi (2026-10-29):** `dart analyze` bersih, `flutter test` 60/60,
-`lint DESIGN.md` 0 error, export dtcg exit 0, semua pasangan warna chip lolos AA.
+**Baseline terakhir terverifikasi (2026-10-30):** `dart analyze` bersih, `flutter test` 60/60,
+`lint DESIGN.md` 0 error, export dtcg exit 0, semua pasangan warna chip lolos AA,
+sheet grab handle center 195 = sheet center 195 (selisih 0).
 
 ---
 
