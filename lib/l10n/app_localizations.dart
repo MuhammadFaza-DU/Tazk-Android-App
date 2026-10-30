@@ -233,13 +233,13 @@ abstract class AppLocalizations {
   /// No description provided for @homeGreeting.
   ///
   /// In id, this message translates to:
-  /// **'Halo, {name}!'**
+  /// **'Halo, {name}'**
   String homeGreeting(String name);
 
   /// No description provided for @homeTasksToday.
   ///
   /// In id, this message translates to:
-  /// **'Tasks Hari Ini'**
+  /// **'Tugas Hari Ini'**
   String get homeTasksToday;
 
   /// No description provided for @homeNoTasksToday.
@@ -275,8 +275,44 @@ abstract class AppLocalizations {
   /// No description provided for @homeStartPomodoroButton.
   ///
   /// In id, this message translates to:
-  /// **'Mulai Pomodoro'**
+  /// **'Mulai sesi fokus'**
   String get homeStartPomodoroButton;
+
+  /// No description provided for @homeTasksRemaining.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} sisa'**
+  String homeTasksRemaining(int count);
+
+  /// No description provided for @homeHabitsProgress.
+  ///
+  /// In id, this message translates to:
+  /// **'{done} dari {total}'**
+  String homeHabitsProgress(int done, int total);
+
+  /// No description provided for @homeNoTime.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanpa jam'**
+  String get homeNoTime;
+
+  /// No description provided for @homeStreakDays.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} hari'**
+  String homeStreakDays(int count);
+
+  /// No description provided for @homeHabitMinutes.
+  ///
+  /// In id, this message translates to:
+  /// **'{current} / {target} mnt'**
+  String homeHabitMinutes(int current, int target);
+
+  /// No description provided for @homeXpMeta.
+  ///
+  /// In id, this message translates to:
+  /// **'{xp} / {needed} XP · {rank}'**
+  String homeXpMeta(int xp, int needed, String rank);
 
   /// No description provided for @levelLabel.
   ///

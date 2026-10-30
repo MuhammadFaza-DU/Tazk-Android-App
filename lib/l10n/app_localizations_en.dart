@@ -78,7 +78,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeGreeting(String name) {
-    return 'Hi, $name!';
+    return 'Hi, $name';
   }
 
   @override
@@ -104,7 +104,47 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeStartPomodoroButton => 'Start Pomodoro';
+  String get homeStartPomodoroButton => 'Start focus session';
+
+  @override
+  String homeTasksRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count left',
+      one: '1 left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeHabitsProgress(int done, int total) {
+    return '$done of $total';
+  }
+
+  @override
+  String get homeNoTime => 'No time';
+
+  @override
+  String homeStreakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '$count day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeHabitMinutes(int current, int target) {
+    return '$current / $target min';
+  }
+
+  @override
+  String homeXpMeta(int xp, int needed, String rank) {
+    return '$xp / $needed XP · $rank';
+  }
 
   @override
   String levelLabel(int level) {

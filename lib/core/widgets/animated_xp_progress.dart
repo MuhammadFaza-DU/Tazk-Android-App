@@ -18,10 +18,22 @@ class AnimatedXpProgress extends StatefulWidget {
     super.key,
     required this.value,
     required this.level,
+    this.height = 10,
+    this.trackColor,
+    this.fillColor,
   });
 
   final double value;
   final int level;
+
+  /// Tinggi bar. Default 10 (dipakai sebelum board `01 Home`).
+  final double height;
+
+  /// Warna track. `null` → isian clay redup seperti default lama.
+  final Color? trackColor;
+
+  /// Warna isi bar. `null` → `honey`.
+  final Color? fillColor;
 
   @override
   State<AnimatedXpProgress> createState() => _AnimatedXpProgressState();
@@ -97,6 +109,8 @@ class _AnimatedXpProgressState extends State<AnimatedXpProgress>
     final target = widget.value.clamp(0.0, 1.0);
     final colors = context.colors;
     const radius = BorderRadius.all(Radius.circular(8));
+    final trackColor = widget.trackColor ?? colors.clay.withValues(alpha: 0.16);
+    final fillColor = widget.fillColor ?? colors.honey;
 
     // Constant shadow geometry/colour: the render object only repaints when
     // this decoration changes, which it never does frame-to-frame.
@@ -133,9 +147,9 @@ class _AnimatedXpProgressState extends State<AnimatedXpProgress>
             builder: (context, animatedValue, _) {
               return LinearProgressIndicator(
                 value: animatedValue,
-                minHeight: 10,
-                backgroundColor: colors.clay.withValues(alpha: 0.16),
-                valueColor: AlwaysStoppedAnimation<Color>(colors.honey),
+                minHeight: widget.height,
+                backgroundColor: trackColor,
+                valueColor: AlwaysStoppedAnimation<Color>(fillColor),
               );
             },
           ),

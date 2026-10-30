@@ -30,11 +30,11 @@
   "fieldNameLabel": "Nama",
   "onboardingNameEmptyError": "Nama tidak boleh kosong",
 
-  "homeGreeting": "Halo, {name}!",
+  "homeGreeting": "Halo, {name}",
   "@homeGreeting": {
     "placeholders": { "name": { "type": "String" } }
   },
-  "homeTasksToday": "Tasks Hari Ini",
+  "homeTasksToday": "Tugas Hari Ini",
   "homeNoTasksToday": "Belum ada task hari ini",
   "errorLoadingTasks": "Gagal memuat task: {error}",
   "@errorLoadingTasks": {
@@ -46,7 +46,38 @@
   "@errorLoadingHabits": {
     "placeholders": { "error": { "type": "String" } }
   },
-  "homeStartPomodoroButton": "Mulai Pomodoro",
+  "homeStartPomodoroButton": "Mulai sesi fokus",
+  "homeTasksRemaining": "{count} sisa",
+  "@homeTasksRemaining": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "homeHabitsProgress": "{done} dari {total}",
+  "@homeHabitsProgress": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "homeNoTime": "Tanpa jam",
+  "homeStreakDays": "{count} hari",
+  "@homeStreakDays": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "homeHabitMinutes": "{current} / {target} mnt",
+  "@homeHabitMinutes": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "target": { "type": "int" }
+    }
+  },
+  "homeXpMeta": "{xp} / {needed} XP · {rank}",
+  "@homeXpMeta": {
+    "placeholders": {
+      "xp": { "type": "int" },
+      "needed": { "type": "int" },
+      "rank": { "type": "String" }
+    }
+  },
   "levelLabel": "Level {level}",
   "@levelLabel": {
     "placeholders": { "level": { "type": "int" } }

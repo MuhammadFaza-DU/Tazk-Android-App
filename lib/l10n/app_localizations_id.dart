@@ -78,11 +78,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String homeGreeting(String name) {
-    return 'Halo, $name!';
+    return 'Halo, $name';
   }
 
   @override
-  String get homeTasksToday => 'Tasks Hari Ini';
+  String get homeTasksToday => 'Tugas Hari Ini';
 
   @override
   String get homeNoTasksToday => 'Belum ada task hari ini';
@@ -104,7 +104,35 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get homeStartPomodoroButton => 'Mulai Pomodoro';
+  String get homeStartPomodoroButton => 'Mulai sesi fokus';
+
+  @override
+  String homeTasksRemaining(int count) {
+    return '$count sisa';
+  }
+
+  @override
+  String homeHabitsProgress(int done, int total) {
+    return '$done dari $total';
+  }
+
+  @override
+  String get homeNoTime => 'Tanpa jam';
+
+  @override
+  String homeStreakDays(int count) {
+    return '$count hari';
+  }
+
+  @override
+  String homeHabitMinutes(int current, int target) {
+    return '$current / $target mnt';
+  }
+
+  @override
+  String homeXpMeta(int xp, int needed, String rank) {
+    return '$xp / $needed XP · $rank';
+  }
 
   @override
   String levelLabel(int level) {
