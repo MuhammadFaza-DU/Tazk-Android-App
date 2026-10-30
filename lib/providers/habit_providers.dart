@@ -35,3 +35,11 @@ final habitLogForDateProvider =
 final habitHistoryProvider = StreamProvider.family<List<HabitLog>, int>((ref, habitId) {
   return ref.watch(habitRepositoryProvider).watchHistory(habitId);
 });
+
+final todayHabitLogCompletionProvider = StreamProvider<Map<int, bool>>((ref) {
+  final today = ref.watch(currentDateProvider);
+  return ref
+      .watch(habitRepositoryProvider)
+      .watchLogsForDate(today)
+      .map((logs) => {for (final log in logs) log.habitId: log.isCompleted});
+});

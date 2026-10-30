@@ -68,6 +68,11 @@ class HabitRepository {
         .watch();
   }
 
+  Stream<List<HabitLog>> watchLogsForDate(DateTime date) {
+    final day = _dateOnly(date);
+    return (_db.select(_db.habitLogs)..where((l) => l.date.equals(day))).watch();
+  }
+
   Future<int> createHabit({
     required String name,
     required HabitFrequency frequency,

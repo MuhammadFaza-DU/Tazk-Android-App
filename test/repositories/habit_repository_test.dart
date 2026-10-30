@@ -108,4 +108,27 @@ void main() {
     expect(logs, hasLength(1));
     expect(logs.single.isCompleted, isTrue);
   });
+
+  test('watchLogsForDate returns all logs for that date only', () async {
+    final today = DateTime(2026, 7, 21);
+    final otherDay = DateTime(2026, 7, 20);
+
+    final idA = await habits.createHabit(
+      name: 'Habit A',
+      frequency: HabitFrequency.daily,
+    );
+    final idB = await habits.createHabit(
+      name: 'Habit B',
+      frequency: HabitFrequency.daily,
+    );
+
+    await habits.completeHabitOnDate(idA, today);
+    await habits.completeHabitOnDate(idB, today);
+    await habits.completeHabitOnDate(idA, otherDay);
+
+    final logs = await habits.watchLogsForDate(today).first;
+
+    expect(logs, hasLength(2));
+    expect(logs.map((l) => l.habitId).toSet(), {idA, idB});
+  });
 }

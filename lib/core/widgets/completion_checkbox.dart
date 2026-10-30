@@ -39,10 +39,12 @@ class _CompletionCheckboxState extends State<CompletionCheckbox> {
         _pressed = true;
         _burst = true;
       });
-      await Future<void>.delayed(const Duration(milliseconds: 140));
-      if (mounted) setState(() => _pressed = false);
-      await Future<void>.delayed(const Duration(milliseconds: 240));
-      if (mounted) setState(() => _burst = false);
+      Future<void>.delayed(const Duration(milliseconds: 140), () {
+        if (mounted) setState(() => _pressed = false);
+      });
+      Future<void>.delayed(const Duration(milliseconds: 380), () {
+        if (mounted) setState(() => _burst = false);
+      });
       await widget.onComplete!();
     } else {
       await widget.onUncomplete!();

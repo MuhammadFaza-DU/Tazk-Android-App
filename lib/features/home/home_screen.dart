@@ -45,6 +45,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final streak = ref.watch(streakStateProvider).valueOrNull;
     final tasksAsync = ref.watch(todayTasksProvider);
     final todayHabits = ref.watch(todayHabitsProvider);
+    final habitCompletion =
+        ref.watch(todayHabitLogCompletionProvider).valueOrNull ?? const <int, bool>{};
     final l10n = AppLocalizations.of(context)!;
 
     ref.listen(streakStateProvider, (previous, next) {
@@ -64,43 +66,107 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       title: (profile == null || profile.name.trim().isEmpty)
           ? l10n.appTitle
           : l10n.homeGreeting(profile.name),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const NotificationPermissionBanner(),
-          const ExactAlarmBanner(),
-          _GamificationSummary(profile: profile, streak: streak),
-          const SizedBox(height: 24),
-          Text(l10n.homeTasksToday, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          tasksAsync.when(
-            data: (tasks) => tasks.isEmpty
-                ? _EmptyState(message: l10n.homeNoTasksToday)
-                : Column(children: [for (final task in tasks) _TaskTile(task: task)]),
-            loading: () => const _LoadingRow(),
-            error: (error, _) => _EmptyState(message: l10n.errorLoadingTasks(error.toString())),
+      body: CustomScrollView(
+        slivers: [
+          _paddedSliver(
+            const SliverToBoxAdapter(child: NotificationPermissionBanner()),
+            top: 16,
           ),
-          const SizedBox(height: 24),
-          Text(l10n.homeHabitsToday, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          todayHabits.isEmpty
-              ? _EmptyState(message: l10n.homeNoActiveHabits)
-              : Column(children: [for (final habit in todayHabits) _HabitTile(habit: habit)]),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const PomodoroScreen()),
-                );
-              },
-              icon: const Icon(Icons.play_arrow_rounded),
-              label: Text(l10n.homeStartPomodoroButton),
+          _paddedSliver(const SliverToBoxAdapter(child: ExactAlarmBanner())),
+          _paddedSliver(
+            SliverToBoxAdapter(
+              child: _GamificationSummary(profile: profile, streak: streak),
             ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          _paddedSliver(
+            SliverToBoxAdapter(
+              child: Text(l10n.homeTasksToday,
+                  style: Theme.of(context).textTheme.titleLarge),
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          ..._buildTaskSlivers(tasksAsync, l10n),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          _paddedSliver(
+            SliverToBoxAdapter(
+              child: Text(l10n.homeHabitsToday,
+                  style: Theme.of(context).textTheme.titleLarge),
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          if (todayHabits.isEmpty)
+            _paddedSliver(
+              SliverToBoxAdapter(
+                  child: _EmptyState(message: l10n.homeNoActiveHabits)),
+            )
+          else
+            _paddedSliver(
+              SliverList.builder(
+                itemCount: todayHabits.length,
+                itemBuilder: (context, i) => _HabitTile(
+                  habit: todayHabits[i],
+                  isCompleted: habitCompletion[todayHabits[i].id] ?? false,
+                ),
+              ),
+            ),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          _paddedSliver(
+            SliverToBoxAdapter(
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const PomodoroScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: Text(l10n.homeStartPomodoroButton),
+                ),
+              ),
+            ),
+            bottom: 16,
           ),
         ],
       ),
+    );
+  }
+
+  Widget _paddedSliver(Widget sliver, {double top = 0, double bottom = 0}) {
+    return SliverPadding(
+      padding: EdgeInsets.fromLTRB(16, top, 16, bottom),
+      sliver: sliver,
+    );
+  }
+
+  List<Widget> _buildTaskSlivers(
+      AsyncValue<List<Task>> tasksAsync, AppLocalizations l10n) {
+    return tasksAsync.when(
+      data: (tasks) => tasks.isEmpty
+          ? [
+              _paddedSliver(
+                SliverToBoxAdapter(
+                    child: _EmptyState(message: l10n.homeNoTasksToday)),
+              ),
+            ]
+          : [
+              _paddedSliver(
+                SliverList.builder(
+                  itemCount: tasks.length,
+                  itemBuilder: (context, i) => _TaskTile(task: tasks[i]),
+                ),
+              ),
+            ],
+      loading: () =>
+          [_paddedSliver(const SliverToBoxAdapter(child: _LoadingRow()))],
+      error: (error, _) => [
+        _paddedSliver(
+          SliverToBoxAdapter(
+            child: _EmptyState(message: l10n.errorLoadingTasks(error.toString())),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -181,15 +247,13 @@ class _TaskTile extends ConsumerWidget {
 }
 
 class _HabitTile extends ConsumerWidget {
-  const _HabitTile({required this.habit});
+  const _HabitTile({required this.habit, required this.isCompleted});
 
   final Habit habit;
+  final bool isCompleted;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isCompleted =
-        ref.watch(habitTodayLogProvider(habit.id)).valueOrNull?.isCompleted ?? false;
-
     return ListTile(
       leading: CompletionCheckbox(
         value: isCompleted,
