@@ -947,7 +947,7 @@ abstract class AppLocalizations {
   /// No description provided for @splashTagline.
   ///
   /// In id, this message translates to:
-  /// **'Tumbuh tiap hari'**
+  /// **'Satu langkah kecil setiap hari'**
   String get splashTagline;
 
   /// No description provided for @rankPerintis.
@@ -1225,6 +1225,48 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Streak kamu tetap aman karena freeze otomatis dipakai untuk hari yang terlewat.'**
   String get notifFreezeUsedBody;
+
+  /// No description provided for @stateEmptyTasksTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada tugas hari ini'**
+  String get stateEmptyTasksTitle;
+
+  /// No description provided for @stateEmptyTasksSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Santai dulu, atau tambah satu tugas kecil untuk mulai.'**
+  String get stateEmptyTasksSubtitle;
+
+  /// No description provided for @stateEmptyTasksAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Tambah tugas'**
+  String get stateEmptyTasksAction;
+
+  /// No description provided for @stateLoadingLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Memuat data'**
+  String get stateLoadingLabel;
+
+  /// No description provided for @stateErrorTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal memuat data'**
+  String get stateErrorTitle;
+
+  /// No description provided for @stateErrorMessage.
+  ///
+  /// In id, this message translates to:
+  /// **'Coba lagi sebentar. Data lokalmu tetap aman.'**
+  String get stateErrorMessage;
+
+  /// No description provided for @stateRetryAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Coba lagi'**
+  String get stateRetryAction;
 }
 
 class _AppLocalizationsDelegate

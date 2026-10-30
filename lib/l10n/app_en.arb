@@ -156,7 +156,7 @@
   "errorLoadingAvatars": "Failed to load avatars: {error}",
   "editNameDialogTitle": "Edit Name",
 
-  "splashTagline": "Growing every day",
+  "splashTagline": "One small step every day",
 
   "rankPerintis": "Pioneer",
   "rankPetarung": "Fighter",
@@ -205,5 +205,13 @@
   "notifStreakWarningTitle": "Don't break your streak!",
   "notifStreakWarningBody": "No task/habit completed yet today. Finish one before midnight!",
   "notifFreezeUsedTitle": "Freeze used!",
-  "notifFreezeUsedBody": "Your streak stayed safe because a freeze was automatically used for the missed day."
+  "notifFreezeUsedBody": "Your streak stayed safe because a freeze was automatically used for the missed day.",
+
+  "stateEmptyTasksTitle": "No tasks today yet",
+  "stateEmptyTasksSubtitle": "Take it easy, or add one small task to get started.",
+  "stateEmptyTasksAction": "Add task",
+  "stateLoadingLabel": "Loading data",
+  "stateErrorTitle": "Failed to load data",
+  "stateErrorMessage": "Try again in a moment. Your local data is still safe.",
+  "stateRetryAction": "Try again"
 }

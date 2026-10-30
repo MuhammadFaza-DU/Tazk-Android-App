@@ -2,18 +2,22 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_motion.dart';
+import '../../core/theme/app_typography.dart';
+import '../../core/widgets/app_shell.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/exact_alarm_permission_provider.dart';
 import '../../providers/notification_permission_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/repository_providers.dart';
-import '../../core/widgets/app_shell.dart';
 import '../onboarding/onboarding_screen.dart';
 
+/// Splash statis mengikuti board `design-export/22 Splash.png`.
+///
+/// Komposisi (satu grup, terpusat vertikal di atas `canvas`):
+/// lingkaran maskot → wordmark "Tazk" → tagline → progress bar tipis.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -21,77 +25,44 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  static const _videoAsset = 'assets/videos/tazk_growth_splash.mp4';
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   static const _transitionDuration = Duration(milliseconds: 450);
+
+  /// Batas splash: navigasi tidak pernah menunggu lebih lama dari ini.
   static const _maxSplashDuration = Duration(milliseconds: 1200);
 
+  // Ukuran di bawah diukur dari board `design-export/22 Splash.png`
+  // (780×1688 px = frame 390×844dp @2x), bukan dikira-kira:
+  //   lingkaran honey  440px → Ø220dp
+  //   gambar maskot    432×324px → 216×162dp (rasio PNG 0.75, tidak di-crop;
+  //                    figure otter 352px → 176dp = 80% tinggi lingkaran)
+  //   progress track   240×8px → 120×4dp
+  //   wordmark         46dp (cap 67px → 33.5dp, cocok)
+  //   tagline          lebar glyph 319px → 159,5dp ⇒ ~11,5dp; ukuran terdekat
+  //                    di skala DESIGN.md adalah caption/bodySmall (12dp).
+  static const double _mascotCircleSize = 220;
+  static const double _mascotImageWidth = 162;
+  static const double _mascotImageHeight = 216;
+
+  static const double _progressWidth = 120;
+  static const double _progressHeight = 4;
+
+  // Jarak di board diukur antar *glyph* (circle→cap wordmark 30,5dp;
+  // wordmark→tagline 32dp; tagline→bar 19dp). Nilai di bawah sudah
+  // dikompensasi terhadap leading bawaan font agar glyph jatuh di posisi itu.
+  static const double _gapMascotWordmark = 18;
+  static const double _gapWordmarkTagline = 17;
+  static const double _gapTaglineProgress = 14;
+
   late final Future<Widget> _nextScreenFuture;
-  VideoPlayerController? _videoController;
-  late final AnimationController _fallbackController;
   Timer? _maxSplashTimer;
-  bool _fallbackStarted = false;
-  bool _videoReady = false;
-  bool _showFallback = false;
-  bool _showBranding = false;
   bool _isNavigating = false;
 
   @override
   void initState() {
     super.initState();
-    _fallbackController = AnimationController(
-      vsync: this,
-      duration: AppMotion.celebration,
-    );
     _nextScreenFuture = _prepareNextScreen();
-    _initializeVideo();
-    // Show a static fallback frame immediately while the video is still
-    // loading, so users never stare at a blank screen (tests and broken
-    // assets included). The video still replaces it once ready.
-    Future<void>.delayed(Duration.zero, () {
-      if (!mounted || _videoReady) return;
-      setState(() => _showFallback = true);
-    });
-    // Never gate navigation on the full video length: force the transition
-    // once the max splash duration elapses, whichever trigger fires first.
     _maxSplashTimer = Timer(_maxSplashDuration, _navigateNext);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Reduced motion: the swaying fallback tree never ticks. Started here
-    // (not in initState) because `context.reduceMotion` needs a MediaQuery.
-    if (_fallbackStarted) return;
-    _fallbackStarted = true;
-    if (!context.reduceMotion) {
-      _fallbackController.repeat(reverse: true);
-    }
-  }
-
-  Future<void> _initializeVideo() async {
-    final controller = VideoPlayerController.asset(_videoAsset);
-    _videoController = controller;
-
-    try {
-      await controller.initialize();
-      if (!mounted) return;
-      await controller.setLooping(false);
-      if (!mounted) return;
-      await controller.setVolume(0);
-      if (!mounted) return;
-      setState(() => _videoReady = true);
-      controller.addListener(_handleVideoProgress);
-      if (!mounted) return;
-      await controller.play();
-    } catch (error) {
-      debugPrint('SplashScreen: failed to play $_videoAsset: $error');
-      await controller.dispose();
-      _videoController = null;
-      if (!mounted) return;
-      await _navigateNext();
-    }
   }
 
   Future<Widget> _prepareNextScreen() async {
@@ -116,22 +87,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         : const AppShell();
   }
 
-  void _handleVideoProgress() {
-    final controller = _videoController;
-    if (controller == null || !controller.value.isInitialized) return;
-    final duration = controller.value.duration;
-    if (duration == Duration.zero) return;
-    final position = controller.value.position;
-    // Reveal branding for the final ~35% of the clip (PRD: logo appears at end).
-    if (!_showBranding && position >= duration * 0.65) {
-      setState(() => _showBranding = true);
-    }
-    final almostDone = position >= duration - const Duration(milliseconds: 120);
-    if (almostDone && !_isNavigating) {
-      _navigateNext();
-    }
-  }
-
   Future<void> _navigateNext() async {
     if (_isNavigating) return;
     _maxSplashTimer?.cancel();
@@ -152,157 +107,128 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   void dispose() {
     _maxSplashTimer?.cancel();
-    _videoController?.removeListener(_handleVideoProgress);
-    _videoController?.dispose();
-    _fallbackController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      backgroundColor: context.colors.canvas,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (_videoReady) _SplashVideo(controller: _videoController!),
-          if (_showFallback && !_videoReady)
-            _FallbackTree(animation: _fallbackController),
-          // Branding reveal at the tail end of the splash (growth metaphor).
-          AnimatedOpacity(
-            opacity: _showBranding || _showFallback ? 1 : 0,
-            duration: context.motion(AppMotion.slow),
-            curve: AppMotion.easeStandard,
-            child: Container(
-              alignment: Alignment.bottomCenter,
-              padding: const EdgeInsets.only(bottom: 64),
+      backgroundColor: colors.canvas,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: _mascotCircleSize,
+              height: _mascotCircleSize,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    context.colors.canvas.withValues(alpha: 0.72),
-                  ],
+                shape: BoxShape.circle,
+                color: colors.honeyContainer,
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/mascot/otter-waving.png',
+                  width: _mascotImageWidth,
+                  height: _mascotImageHeight,
+                  fit: BoxFit.cover,
+                  excludeFromSemantics: true,
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Tazk',
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                          color: context.colors.primary,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    AppLocalizations.of(context)!.splashTagline,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: (isDark ? context.colors.inkMuted : context.colors.ink),
-                        ),
-                  ),
-                ],
+            ),
+            const SizedBox(height: _gapMascotWordmark),
+            Text(
+              'Tazk',
+              style: TextStyle(
+                fontFamily: AppTypography.titleFont,
+                fontSize: 46,
+                fontWeight: FontWeight.w700,
+                height: 1.2,
+                color: colors.primary,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SplashVideo extends StatelessWidget {
-  const _SplashVideo({required this.controller});
-
-  final VideoPlayerController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = controller.value.size;
-    return FittedBox(
-      fit: BoxFit.cover,
-      child: SizedBox(
-        width: size.width,
-        height: size.height,
-        child: VideoPlayer(controller),
-      ),
-    );
-  }
-}
-
-class _FallbackTree extends StatelessWidget {
-  const _FallbackTree({required this.animation});
-
-  final Animation<double> animation;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Center(
-      child: AnimatedBuilder(
-        animation: animation,
-        builder: (context, _) => CustomPaint(
-          size: const Size(140, 180),
-          painter: _TreePainter(
-            t: animation.value,
-            trunk: colors.clay,
-            foliage: colors.primary,
-            sparkle: colors.honey,
-          ),
+            const SizedBox(height: _gapWordmarkTagline),
+            Text(
+              l10n.splashTagline,
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: colors.inkMuted),
+            ),
+            const SizedBox(height: _gapTaglineProgress),
+            _SplashProgress(
+              width: _progressWidth,
+              height: _progressHeight,
+              duration: context.motion(_maxSplashDuration),
+              trackColor: colors.border,
+              fillColor: colors.primary,
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _TreePainter extends CustomPainter {
-  _TreePainter({
-    required this.t,
-    required this.trunk,
-    required this.foliage,
-    required this.sparkle,
+/// Progress tipis 0 → 1 selama splash, murni `Transform.scale` (composite-only)
+/// sehingga tidak ada layout/paint per frame.
+class _SplashProgress extends StatelessWidget {
+  const _SplashProgress({
+    required this.width,
+    required this.height,
+    required this.duration,
+    required this.trackColor,
+    required this.fillColor,
   });
 
-  final double t;
-  final Color trunk;
-  final Color foliage;
-  final Color sparkle;
+  final double width;
+  final double height;
+  final Duration duration;
+  final Color trackColor;
+  final Color fillColor;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final trunkPaint = Paint()
-      ..color = trunk
-      ..style = PaintingStyle.fill;
-    final foliagePaint = Paint()
-      ..color = foliage.withValues(alpha: 0.9)
-      ..style = PaintingStyle.fill;
-    final cx = size.width / 2;
-    final trunkH = 64 * (0.72 + 0.28 * t);
-    final trunkW = 16.0;
-    final trunkTop = size.height * 0.58 - trunkH * 0.5;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(cx, trunkTop + trunkH * 0.5), width: trunkW, height: trunkH),
-        const Radius.circular(6),
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(999);
+    return SizedBox(
+      width: width,
+      height: height,
+      child: TweenAnimationBuilder<double>(
+        key: const Key('splash_progress'),
+        tween: Tween<double>(begin: 0, end: 1),
+        duration: duration,
+        curve: AppMotion.easeStandard,
+        builder: (context, value, _) {
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: trackColor,
+                  borderRadius: radius,
+                ),
+              ),
+              ClipRRect(
+                borderRadius: radius,
+                child: Transform.scale(
+                  scaleX: value,
+                  alignment: Alignment.centerLeft,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: fillColor,
+                      borderRadius: radius,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
-      trunkPaint,
     );
-    final foliageCenter = Offset(cx, trunkTop - 8 - 4 * t);
-    final r = 34 + 6 * t;
-    canvas.drawCircle(foliageCenter.translate(-16, 10), r * 0.72, foliagePaint);
-    canvas.drawCircle(foliageCenter.translate(16, 10), r * 0.72, foliagePaint);
-    canvas.drawCircle(foliageCenter, r, foliagePaint..color = foliage);
-    // Sparkle
-    final sparklePaint = Paint()
-      ..color = sparkle.withValues(alpha: 0.55 + 0.25 * t)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(foliageCenter.translate(0, -r * 0.35), 3 + t, sparklePaint);
   }
-
-  @override
-  bool shouldRepaint(covariant _TreePainter oldDelegate) => oldDelegate.t != t;
 }

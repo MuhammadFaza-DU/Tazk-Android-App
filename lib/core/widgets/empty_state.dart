@@ -2,31 +2,43 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_motion.dart';
+import 'app_card.dart';
 
-/// Kolom ter-pusat: maskot otter + `message` (body, `ink-muted`) + aksi opsional.
+/// State kosong — board `11 States` (EMPTY).
+///
+/// Kartu `AppCard` ter-pusat berisi lingkaran maskot 96dp (`surface-alt` +
+/// `ClipOval`, jadi PNG berlatar krem tidak menempel sebagai persegi), judul
+/// Fredoka (`headlineSmall`, `ink`), sub-judul (`bodyMedium`, `ink-muted`), dan
+/// aksi opsional. Jarak: maskot→judul 16, judul→sub-judul 8, sub-judul→aksi 16.
 ///
 /// Entrance sekali saat mount: fade + geser 8px (`base`, `easeStandard`),
 /// composite-only (`Opacity` + `Transform.translate`) dan instan saat
-/// reduced-motion aktif (`context.motion` → `Duration.zero`).
+/// reduced-motion aktif. Call site lama (`title == null`) tetap mendapat
+/// maskot + `message` seperti sebelumnya.
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
+    this.title,
     required this.message,
     this.action,
-    this.imageAsset = 'assets/mascot/otter-with-sprout.png',
   });
 
+  /// Judul Fredoka. `null` → mode lama (tanpa judul).
+  final String? title;
+
+  /// Sub-judul saat [title] diisi; teks utama saat [title] kosong.
   final String message;
+
   final Widget? action;
 
-  /// Maskot yang tersedia di repo: `otter-portrait`, `otter-waving`,
-  /// `otter-with-sprout` (default = otter dgn tunas, sesuai brand).
-  final String imageAsset;
+  /// Diameter lingkaran maskot (board: ~96dp).
+  static const double mascotDiameter = 96;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final theme = Theme.of(context);
+    final title = this.title;
 
     return TweenAnimationBuilder<double>(
       key: const Key('empty_state_entrance'),
@@ -40,25 +52,57 @@ class EmptyState extends StatelessWidget {
           child: child,
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.asset(
-            imageAsset,
-            height: 120,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stack) =>
-                Icon(Icons.pets_rounded, size: 48, color: colors.inkMuted),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(color: colors.inkMuted),
-          ),
-          if (action != null) ...[const SizedBox(height: 16), action!],
-        ],
+      child: AppCard(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Align(
+              child: Container(
+                width: mascotDiameter,
+                height: mascotDiameter,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colors.surfaceAlt,
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/mascot/otter-portrait.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      Icons.pets_rounded,
+                      size: 40,
+                      color: colors.inkMuted,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            if (title != null) ...[
+              const SizedBox(height: 16),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: colors.ink,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ] else
+              const SizedBox(height: 16),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.inkMuted,
+              ),
+            ),
+            if (action != null) ...[
+              const SizedBox(height: 16),
+              Align(child: action!),
+            ],
+          ],
+        ),
       ),
     );
   }

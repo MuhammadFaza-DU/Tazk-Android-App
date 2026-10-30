@@ -470,7 +470,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get editNameDialogTitle => 'Edit Nama';
 
   @override
-  String get splashTagline => 'Tumbuh tiap hari';
+  String get splashTagline => 'Satu langkah kecil setiap hari';
 
   @override
   String get rankPerintis => 'Perintis';
@@ -624,4 +624,27 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get notifFreezeUsedBody =>
       'Streak kamu tetap aman karena freeze otomatis dipakai untuk hari yang terlewat.';
+
+  @override
+  String get stateEmptyTasksTitle => 'Belum ada tugas hari ini';
+
+  @override
+  String get stateEmptyTasksSubtitle =>
+      'Santai dulu, atau tambah satu tugas kecil untuk mulai.';
+
+  @override
+  String get stateEmptyTasksAction => 'Tambah tugas';
+
+  @override
+  String get stateLoadingLabel => 'Memuat data';
+
+  @override
+  String get stateErrorTitle => 'Gagal memuat data';
+
+  @override
+  String get stateErrorMessage =>
+      'Coba lagi sebentar. Data lokalmu tetap aman.';
+
+  @override
+  String get stateRetryAction => 'Coba lagi';
 }

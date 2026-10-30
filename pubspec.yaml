@@ -58,9 +58,6 @@ dependencies:
   # Exact background trigger for the midnight day-rollover job
   android_alarm_manager_plus: ^4.0.0
 
-  # Splash video
-  video_player: ^2.9.2
-
   # Homescreen widget
   home_widget: ^0.7.0
 

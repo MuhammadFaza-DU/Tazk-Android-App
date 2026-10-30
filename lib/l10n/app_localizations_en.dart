@@ -471,7 +471,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editNameDialogTitle => 'Edit Name';
 
   @override
-  String get splashTagline => 'Growing every day';
+  String get splashTagline => 'One small step every day';
 
   @override
   String get rankPerintis => 'Pioneer';
@@ -625,4 +625,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notifFreezeUsedBody =>
       'Your streak stayed safe because a freeze was automatically used for the missed day.';
+
+  @override
+  String get stateEmptyTasksTitle => 'No tasks today yet';
+
+  @override
+  String get stateEmptyTasksSubtitle =>
+      'Take it easy, or add one small task to get started.';
+
+  @override
+  String get stateEmptyTasksAction => 'Add task';
+
+  @override
+  String get stateLoadingLabel => 'Loading data';
+
+  @override
+  String get stateErrorTitle => 'Failed to load data';
+
+  @override
+  String get stateErrorMessage =>
+      'Try again in a moment. Your local data is still safe.';
+
+  @override
+  String get stateRetryAction => 'Try again';
 }

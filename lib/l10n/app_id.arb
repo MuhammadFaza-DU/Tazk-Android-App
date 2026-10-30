@@ -225,7 +225,7 @@
   },
   "editNameDialogTitle": "Edit Nama",
 
-  "splashTagline": "Tumbuh tiap hari",
+  "splashTagline": "Satu langkah kecil setiap hari",
 
   "rankPerintis": "Perintis",
   "rankPetarung": "Petarung",
@@ -283,5 +283,13 @@
   "notifStreakWarningTitle": "Jangan putus streak kamu!",
   "notifStreakWarningBody": "Belum ada task/habit yang selesai hari ini. Selesaikan sebelum tengah malam ya!",
   "notifFreezeUsedTitle": "Freeze terpakai!",
-  "notifFreezeUsedBody": "Streak kamu tetap aman karena freeze otomatis dipakai untuk hari yang terlewat."
+  "notifFreezeUsedBody": "Streak kamu tetap aman karena freeze otomatis dipakai untuk hari yang terlewat.",
+
+  "stateEmptyTasksTitle": "Belum ada tugas hari ini",
+  "stateEmptyTasksSubtitle": "Santai dulu, atau tambah satu tugas kecil untuk mulai.",
+  "stateEmptyTasksAction": "Tambah tugas",
+  "stateLoadingLabel": "Memuat data",
+  "stateErrorTitle": "Gagal memuat data",
+  "stateErrorMessage": "Coba lagi sebentar. Data lokalmu tetap aman.",
+  "stateRetryAction": "Coba lagi"
 }
