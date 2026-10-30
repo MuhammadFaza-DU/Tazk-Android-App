@@ -3,7 +3,13 @@
 Dokumen penanda posisi kerja. Baca ini dulu sebelum melanjutkan, supaya tidak
 mengulang keputusan yang sudah diambil atau mengerjakan hal yang sudah selesai.
 
-Terakhir diperbarui: **2026-10-30**---
+Terakhir diperbarui: **2026-10-30**
+
+## Log Perubahan (terbaru duluan)
+
+- 2026-10-30 — Menambah file aturan project `AGENTS.md` (root) + section log ini (mekanisme "selalu update STATUS.md") — *(belum commit)*
+
+---
 
 ## Ringkas satu paragraf
 
