@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
-enum _AppButtonVariant { primary, secondary, ghost }
+enum _AppButtonVariant { primary, secondary, ghost, danger }
 
 /// Design system v2 button — tiga variant, radius `md` (14), min height 48
 /// (tap target). Tidak pakai gradient/shad lebih; aksen cuma lewat token.
@@ -31,6 +31,14 @@ class AppButton extends StatelessWidget {
     this.expanded = false,
   }) : _variant = _AppButtonVariant.ghost;
 
+  const AppButton.danger({
+    super.key,
+    required this.label,
+    this.icon,
+    this.onPressed,
+    this.expanded = false,
+  }) : _variant = _AppButtonVariant.danger;
+
   final String label;
   final IconData? icon;
   final VoidCallback? onPressed;
@@ -46,6 +54,7 @@ class AppButton extends StatelessWidget {
       _AppButtonVariant.primary => (colors.primary, colors.onPrimary),
       _AppButtonVariant.secondary => (colors.primaryContainer, colors.primary),
       _AppButtonVariant.ghost => (Colors.transparent, colors.primary),
+      _AppButtonVariant.danger => (colors.danger, colors.onPrimary),
     };
 
     const radius = BorderRadius.all(Radius.circular(14)); // rounded.md

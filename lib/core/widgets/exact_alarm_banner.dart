@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/exact_alarm_permission_provider.dart';
 import '../../providers/notification_provider.dart';
+import '../theme/app_colors.dart';
+import 'app_button.dart';
+import 'app_card.dart';
 
 class ExactAlarmBanner extends ConsumerWidget {
   const ExactAlarmBanner({super.key});
@@ -16,31 +19,31 @@ class ExactAlarmBanner extends ConsumerWidget {
     }
 
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
+    final colors = context.colors;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      color: theme.colorScheme.tertiaryContainer,
-      child: Padding(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: AppCard(
         padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 l10n.exactAlarmBannerMessage,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onTertiaryContainer,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: colors.warningStrong),
               ),
             ),
-            TextButton(
+            AppButton.ghost(
+              label: l10n.exactAlarmBannerAction,
               onPressed: () async {
                 await ref
                     .read(notificationServiceProvider)
                     .requestExactAlarmPermission();
                 ref.read(exactAlarmProvider.notifier).check();
               },
-              child: Text(l10n.exactAlarmBannerAction),
             ),
             IconButton(
               icon: const Icon(Icons.close_rounded),

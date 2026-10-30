@@ -100,13 +100,21 @@ class _MicroConfettiBurstState extends State<_MicroConfettiBurst>
 
   @override
   Widget build(BuildContext context) {
+    final colors = [
+      context.colors.honey,
+      context.colors.primary,
+      context.colors.clay,
+    ];
     return IgnorePointer(
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
           return CustomPaint(
             size: const Size(28, 28),
-            painter: _ConfettiPainter(progress: _controller.value),
+            painter: _ConfettiPainter(
+              progress: _controller.value,
+              colors: colors,
+            ),
           );
         },
       ),
@@ -115,15 +123,10 @@ class _MicroConfettiBurstState extends State<_MicroConfettiBurst>
 }
 
 class _ConfettiPainter extends CustomPainter {
-  _ConfettiPainter({required this.progress});
+  _ConfettiPainter({required this.progress, required this.colors});
 
   final double progress;
-
-  static const _colors = [
-    AppColors.accentLight,
-    AppColors.primaryLight,
-    AppColors.terracotta,
-  ];
+  final List<Color> colors;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -136,7 +139,7 @@ class _ConfettiPainter extends CustomPainter {
           Offset(math.cos(angle) * distance, math.sin(angle) * distance);
       final alpha = (1 - progress).clamp(0.0, 1.0);
       final paint = Paint()
-        ..color = _colors[i % _colors.length].withValues(alpha: alpha)
+        ..color = colors[i % colors.length].withValues(alpha: alpha)
         ..style = PaintingStyle.fill;
       final radius = 2.4 * (1 - 0.45 * progress);
       canvas.drawCircle(pos, radius, paint);

@@ -12,7 +12,6 @@ Future<void> showRankCelebration(
     context: context,
     barrierDismissible: true,
     barrierLabel: 'celebration',
-    barrierColor: Colors.black.withValues(alpha: 0.48),
     transitionDuration: const Duration(milliseconds: 360),
     pageBuilder: (context, _, _) => _CelebrationDialog(rankLabel: rankLabel),
     transitionBuilder: (context, animation, _, child) {
@@ -52,6 +51,13 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final confettiColors = [
+      colors.honey,
+      colors.primary,
+      colors.clay,
+      colors.onPrimary,
+    ];
     return Center(
       child: Material(
         color: Colors.transparent,
@@ -63,7 +69,10 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (context, _) => CustomPaint(
-                  painter: _FullscreenConfettiPainter(progress: _controller.value),
+                  painter: _FullscreenConfettiPainter(
+                    progress: _controller.value,
+                    colors: confettiColors,
+                  ),
                 ),
               ),
             ),
@@ -71,20 +80,14 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
               margin: const EdgeInsets.symmetric(horizontal: 28),
               padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.18),
-                    blurRadius: 24,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
+                border: Border.all(color: colors.border),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.celebration_rounded, size: 56, color: AppColors.accentLight),
+                  Icon(Icons.celebration_rounded, size: 56, color: colors.honey),
                   const SizedBox(height: 12),
                   Text(
                     'Rank Baru!',
@@ -94,13 +97,13 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.accentLight.withValues(alpha: 0.18),
+                      color: colors.honey.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
                       widget.rankLabel,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.terracotta,
+                            color: colors.clay,
                             fontWeight: FontWeight.w700,
                           ),
                     ),
@@ -121,9 +124,10 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
 }
 
 class _FullscreenConfettiPainter extends CustomPainter {
-  _FullscreenConfettiPainter({required this.progress});
+  _FullscreenConfettiPainter({required this.progress, required this.colors});
 
   final double progress;
+  final List<Color> colors;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -136,12 +140,7 @@ class _FullscreenConfettiPainter extends CustomPainter {
       final y = startY + fall;
       final sway = math.sin(progress * 6 + i) * 10;
       final paint = Paint()
-        ..color = [
-          AppColors.accentLight,
-          AppColors.primaryLight,
-          AppColors.terracotta,
-          Colors.white,
-        ][i % 4].withValues(alpha: 0.9)
+        ..color = colors[i % colors.length].withValues(alpha: 0.9)
         ..style = PaintingStyle.fill;
       final r = 3 + rng.nextDouble() * 3;
       canvas.drawCircle(Offset(x + sway, y), r, paint);

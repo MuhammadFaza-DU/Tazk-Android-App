@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tazk/core/theme/app_theme.dart';
 import 'package:tazk/core/widgets/completion_checkbox.dart';
 
 void main() {
@@ -9,6 +10,7 @@ void main() {
     var called = 0;
     await tester.pumpWidget(
       MaterialApp(
+        theme: AppTheme.light,
         home: Scaffold(
           body: CompletionCheckbox(
             value: false,
@@ -35,6 +37,7 @@ void main() {
     var called = 0;
     await tester.pumpWidget(
       MaterialApp(
+        theme: AppTheme.light,
         home: Scaffold(
           body: CompletionCheckbox(
             value: true,

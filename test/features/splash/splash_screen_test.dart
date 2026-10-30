@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:tazk/core/theme/app_theme.dart';
 import 'package:tazk/data/database/database.dart';
 import 'package:tazk/features/onboarding/onboarding_screen.dart';
 import 'package:tazk/features/splash/splash_screen.dart';
@@ -25,14 +26,24 @@ void main() {
     const timezoneChannel = MethodChannel('flutter_timezone');
     const notificationsChannel =
         MethodChannel('dexterous.com/flutter/local_notifications');
+    const appSettingsChannel = MethodChannel('com.tazk.tazk/app_settings');
     messenger.setMockMethodCallHandler(homeWidgetChannel, (call) async => null);
     messenger.setMockMethodCallHandler(timezoneChannel, (call) async => 'UTC');
     messenger
         .setMockMethodCallHandler(notificationsChannel, (call) async => null);
+    // getMountedWidgets (added in T1-B) must answer immediately: with none
+    // mounted, HomeWidgetService.refreshAll() skips every DB query, so the
+    // splash's daily-rollover work completes cleanly instead of leaving a DB
+    // operation hanging on the 100ms channel fallback when the test ends.
+    messenger.setMockMethodCallHandler(appSettingsChannel, (call) async {
+      if (call.method == 'getMountedWidgets') return <String>[];
+      return null;
+    });
     addTearDown(() {
       messenger.setMockMethodCallHandler(homeWidgetChannel, null);
       messenger.setMockMethodCallHandler(timezoneChannel, null);
       messenger.setMockMethodCallHandler(notificationsChannel, null);
+      messenger.setMockMethodCallHandler(appSettingsChannel, null);
     });
 
     // The splash's next-screen preparation touches the Drift database (profile
@@ -47,6 +58,7 @@ void main() {
           appDatabaseProvider.overrideWithValue(db),
         ],
         child: MaterialApp(
+          theme: AppTheme.light,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -84,5 +96,10 @@ void main() {
     expect(find.byType(SplashScreen), findsNothing);
     // An empty profile name routes to OnboardingScreen.
     expect(find.byType(OnboardingScreen), findsOneWidget);
+
+    // Clean teardown: dispose the tree so providers/streams close and no timer
+    // is left pending when the test ends.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 100));
   });
 }

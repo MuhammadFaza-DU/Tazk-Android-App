@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:tazk/core/theme/app_theme.dart';
 import 'package:tazk/core/widgets/notification_permission_banner.dart';
 import 'package:tazk/l10n/app_localizations.dart';
 import 'package:tazk/providers/notification_permission_provider.dart';
@@ -24,6 +25,7 @@ Widget _wrap(Widget child, NotificationPermissionState state) {
       ),
     ],
     child: MaterialApp(
+      theme: AppTheme.light,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

@@ -148,9 +148,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark
-          ? AppColors.backgroundDark
-          : AppColors.backgroundLight,
+      backgroundColor: context.colors.canvas,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -171,8 +169,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    (isDark ? AppColors.backgroundDark : AppColors.backgroundLight)
-                        .withValues(alpha: 0.72),
+                    context.colors.canvas.withValues(alpha: 0.72),
                   ],
                 ),
               ),
@@ -182,7 +179,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   Text(
                     'Tazk',
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                          color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                          color: context.colors.primary,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.2,
                         ),
@@ -191,7 +188,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   Text(
                     AppLocalizations.of(context)!.splashTagline,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: (isDark ? Colors.white70 : Colors.black54),
+                          color: (isDark ? context.colors.inkMuted : context.colors.ink),
                         ),
                   ),
                 ],
@@ -230,12 +227,18 @@ class _FallbackTree extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Center(
       child: AnimatedBuilder(
         animation: animation,
         builder: (context, _) => CustomPaint(
           size: const Size(140, 180),
-          painter: _TreePainter(t: animation.value),
+          painter: _TreePainter(
+            t: animation.value,
+            trunk: colors.clay,
+            foliage: colors.primary,
+            sparkle: colors.honey,
+          ),
         ),
       ),
     );
@@ -243,17 +246,25 @@ class _FallbackTree extends StatelessWidget {
 }
 
 class _TreePainter extends CustomPainter {
-  _TreePainter({required this.t});
+  _TreePainter({
+    required this.t,
+    required this.trunk,
+    required this.foliage,
+    required this.sparkle,
+  });
 
   final double t;
+  final Color trunk;
+  final Color foliage;
+  final Color sparkle;
 
   @override
   void paint(Canvas canvas, Size size) {
     final trunkPaint = Paint()
-      ..color = AppColors.terracotta
+      ..color = trunk
       ..style = PaintingStyle.fill;
     final foliagePaint = Paint()
-      ..color = AppColors.primaryLight.withValues(alpha: 0.9)
+      ..color = foliage.withValues(alpha: 0.9)
       ..style = PaintingStyle.fill;
     final cx = size.width / 2;
     final trunkH = 64 * (0.72 + 0.28 * t);
@@ -270,10 +281,10 @@ class _TreePainter extends CustomPainter {
     final r = 34 + 6 * t;
     canvas.drawCircle(foliageCenter.translate(-16, 10), r * 0.72, foliagePaint);
     canvas.drawCircle(foliageCenter.translate(16, 10), r * 0.72, foliagePaint);
-    canvas.drawCircle(foliageCenter, r, foliagePaint..color = AppColors.primaryLight);
+    canvas.drawCircle(foliageCenter, r, foliagePaint..color = foliage);
     // Sparkle
     final sparklePaint = Paint()
-      ..color = AppColors.accentLight.withValues(alpha: 0.55 + 0.25 * t)
+      ..color = sparkle.withValues(alpha: 0.55 + 0.25 * t)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(foliageCenter.translate(0, -r * 0.35), 3 + t, sparklePaint);
   }

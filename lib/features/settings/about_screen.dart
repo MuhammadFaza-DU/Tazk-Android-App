@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../core/theme/app_colors.dart';
+import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_scaffold.dart';
 import '../../l10n/app_localizations.dart';
 
 // Fallback matches pubspec.yaml version so the screen never shows a hard-coded
@@ -39,24 +42,44 @@ class _AboutScreenState extends State<AboutScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.aboutScreenTitle)),
+    final theme = Theme.of(context).textTheme;
+    final colors = context.colors;
+    return AppScaffold(
+      title: l10n.aboutScreenTitle,
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16), // spacing.lg (DESIGN: Layout)
         children: [
-          Center(
+          AppCard(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(l10n.appTitle, style: Theme.of(context).textTheme.headlineMedium),
-                const SizedBox(height: 4),
-                Text(l10n.splashTagline, style: Theme.of(context).textTheme.bodyMedium),
-                const SizedBox(height: 12),
-                Text(l10n.aboutVersionLabel(_version)),
+                Text(
+                  l10n.appTitle,
+                  style: theme.displayLarge, // display — Fredoka 30
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4), // spacing.xs
+                Text(
+                  l10n.splashTagline,
+                  style: theme.bodyLarge?.copyWith(color: colors.inkMuted),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12), // spacing.md
+                Text(
+                  l10n.aboutVersionLabel(_version),
+                  style: theme.bodySmall?.copyWith(color: colors.inkMuted), // caption
+                ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          Text(l10n.aboutDescription, textAlign: TextAlign.center),
+          const SizedBox(height: 24), // spacing.xl — antar-section
+          AppCard(
+            child: Text(
+              l10n.aboutDescription,
+              textAlign: TextAlign.center,
+              style: theme.bodyLarge, // body — Plus Jakarta Sans 15
+            ),
+          ),
         ],
       ),
     );

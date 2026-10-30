@@ -58,6 +58,7 @@ class _AnimatedXpProgressState extends State<AnimatedXpProgress>
   @override
   Widget build(BuildContext context) {
     final target = widget.value.clamp(0.0, 1.0);
+    final colors = context.colors;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
@@ -69,7 +70,7 @@ class _AnimatedXpProgressState extends State<AnimatedXpProgress>
               boxShadow: _glow.value > 0
                   ? [
                       BoxShadow(
-                        color: AppColors.accentLight
+                        color: colors.honey
                             .withValues(alpha: 0.45 * (1 - _glow.value) + 0.15),
                         blurRadius: 10 * _glow.value + 2,
                         spreadRadius: 1 * _glow.value,
@@ -87,8 +88,8 @@ class _AnimatedXpProgressState extends State<AnimatedXpProgress>
                   return LinearProgressIndicator(
                     value: animatedValue,
                     minHeight: 10,
-                    backgroundColor: AppColors.terracotta.withValues(alpha: 0.16),
-                    valueColor: const AlwaysStoppedAnimation(AppColors.accentLight),
+                    backgroundColor: colors.clay.withValues(alpha: 0.16),
+                    valueColor: AlwaysStoppedAnimation<Color>(colors.honey),
                   );
                 },
               ),
