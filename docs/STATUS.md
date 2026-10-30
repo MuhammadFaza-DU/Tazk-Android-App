@@ -19,14 +19,19 @@ Langkah berikutnya: migrasi design system ke kode (Tahap 2).
 | Item | Nilai |
 |---|---|
 | Branch | `main` |
-| Commit terakhir | `8627cf7` — fix(canvas): tengahkan sheet grab handle + jadikan komponen |
-| Tag stabil terakhir | `stable-2026-10-30-v2` |
-| Status push | **6 commit belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
+| Commit terakhir | jalankan `git log -1` — dokumen ini di-commit sesudahnya, jadi hash di teks akan selalu tertinggal satu |
+| Commit terakhir yang tercatat saat dokumen ditulis | `8627cf7` — fix(canvas): tengahkan sheet grab handle + jadikan komponen |
+| Tag stabil terakhir | `stable-2026-10-30-v2` (lihat `git tag \| Select-String stable` untuk yang terbaru) |
+| Status push | **7 commit belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
 | Working tree | bersih |
+
+> Catatan: hash commit dan jumlah commit di dokumen ini **selalu tertinggal satu** dari
+> kenyataan, karena commit yang menulis dokumen ini mengubah keduanya. Kalau butuh angka
+> pasti, jalankan `git log -1` dan `git log --oneline origin/main..HEAD | Measure-Object`.
 
 Tag stabil sebelumnya: `stable-2026-10-30-v1`, `stable-2026-10-29-v1`, `stable-2026-10-29-v2`, `stable-2026-10-26-v1`, `stable-2026-08-23-v1..v3`
 
-**Riwayat commit sesi ini (lokal, belum di-push):**
+**Riwayat commit sesi ini (lokal, belum di-push).** Tabel ini berhenti di commit sebelum dokumen ditulis; commit dokumentasi sesudahnya tidak tercantum.
 
 | Commit | Isi |
 |---|---|
