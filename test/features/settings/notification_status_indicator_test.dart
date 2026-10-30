@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:tazk/core/theme/app_theme.dart';
 import 'package:tazk/features/settings/settings_screen.dart';
 import 'package:tazk/l10n/app_localizations.dart';
 import 'package:tazk/providers/database_provider.dart';
@@ -49,6 +50,7 @@ Widget _wrap(NotificationPermissionState permissionState) {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('id'),
+      theme: AppTheme.light,
       home: const SettingsScreen(),
     ),
   );

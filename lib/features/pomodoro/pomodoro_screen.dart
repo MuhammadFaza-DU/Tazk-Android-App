@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
+import '../../core/widgets/app_button.dart';
+import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/app_text_field.dart';
 import '../../data/database/database.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/habit_providers.dart';
@@ -72,22 +77,20 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
   Future<void> _showCompletionDialog(String? habitName) async {
     SystemSound.play(SystemSoundType.alert);
     final l10n = AppLocalizations.of(context)!;
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.sessionCompleteTitle),
-        content: Text(
-          habitName != null
-              ? l10n.sessionCompleteHabitMessage(habitName)
-              : l10n.sessionCompleteFreeMessage,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.okButton),
-          ),
-        ],
+    await showAppDialog<void>(
+      context,
+      title: l10n.sessionCompleteTitle,
+      content: Text(
+        habitName != null
+            ? l10n.sessionCompleteHabitMessage(habitName)
+            : l10n.sessionCompleteFreeMessage,
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.okButton),
+        ),
+      ],
     );
   }
 
@@ -107,6 +110,36 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
     return '$minutes:$seconds';
   }
 
+  /// Input dekorasi bertema untuk dropdown habit — `filled` `surface`, border
+  /// `md` (14) warna `border`, fokus → `primary` (konsisten dgn `AppTextField`).
+  InputDecoration _inputDecoration(String labelText) {
+    final colors = context.colors;
+    final theme = Theme.of(context);
+    const radius = BorderRadius.all(Radius.circular(14)); // rounded.md
+
+    OutlineInputBorder border(Color color, [double width = 1]) {
+      return OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: color, width: width),
+      );
+    }
+
+    return InputDecoration(
+      labelText: labelText,
+      filled: true,
+      fillColor: colors.surface,
+      labelStyle: theme.textTheme.labelLarge?.copyWith(color: colors.inkMuted),
+      floatingLabelStyle:
+          theme.textTheme.labelLarge?.copyWith(color: colors.primary),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      enabledBorder: border(colors.border),
+      border: border(colors.border),
+      focusedBorder: border(colors.primary, 1.5),
+      disabledBorder: border(colors.border),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = ref.watch(pomodoroControllerProvider);
@@ -114,6 +147,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
         ref.watch(activeHabitsProvider).valueOrNull ?? const <Habit>[];
     final habitRepository = ref.watch(habitRepositoryProvider);
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
 
     final completionByHabitId = <int, bool>{};
     for (final habit in activeHabits) {
@@ -136,37 +170,49 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text(l10n.modeLabel, style: Theme.of(context).textTheme.titleSmall),
-          RadioGroup<bool>(
-            groupValue: controller.isHabitMode,
-            onChanged: controller.isEditable
-                ? (value) {
+          Text(
+            l10n.modeLabel,
+            style: Theme.of(context)
+                .textTheme
+                .labelLarge
+                ?.copyWith(color: colors.inkMuted),
+          ),
+          const SizedBox(height: 8),
+          SegmentedButton<bool>(
+            segments: [
+              ButtonSegment(value: true, label: Text(l10n.modeHabitLinked)),
+              ButtonSegment(value: false, label: Text(l10n.modeFreeStanding)),
+            ],
+            selected: {controller.isHabitMode},
+            showSelectedIcon: false,
+            onSelectionChanged: controller.isEditable
+                ? (selection) {
                     setState(() => _isDurationInputValid = true);
-                    ref.read(pomodoroControllerProvider).setHabitMode(value!);
+                    ref.read(pomodoroControllerProvider).setHabitMode(
+                          selection.first,
+                        );
                   }
                 : (_) {},
-            child: Column(
-              children: [
-                RadioListTile<bool>(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.modeHabitLinked),
-                  value: true,
-                ),
-                RadioListTile<bool>(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.modeFreeStanding),
-                  value: false,
-                ),
-              ],
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                (states) => states.contains(WidgetState.selected)
+                    ? colors.primary
+                    : colors.surfaceAlt,
+              ),
+              foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                (states) => states.contains(WidgetState.selected)
+                    ? colors.onPrimary
+                    : colors.inkMuted,
+              ),
             ),
           ),
           if (controller.isHabitMode) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             DropdownButtonFormField<Habit>(
               initialValue: pomodoroHabits.contains(controller.selectedHabit)
                   ? controller.selectedHabit
                   : null,
-              decoration: InputDecoration(labelText: l10n.selectHabitLabel),
+              decoration: _inputDecoration(l10n.selectHabitLabel),
               items: [
                 for (final habit in pomodoroHabits)
                   DropdownMenuItem(value: habit, child: Text(habit.name)),
@@ -180,14 +226,11 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
             ),
           ],
           const SizedBox(height: 16),
-          TextField(
+          AppTextField(
             controller: _durationController,
-            enabled: controller.isEditable,
-            decoration: InputDecoration(
-              labelText: l10n.durationMinutesLabel,
-              helperText: l10n.durationHelperText,
-            ),
+            labelText: l10n.durationMinutesLabel,
             keyboardType: TextInputType.number,
+            enabled: controller.isEditable,
             onChanged: (value) {
               final minutes = int.tryParse(value.trim());
               setState(
@@ -200,6 +243,14 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
               }
             },
           ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.durationHelperText,
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.copyWith(color: colors.inkMuted),
+          ),
           const SizedBox(height: 32),
           Center(
             child: ValueListenableBuilder<Duration>(
@@ -210,7 +261,8 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
                       ? controller.sessionDuration
                       : remaining,
                 ),
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                  fontFamily: AppTypography.bodyFont, // angka/timer = PJS (DESIGN)
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
@@ -218,40 +270,39 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
           ),
           const SizedBox(height: 24),
           if (controller.status == PomodoroSessionStatus.idle)
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: controller.canStart && _isDurationInputValid
-                    ? () => ref
-                          .read(pomodoroControllerProvider)
-                          .start(
-                            completionTitle: l10n.sessionCompleteTitle,
-                            completionBody:
-                                controller.isHabitMode &&
-                                    controller.selectedHabit != null
-                                ? l10n.sessionCompleteHabitMessage(
-                                    controller.selectedHabit!.name,
-                                  )
-                                : l10n.sessionCompleteFreeMessage,
-                          )
-                    : null,
-                child: Text(l10n.startButton),
-              ),
+            AppButton.primary(
+              label: l10n.startButton,
+              onPressed: controller.canStart && _isDurationInputValid
+                  ? () => ref.read(pomodoroControllerProvider).start(
+                        completionTitle: l10n.sessionCompleteTitle,
+                        completionBody: controller.isHabitMode &&
+                                controller.selectedHabit != null
+                            ? l10n.sessionCompleteHabitMessage(
+                                controller.selectedHabit!.name,
+                              )
+                            : l10n.sessionCompleteFreeMessage,
+                      )
+                  : null,
+              expanded: true,
             )
           else
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton(
+                  child: AppButton.secondary(
+                    label: l10n.cancelSessionButton,
                     onPressed: ref.read(pomodoroControllerProvider).cancel,
-                    child: Text(l10n.cancelSessionButton),
+                    expanded: true,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: FilledButton(
-                    onPressed:
+                  child: AppButton.primary(
+                    label:
                         controller.status == PomodoroSessionStatus.running
+                        ? l10n.pauseButton
+                        : l10n.resumeButton,
+                    onPressed: controller.status == PomodoroSessionStatus.running
                         ? ref.read(pomodoroControllerProvider).pause
                         : () => ref
                               .read(pomodoroControllerProvider)
@@ -265,11 +316,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
                                       )
                                     : l10n.sessionCompleteFreeMessage,
                               ),
-                    child: Text(
-                      controller.status == PomodoroSessionStatus.running
-                          ? l10n.pauseButton
-                          : l10n.resumeButton,
-                    ),
+                    expanded: true,
                   ),
                 ),
               ],
