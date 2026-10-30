@@ -7,6 +7,8 @@ Terakhir diperbarui: **2026-10-30**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-10-30 — T2-B: widget kit 12 komponen + preview dev-only — commit `5989955`
+- 2026-10-30 — T2-A: font Fredoka+PJS + 19 token ThemeExtension + ColorScheme eksplisit — commit `69587d2`
 - 2026-10-30 — T1 Performa tuntas (batch 2): checkbox tulis DB langsung (buang delay 380ms) + home lazy sliver & satu query log habit — commit `9cc313e`
 - 2026-10-30 — T1 Performa (batch 1): coalesce + gate push widget, pomodoro label-only rebuild, startup non-blocking + rollover 1×/hari, splash decouple video, minify+shrink+split ABI (176→~30 MB/ABI) — commit `7e902bc`
 - 2026-10-30 — T1-A: 4 index DB + migrasi schema v3 — commit `bfbdd72`
@@ -19,10 +21,9 @@ Terakhir diperbarui: **2026-10-30**
 ## Ringkas satu paragraf
 
 Tazk sedang diupgrade dari v1 ke v2. **Fase desain selesai** (design system, 27 board
-kanvas, DESIGN.md). **T1 Performa selesai** (8/8 sub-task: index DB, push widget
-coalesce+gate, checkbox DB-langsung, home lazy sliver, pomodoro label-only, startup
-non-blocking, splash decouple, minify+split ABI). Fase berikutnya: T2 — migrasi design
-system ke kode (font + token + widget kit).
+kanvas, DESIGN.md). **T1 Performa selesai** (8/8 sub-task) & **T2 design system ke kode
+selesai** (font Fredoka+Plus Jakarta Sans, 19 token ThemeExtension, ColorScheme eksplisit,
+widget kit 12 komponen + preview dev-only). Fase berikutnya: T3 — redesign 12 layar + navigasi.
 
 ---
 
@@ -123,7 +124,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 |---|---|---|
 | T0 Fondasi | 🟡 sebagian | Arsip v1 selesai, `.gitignore` dirapikan. Belum ada gate CI |
 | T1 Performa (lag) | ✅ selesai | 8/8: index DB, push coalesce+gate, checkbox DB-langsung, home lazy sliver, pomodoro label-only, startup non-blocking, splash decouple, minify+split ABI |
-| T2 Design system | 🟡 desain selesai, kode belum | `DESIGN.md` + kanvas selesai (13 komponen termasuk `Sheet/Handle`); `app_colors.dart`/`app_typography.dart` **masih v1** |
+| T2 Design system | ✅ selesai | font Fredoka+PJS, 19 token `ThemeExtension`, `ColorScheme` eksplisit (bukan fromSeed), widget kit 12 komponen + preview dev-only |
 | T3 Redesign layar | 🟡 desain selesai, kode belum | 12 layar di kanvas, kode masih v1 |
 | T4 Animasi | ⬜ belum | Motion token sudah didefinisikan |
 | T5 Statistik | 🟡 desain selesai | Layar 07 digambar, fitur belum |
