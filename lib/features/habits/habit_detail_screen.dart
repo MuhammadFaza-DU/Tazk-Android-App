@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_dialog.dart';
+import '../../core/widgets/app_page_route.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/section_header.dart';
 import '../../data/database/database.dart';
@@ -45,7 +46,7 @@ class HabitDetailScreen extends ConsumerWidget {
           tooltip: l10n.editHabitTitle,
           onPressed: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => HabitFormScreen(habit: habit)),
+              AppPageRoute(builder: (_) => HabitFormScreen(habit: habit)),
             );
           },
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/dev/component_preview_screen.dart';
+import 'app_page_route.dart';
 
 /// Shared scaffold for PUSHED screens (Pomodoro, Task/Habit form & detail,
 /// Profile, Settings, About): AppBar + body only.
@@ -44,7 +45,7 @@ class AppScaffold extends StatelessWidget {
       icon: const Icon(Icons.widgets_outlined),
       onPressed: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ComponentPreviewScreen()),
+          AppPageRoute(builder: (_) => const ComponentPreviewScreen()),
         );
       },
     );

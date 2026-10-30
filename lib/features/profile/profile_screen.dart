@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_motion.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_chip.dart';
@@ -11,6 +14,7 @@ import '../../core/widgets/app_sheet.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/progress_bar.dart';
 import '../../core/widgets/section_header.dart';
+import '../../core/widgets/shine_sweep.dart';
 import '../../core/widgets/stat_tile.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
@@ -317,12 +321,19 @@ class _BadgeGrid extends StatelessWidget {
       runSpacing: 8, // spacing.sm
       children: [
         for (final rank in StreakRank.values)
-          _CollectionChip(
-            isUnlocked: unlockedRanks.contains(rank),
-            icon: Icons.military_tech_rounded,
-            label: rank.label(context),
-            unlockedBackground: colors.honeyContainer,
-            unlockedForeground: colors.warningStrong,
+          _ShineOnNew<StreakRank>(
+            key: ValueKey(rank),
+            unlocked: unlockedRanks.contains(rank)
+                ? <StreakRank>{rank}
+                : const <StreakRank>{},
+            builder: (shining) => _CollectionChip(
+              isUnlocked: unlockedRanks.contains(rank),
+              icon: Icons.military_tech_rounded,
+              label: rank.label(context),
+              unlockedBackground: colors.honeyContainer,
+              unlockedForeground: colors.warningStrong,
+              shine: shining,
+            ),
           ),
       ],
     );
@@ -348,15 +359,21 @@ class _AvatarGrid extends StatelessWidget {
       runSpacing: 8, // spacing.sm
       children: [
         for (final milestone in sorted)
-          _CollectionChip(
-            isUnlocked: true,
-            icon: _avatarIconFor(_avatarIdForMilestone(milestone)),
-            label: 'Lv $milestone',
-            unlockedBackground: colors.primaryContainer,
-            unlockedForeground: colors.primary,
+          _ShineOnNew<int>(
+            key: ValueKey(milestone),
+            unlocked: <int>{milestone},
+            builder: (shining) => _CollectionChip(
+              isUnlocked: true,
+              icon: _avatarIconFor(_avatarIdForMilestone(milestone)),
+              label: 'Lv $milestone',
+              unlockedBackground: colors.primaryContainer,
+              unlockedForeground: colors.primary,
+              shine: shining,
+            ),
           ),
         for (final milestone in nextLocked)
           _CollectionChip(
+            key: ValueKey(milestone),
             isUnlocked: false,
             icon: Icons.person_rounded,
             label: 'Lv $milestone',
@@ -368,15 +385,85 @@ class _AvatarGrid extends StatelessWidget {
   }
 }
 
+/// Memainkan shine HANYA untuk elemen yang **baru** masuk ke [unlocked].
+///
+/// Kontrak:
+/// * Build pertama (`_previous == null`) tidak menyala — membuka layar tidak
+///   boleh menyalakan seluruh koleksi.
+/// * Reduced motion → tidak pernah diisi, jadi tidak ada ticker sama sekali.
+/// * Shine adalah event sesaat: `_shining` dikosongkan lewat [Timer] setelah
+///   sapuan selesai (`AppMotion.slow` + jeda kecil), timer dibatalkan saat
+///   dispose supaya tidak ada `setState` setelah unmount.
+class _ShineOnNew<T> extends StatefulWidget {
+  const _ShineOnNew({
+    super.key,
+    required this.unlocked,
+    required this.builder,
+  });
+
+  /// Himpunan yang relevan untuk widget ini (biasanya satu elemen).
+  final Set<T> unlocked;
+  final Widget Function(bool shining) builder;
+
+  @override
+  State<_ShineOnNew<T>> createState() => _ShineOnNewState<T>();
+}
+
+class _ShineOnNewState<T> extends State<_ShineOnNew<T>> {
+  Set<T>? _previous;
+  final Set<T> _shining = <T>{};
+  Timer? _timer;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncUnlocked();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ShineOnNew<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncUnlocked();
+  }
+
+  void _syncUnlocked() {
+    final previous = _previous;
+    _previous = <T>{...widget.unlocked};
+    if (previous == null) return; // build pertama: jangan shine apa pun
+    if (context.reduceMotion) return;
+
+    final freshlyUnlocked = widget.unlocked.difference(previous);
+    if (freshlyUnlocked.isEmpty) return;
+
+    _shining.addAll(freshlyUnlocked);
+    _timer?.cancel();
+    _timer = Timer(AppMotion.slow + const Duration(milliseconds: 80), () {
+      if (!mounted) return;
+      setState(_shining.clear);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(_shining.isNotEmpty);
+}
+
 /// Chip koleksi (badge/avatar) bergaya `AppChip` + ikon leading. State
 /// lock/unlock disinyalkan lewat ikon (gembok vs ikon item) — bukan warna saja.
 class _CollectionChip extends StatelessWidget {
   const _CollectionChip({
+    super.key,
     required this.isUnlocked,
     required this.icon,
     required this.label,
     required this.unlockedBackground,
     required this.unlockedForeground,
+    this.shine = false,
   });
 
   final bool isUnlocked;
@@ -384,6 +471,9 @@ class _CollectionChip extends StatelessWidget {
   final String label;
   final Color unlockedBackground;
   final Color unlockedForeground;
+
+  /// `true` hanya sesaat setelah item ini baru unlock.
+  final bool shine;
 
   @override
   Widget build(BuildContext context) {
@@ -394,7 +484,7 @@ class _CollectionChip extends StatelessWidget {
     final foreground = isUnlocked ? unlockedForeground : colors.inkMuted;
     final leadingIcon = isUnlocked ? icon : Icons.lock_outline_rounded;
 
-    return Container(
+    final chip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: background,
@@ -413,6 +503,9 @@ class _CollectionChip extends StatelessWidget {
         ],
       ),
     );
+
+    if (!shine || !isUnlocked) return chip;
+    return ShineSweep(autoPlay: true, child: chip);
   }
 }
 

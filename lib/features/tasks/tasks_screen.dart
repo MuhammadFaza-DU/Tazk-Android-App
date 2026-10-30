@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/app_chip.dart';
+import '../../core/widgets/app_page_route.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/completion_checkbox.dart';
 import '../../core/widgets/empty_state.dart';
@@ -28,7 +29,7 @@ class TasksScreen extends ConsumerWidget {
           icon: const Icon(Icons.add_rounded),
           onPressed: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const TaskFormScreen()),
+              AppPageRoute(builder: (_) => const TaskFormScreen()),
             );
           },
         ),
@@ -91,7 +92,7 @@ class _TaskRow extends ConsumerWidget {
       ),
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => TaskFormScreen(task: task)),
+          AppPageRoute(builder: (_) => TaskFormScreen(task: task)),
         );
       },
     );

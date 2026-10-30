@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_page_route.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/completion_checkbox.dart';
 import '../../core/widgets/empty_state.dart';
@@ -492,7 +493,7 @@ class _TaskRow extends StatelessWidget {
       crossedOut: task.isCompleted,
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => TaskFormScreen(task: task)),
+          AppPageRoute(builder: (_) => TaskFormScreen(task: task)),
         );
       },
       showDivider: showDivider,

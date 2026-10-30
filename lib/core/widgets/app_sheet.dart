@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_motion.dart';
 
 /// Bottom sheet bertema: bg `surface`, radius atas `xl` (24), grab handle 40×4
 /// pill (`border`) ditengahkan pada full width (bukan di dalam padding konten).
@@ -14,6 +15,12 @@ Future<T?> showAppSheet<T>(
     context: context,
     backgroundColor: colors.surface,
     isScrollControlled: isScrollControlled,
+    // Entrance/exit memakai token motion: `base` (220ms) + ease-standard.
+    // `context.motion` otomatis menjadikan durasi nol saat reduced-motion.
+    sheetAnimationStyle: AnimationStyle(
+      duration: context.motion(AppMotion.base),
+      curve: AppMotion.easeStandard,
+    ),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)), // rounded.xl
     ),

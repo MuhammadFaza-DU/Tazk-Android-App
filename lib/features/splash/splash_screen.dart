@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_motion.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/exact_alarm_permission_provider.dart';
 import '../../providers/notification_permission_provider.dart';
@@ -30,6 +31,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   VideoPlayerController? _videoController;
   late final AnimationController _fallbackController;
   Timer? _maxSplashTimer;
+  bool _fallbackStarted = false;
   bool _videoReady = false;
   bool _showFallback = false;
   bool _showBranding = false;
@@ -40,8 +42,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     super.initState();
     _fallbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
+      duration: AppMotion.celebration,
+    );
     _nextScreenFuture = _prepareNextScreen();
     _initializeVideo();
     // Show a static fallback frame immediately while the video is still
@@ -54,6 +56,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     // Never gate navigation on the full video length: force the transition
     // once the max splash duration elapses, whichever trigger fires first.
     _maxSplashTimer = Timer(_maxSplashDuration, _navigateNext);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reduced motion: the swaying fallback tree never ticks. Started here
+    // (not in initState) because `context.reduceMotion` needs a MediaQuery.
+    if (_fallbackStarted) return;
+    _fallbackStarted = true;
+    if (!context.reduceMotion) {
+      _fallbackController.repeat(reverse: true);
+    }
   }
 
   Future<void> _initializeVideo() async {
@@ -158,8 +172,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           // Branding reveal at the tail end of the splash (growth metaphor).
           AnimatedOpacity(
             opacity: _showBranding || _showFallback ? 1 : 0,
-            duration: const Duration(milliseconds: 420),
-            curve: Curves.easeOut,
+            duration: context.motion(AppMotion.slow),
+            curve: AppMotion.easeStandard,
             child: Container(
               alignment: Alignment.bottomCenter,
               padding: const EdgeInsets.only(bottom: 64),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_page_route.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/completion_checkbox.dart';
 import '../../core/widgets/empty_state.dart';
@@ -33,7 +34,7 @@ class HabitsScreen extends ConsumerWidget {
         foregroundColor: colors.onPrimary,
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const HabitFormScreen()),
+            AppPageRoute(builder: (_) => const HabitFormScreen()),
           );
         },
         child: const Icon(Icons.add_rounded),
@@ -129,7 +130,7 @@ class _HabitRow extends ConsumerWidget {
       showDivider: showDivider,
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => HabitDetailScreen(habit: habit)),
+          AppPageRoute(builder: (_) => HabitDetailScreen(habit: habit)),
         );
       },
     );

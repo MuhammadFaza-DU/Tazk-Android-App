@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_page_route.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/animated_xp_progress.dart';
 import '../../core/widgets/celebration_overlay.dart';
@@ -119,7 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 expanded: true,
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const PomodoroScreen()),
+                    AppPageRoute(builder: (_) => const PomodoroScreen()),
                   );
                 },
               ),

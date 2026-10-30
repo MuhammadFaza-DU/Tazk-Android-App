@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_motion.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_page_route.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../data/models/enums.dart';
@@ -34,9 +36,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         .read(gamificationRepositoryProvider)
         .updateName(_nameController.text.trim());
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const AppShell()),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(AppPageRoute(builder: (_) => const AppShell()));
   }
 
   @override
@@ -61,92 +63,108 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
               child: Form(
                 key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Image.asset(
-                        'assets/mascot/otter-waving.png',
-                        height: 140,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stack) => Icon(
-                          Icons.pets_rounded,
-                          size: 72,
-                          color: colors.inkMuted,
+                // Entrance sekali saat mount: satu wrapper untuk seluruh isi
+                // (maskot, judul, field nama, card tema & bahasa, tombol).
+                child: TweenAnimationBuilder<double>(
+                  key: const Key('onboarding_entrance'),
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: context.motion(AppMotion.base),
+                  curve: AppMotion.easeStandard,
+                  builder: (context, t, child) => Opacity(
+                    opacity: t,
+                    child: Transform.translate(
+                      offset: Offset(0, 8 * (1 - t)),
+                      child: child,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Center(
+                        child: Image.asset(
+                          'assets/mascot/otter-waving.png',
+                          height: 140,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stack) => Icon(
+                            Icons.pets_rounded,
+                            size: 72,
+                            color: colors.inkMuted,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      l10n.onboardingWelcome,
-                      style: textTheme.headlineMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.onboardingAskName,
-                      style:
-                          textTheme.bodyLarge?.copyWith(color: colors.inkMuted),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    AppTextField(
-                      controller: _nameController,
-                      labelText: l10n.fieldNameLabel,
-                      textInputAction: TextInputAction.next,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return l10n.onboardingNameEmptyError;
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    _SectionLabel(l10n.settingsAppearance),
-                    const SizedBox(height: 8),
-                    AppCard(
-                      child: _SegmentedControl<AppThemeMode>(
-                        segments: [
-                          ButtonSegment(
-                            value: AppThemeMode.light,
-                            label: Text(l10n.themeLight),
-                          ),
-                          ButtonSegment(
-                            value: AppThemeMode.dark,
-                            label: Text(l10n.themeDark),
-                          ),
-                        ],
-                        value: themeMode,
-                        onChanged: repo.updateThemeMode,
+                      const SizedBox(height: 24),
+                      Text(
+                        l10n.onboardingWelcome,
+                        style: textTheme.headlineMedium,
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    _SectionLabel(l10n.settingsLanguage),
-                    const SizedBox(height: 8),
-                    AppCard(
-                      child: _SegmentedControl<AppLanguage>(
-                        segments: [
-                          ButtonSegment(
-                            value: AppLanguage.indonesian,
-                            label: Text(l10n.languageIndonesian),
-                          ),
-                          ButtonSegment(
-                            value: AppLanguage.english,
-                            label: Text(l10n.languageEnglish),
-                          ),
-                        ],
-                        value: language,
-                        onChanged: repo.updateLanguage,
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.onboardingAskName,
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: colors.inkMuted,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    const SizedBox(height: 32),
-                    AppButton.primary(
-                      label: l10n.startButton,
-                      onPressed: _submit,
-                      expanded: true,
-                    ),
-                  ],
+                      const SizedBox(height: 24),
+                      AppTextField(
+                        controller: _nameController,
+                        labelText: l10n.fieldNameLabel,
+                        textInputAction: TextInputAction.next,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return l10n.onboardingNameEmptyError;
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      _SectionLabel(l10n.settingsAppearance),
+                      const SizedBox(height: 8),
+                      AppCard(
+                        child: _SegmentedControl<AppThemeMode>(
+                          segments: [
+                            ButtonSegment(
+                              value: AppThemeMode.light,
+                              label: Text(l10n.themeLight),
+                            ),
+                            ButtonSegment(
+                              value: AppThemeMode.dark,
+                              label: Text(l10n.themeDark),
+                            ),
+                          ],
+                          value: themeMode,
+                          onChanged: repo.updateThemeMode,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _SectionLabel(l10n.settingsLanguage),
+                      const SizedBox(height: 8),
+                      AppCard(
+                        child: _SegmentedControl<AppLanguage>(
+                          segments: [
+                            ButtonSegment(
+                              value: AppLanguage.indonesian,
+                              label: Text(l10n.languageIndonesian),
+                            ),
+                            ButtonSegment(
+                              value: AppLanguage.english,
+                              label: Text(l10n.languageEnglish),
+                            ),
+                          ],
+                          value: language,
+                          onChanged: repo.updateLanguage,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      AppButton.primary(
+                        label: l10n.startButton,
+                        onPressed: _submit,
+                        expanded: true,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -170,10 +188,9 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         text,
-        style: Theme.of(context)
-            .textTheme
-            .labelLarge
-            ?.copyWith(color: context.colors.inkMuted),
+        style: Theme.of(
+          context,
+        ).textTheme.labelLarge?.copyWith(color: context.colors.inkMuted),
       ),
     );
   }

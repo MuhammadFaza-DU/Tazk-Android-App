@@ -9,6 +9,7 @@ import '../../features/settings/settings_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
 import '../../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
+import 'app_page_route.dart';
 import 'app_sheet.dart';
 import 'list_row.dart';
 
@@ -156,6 +157,6 @@ class _MoreSheet extends StatelessWidget {
   void _push(BuildContext context, Widget screen) {
     final navigator = Navigator.of(context);
     navigator.pop();
-    navigator.push(MaterialPageRoute(builder: (_) => screen));
+    navigator.push(AppPageRoute(builder: (_) => screen));
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_page_route.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/list_row.dart';
 import '../../data/models/enums.dart';
@@ -53,7 +54,7 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         onTap: () {
                           Navigator.of(context).push(
-                            MaterialPageRoute(
+                            AppPageRoute(
                               builder: (_) => const NotificationSettingsScreen(),
                             ),
                           );
@@ -161,7 +162,7 @@ class SettingsScreen extends ConsumerWidget {
                     showDivider: false,
                     onTap: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const AboutScreen()),
+                        AppPageRoute(builder: (_) => const AboutScreen()),
                       );
                     },
                   ),
