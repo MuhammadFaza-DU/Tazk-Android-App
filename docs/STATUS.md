@@ -3,9 +3,11 @@
 Dokumen penanda posisi kerja. Baca ini dulu sebelum melanjutkan, supaya tidak
 mengulang keputusan yang sudah diambil atau mengerjakan hal yang sudah selesai.
 
-Terakhir diperbarui: **2026-10-30**
+Terakhir diperbarui: **2026-10-31**
 
 ## Log Perubahan (terbaru duluan)
+
+- 2026-10-31 — T4 Motion tuntas: token motion di kode (`AppMotion` + `context.reduceMotion`) + `AppPageRoute`; press scale 0.97; checkbox pop/confetti reduced-motion; XP glow composite-only; celebration `repeat()`→one-shot; progress fill `Transform.scale`; sheet/dialog motion; badge shine sweep; entrance EmptyState/Onboarding; splash sway tergerbangi — commit `714d14d` (+ `dfd17b8`, `ec348dc`), 111/111 test
 
 - 2026-10-30 — T3 tuntas: app shell (tab bar 5 + sheet "Lainnya", tanpa drawer) + redesign 12 layar ke design system v2 + migrasi shared-widget (0 `AppColors.*` deprecated tersisa) — commit `622801a` (+ batch 38d4328, 7e0a744)
 - 2026-10-30 — T2-B: widget kit 12 komponen + preview dev-only — commit `5989955`
@@ -22,9 +24,10 @@ Terakhir diperbarui: **2026-10-30**
 ## Ringkas satu paragraf
 
 Tazk sedang diupgrade dari v1 ke v2. **Fase desain selesai**. **T1 Performa selesai** (8/8),
-**T2 design system selesai** (font, 19 token, ColorScheme, widget kit 12), dan **T3 redesign
-layar selesai** (tab bar 5 + sheet "Lainnya" tanpa drawer, 12 layar pakai widget kit + token,
-shared-widget dimigrasi). Fase berikutnya: T4 — animasi & micro-interaction.
+**T2 design system selesai** (font, 19 token, ColorScheme, widget kit 12), **T3 redesign
+layar selesai** (tab bar 5 + sheet "Lainnya" tanpa drawer, 12 layar pakai widget kit + token),
+dan **T4 motion selesai** (token motion di kode, tanpa `easeIn`/`scale(0)`/ticker idle,
+reduced-motion dihormati di semua animasi). Fase berikutnya: **T5 — statistik & insight**.
 
 ---
 
@@ -127,7 +130,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 | T1 Performa (lag) | ✅ selesai | 8/8: index DB, push coalesce+gate, checkbox DB-langsung, home lazy sliver, pomodoro label-only, startup non-blocking, splash decouple, minify+split ABI |
 | T2 Design system | ✅ selesai | font Fredoka+PJS, 19 token `ThemeExtension`, `ColorScheme` eksplisit (bukan fromSeed), widget kit 12 komponen + preview dev-only |
 | T3 Redesign layar | ✅ selesai | app shell tab bar 5 + sheet "Lainnya" (tanpa drawer); 12 layar pakai widget kit + token; shared-widget & 0 `AppColors.*` deprecated |
-| T4 Animasi | ⬜ belum | Motion token sudah didefinisikan |
+| T4 Animasi | ✅ selesai | motion token di kode (`app_motion.dart`), `AppPageRoute` 220ms fade+slide, press scale, celebration one-shot (ticker idle hilang), XP glow composite-only, shine sweep, reduced-motion (`MediaQuery.disableAnimations`) di semua animasi |
 | T5 Statistik | 🟡 desain selesai | Layar 07 digambar, fitur belum |
 | T6 Subtask & Lokasi | ⬜ belum | |
 | T7 Kategori/tag & pencarian | 🟡 desain selesai | Board 26, fitur belum |
@@ -143,12 +146,12 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 
 ### Isu terbuka yang harus diingat
 
-1. **Font v2 belum diunduh.** `assets/fonts/` kosong; Fredoka & Plus Jakarta Sans belum ada `.ttf`-nya. App sekarang jatuh ke font sistem. Perlu diunduh sebelum T2.
+1. ~~Font v2 belum diunduh.~~ **Selesai di T2** — `assets/fonts/` berisi Fredoka + Plus Jakarta Sans (3 file), terdaftar di `pubspec.yaml`.
 2. **Ikon app persegi belum ada.** Yang ada baru wordmark horizontal (`assets/logo/tazk-logo.png`) yang **terpotong** kalau dipakai di kotak persegi. Prompt ada di `docs/design/ikon-logo-prompts.md` §2.
 3. **Widget scroll belum bisa jalan.** Desainnya ada, tapi butuh `RemoteViewsService` + `RemoteViewsFactory` di Kotlin. Belum dibuat.
 4. **Teks mini di widget belum terverifikasi di HP.** Huruf hari 7.5px, item 8.5px — di bawah rekomendasi Android (10–11sp). **Wajib dites di perangkat.**
 5. **`graphify label` gagal** (timeout). Struktur graph benar (1.941 node / 2.737 edge / 84 komunitas) tapi nama komunitas masih turunan otomatis, belum semantik.
-6. **Kode masih merujuk aset terarsip** — sengaja dibiarkan (punya fallback, tidak crash). Akan hilang di T2/T3.
+6. ~~Kode masih merujuk aset terarsip~~ — **Selesai di T2/T3**: seluruh layar memakai widget kit + token v2; `grep AppColors.<deprecated>` di `lib/` = 0.
 7. **Provider `.env` lama mati** (`vyceai.com` HTTP 503). Sudah diganti ke SEKAI `/v2` (`ds/deepseek-v4.1-flash`). Nebius juga 401.
 8. **Kanvas masih pakai 3 warna untuk "teks di atas primary"** — `$surface` (17×), `$canvas` (9×), `#DDE3D6` (3×). Semua lolos kontras (7.03 / 6.56 / 5.65:1), tapi `DESIGN.md` sekarang mendeklarasikan dua: `on-primary` (`#FBF9F4`) dan `on-primary-muted` (`#DDE3D6`). **Perlu normalisasi kanvas**: 9 node `$canvas` → `$surface`.
 9. **Kontras grab handle masih 1.32:1** (`#E2DACB` di atas `#FBF9F4`) — hampir tak terlihat. Owner minta hanya ditengahkan, jadi kontras sengaja dibiarkan. Kalau mau dibuat terlihat, standar elemen non-teks = 3:1; kandidat `#918A7C` (3.26:1) / dark `#6A7A6E` (3.63:1).
@@ -194,7 +197,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 # 1. App masih jalan?
 flutter pub get
 dart analyze          # harus: No issues found!
-flutter test          # harus: 60/60 lulus
+flutter test          # harus: 111/111 lulus
 
 # 2. DESIGN.md masih valid?
 npx @google/design.md lint DESIGN.md          # harus: 0 errors
