@@ -3711,6 +3711,22 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final Index idxTasksDate = Index(
+    'idx_tasks_date',
+    'CREATE INDEX idx_tasks_date ON tasks (date)',
+  );
+  late final Index idxTasksIsCompleted = Index(
+    'idx_tasks_is_completed',
+    'CREATE INDEX idx_tasks_is_completed ON tasks (is_completed)',
+  );
+  late final Index idxSubtasksTaskId = Index(
+    'idx_subtasks_task_id',
+    'CREATE INDEX idx_subtasks_task_id ON subtasks (task_id)',
+  );
+  late final Index idxHabitsIsActive = Index(
+    'idx_habits_is_active',
+    'CREATE INDEX idx_habits_is_active ON habits (is_active)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3725,6 +3741,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     userProfile,
     cosmeticUnlocks,
     appSettings,
+    idxTasksDate,
+    idxTasksIsCompleted,
+    idxSubtasksTaskId,
+    idxHabitsIsActive,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([

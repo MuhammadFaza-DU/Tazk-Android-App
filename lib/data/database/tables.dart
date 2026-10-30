@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 
 import '../models/enums.dart';
 
+@TableIndex(name: 'idx_tasks_date', columns: {#date})
+@TableIndex(name: 'idx_tasks_is_completed', columns: {#isCompleted})
 class Tasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title => text()();
@@ -13,6 +15,7 @@ class Tasks extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
+@TableIndex(name: 'idx_subtasks_task_id', columns: {#taskId})
 class Subtasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get taskId =>
@@ -21,6 +24,7 @@ class Subtasks extends Table {
   BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
 }
 
+@TableIndex(name: 'idx_habits_is_active', columns: {#isActive})
 class Habits extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();

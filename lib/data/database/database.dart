@@ -34,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -46,6 +46,16 @@ class AppDatabase extends _$AppDatabase {
             await _addHabitColumnIfMissing(m, habits.customInterval);
             await _addHabitColumnIfMissing(m, habits.customDayOfMonth);
             await _addHabitColumnIfMissing(m, habits.customFrequencyType);
+          }
+          if (from < 3) {
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_tasks_date ON tasks(date);');
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_tasks_is_completed ON tasks(is_completed);');
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_habits_is_active ON habits(is_active);');
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_subtasks_task_id ON subtasks(task_id);');
           }
         },
       );
