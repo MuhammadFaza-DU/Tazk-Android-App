@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/app_chip.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/completion_checkbox.dart';
+import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/list_row.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
@@ -32,11 +35,11 @@ class TasksScreen extends ConsumerWidget {
       ],
       body: tasksAsync.when(
         data: (tasks) => tasks.isEmpty
-            ? Center(child: Text(l10n.homeNoTasksToday))
+            ? Center(child: EmptyState(message: l10n.homeNoTasksToday))
             : ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 itemCount: tasks.length,
-                itemBuilder: (context, index) => _TaskListTile(task: tasks[index]),
+                itemBuilder: (context, index) => _TaskRow(task: tasks[index]),
               ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(l10n.errorLoadingTasks(error.toString()))),
@@ -45,8 +48,8 @@ class TasksScreen extends ConsumerWidget {
   }
 }
 
-class _TaskListTile extends ConsumerWidget {
-  const _TaskListTile({required this.task});
+class _TaskRow extends ConsumerWidget {
+  const _TaskRow({required this.task});
 
   final Task task;
 
@@ -59,35 +62,38 @@ class _TaskListTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    return ListTile(
+
+    final subtitleParts = <String>[
+      if (task.time != null) TimeOfDay.fromDateTime(task.time!).format(context),
+      if (task.location != null && task.location!.isNotEmpty) task.location!,
+    ];
+
+    return ListRow(
       leading: CompletionCheckbox(
         value: task.isCompleted,
         onComplete: () => ref.read(taskRepositoryProvider).completeTask(task.id),
         onUncomplete: () => ref.read(taskRepositoryProvider).uncompleteTask(task.id),
       ),
-      title: Text(
-        task.title,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: task.isCompleted
-            ? const TextStyle(decoration: TextDecoration.lineThrough)
-            : null,
+      title: task.title,
+      crossedOut: task.isCompleted,
+      subtitle: subtitleParts.isEmpty ? null : subtitleParts.join(' · '),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AppChip.priority(task.priority, label: _priorityLabel(l10n)),
+          const SizedBox(width: 4),
+          IconButton(
+            icon: const Icon(Icons.copy_rounded),
+            tooltip: l10n.taskDuplicateTooltip,
+            onPressed: () => ref.read(taskRepositoryProvider).duplicateTask(task),
+          ),
+        ],
       ),
-      subtitle: Text([
-        _priorityLabel(l10n),
-        if (task.time != null) TimeOfDay.fromDateTime(task.time!).format(context),
-        if (task.location != null && task.location!.isNotEmpty) task.location!,
-      ].join(' · ')),
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => TaskFormScreen(task: task)),
         );
       },
-      trailing: IconButton(
-        icon: const Icon(Icons.copy_rounded),
-        tooltip: l10n.taskDuplicateTooltip,
-        onPressed: () => ref.read(taskRepositoryProvider).duplicateTask(task),
-      ),
     );
   }
 }

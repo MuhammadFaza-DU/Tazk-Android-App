@@ -2,6 +2,13 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/theme/app_colors.dart';
+import '../../core/widgets/app_button.dart';
+import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/app_text_field.dart';
+import '../../core/widgets/completion_checkbox.dart';
+import '../../core/widgets/list_row.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
@@ -119,74 +126,112 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? l10n.editTaskTitle : l10n.addTaskTitle),
-      ),
+    final colors = context.colors;
+    return AppScaffold(
+      title: _isEditing ? l10n.editTaskTitle : l10n.addTaskTitle,
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            TextFormField(
+            AppTextField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: l10n.fieldTitleLabel),
+              labelText: l10n.fieldTitleLabel,
               validator: (value) => (value == null || value.trim().isEmpty)
                   ? l10n.taskTitleRequiredError
                   : null,
             ),
             const SizedBox(height: 16),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.fieldDateLabel),
-              subtitle: Text('${_date.day}/${_date.month}/${_date.year}'),
-              trailing: const Icon(Icons.calendar_today_rounded),
-              onTap: _pickDate,
-            ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.fieldTimeOptionalLabel),
-              subtitle: Text(_time == null ? '-' : _time!.format(context)),
-              trailing: _time == null
-                  ? const Icon(Icons.access_time_rounded)
-                  : IconButton(
-                      icon: const Icon(Icons.clear_rounded),
-                      onPressed: () => setState(() => _time = null),
-                    ),
-              onTap: _pickTime,
-            ),
-            const SizedBox(height: 8),
-            Text(l10n.fieldPriorityLabel, style: Theme.of(context).textTheme.titleSmall),
-            RadioGroup<TaskPriority>(
-              groupValue: _priority,
-              onChanged: (value) => setState(() => _priority = value!),
+            AppCard(
+              padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  RadioListTile<TaskPriority>(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.priorityLow),
-                    value: TaskPriority.low,
+                  ListRow(
+                    leading: Icon(
+                      Icons.calendar_today_rounded,
+                      color: colors.inkMuted,
+                    ),
+                    title: l10n.fieldDateLabel,
+                    subtitle: '${_date.day}/${_date.month}/${_date.year}',
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      color: colors.inkMuted,
+                    ),
+                    onTap: _pickDate,
                   ),
-                  RadioListTile<TaskPriority>(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.priorityMedium),
-                    value: TaskPriority.medium,
-                  ),
-                  RadioListTile<TaskPriority>(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.priorityHigh),
-                    value: TaskPriority.high,
+                  ListRow(
+                    leading: Icon(
+                      Icons.access_time_rounded,
+                      color: colors.inkMuted,
+                    ),
+                    title: l10n.fieldTimeOptionalLabel,
+                    subtitle: _time == null ? '-' : _time!.format(context),
+                    trailing: _time == null
+                        ? Icon(
+                            Icons.chevron_right_rounded,
+                            color: colors.inkMuted,
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.clear_rounded),
+                            onPressed: () => setState(() => _time = null),
+                          ),
+                    onTap: _pickTime,
+                    showDivider: false,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _locationController,
-              decoration: InputDecoration(labelText: l10n.fieldLocationOptionalLabel),
+            const SizedBox(height: 16),
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.fieldPriorityLabel,
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelLarge
+                        ?.copyWith(color: colors.inkMuted),
+                  ),
+                  RadioGroup<TaskPriority>(
+                    groupValue: _priority,
+                    onChanged: (value) => setState(() => _priority = value!),
+                    child: Column(
+                      children: [
+                        RadioListTile<TaskPriority>(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(l10n.priorityLow),
+                          value: TaskPriority.low,
+                        ),
+                        RadioListTile<TaskPriority>(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(l10n.priorityMedium),
+                          value: TaskPriority.medium,
+                        ),
+                        RadioListTile<TaskPriority>(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(l10n.priorityHigh),
+                          value: TaskPriority.high,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
-            Text(l10n.checklistOptionalLabel, style: Theme.of(context).textTheme.titleSmall),
+            AppTextField(
+              controller: _locationController,
+              labelText: l10n.fieldLocationOptionalLabel,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              l10n.checklistOptionalLabel,
+              style: Theme.of(context)
+                  .textTheme
+                  .labelLarge
+                  ?.copyWith(color: colors.inkMuted),
+            ),
             const SizedBox(height: 8),
             if (_isEditing)
               _ExistingSubtasksList(taskId: widget.task!.id)
@@ -194,40 +239,43 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               Column(
                 children: [
                   for (final title in _newSubtaskTitles)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.check_box_outline_blank_rounded),
-                      title: Text(title),
+                    ListRow(
+                      leading: Icon(
+                        Icons.check_box_outline_blank_rounded,
+                        color: colors.inkMuted,
+                      ),
+                      title: title,
                       trailing: IconButton(
                         icon: const Icon(Icons.close_rounded),
                         onPressed: () =>
                             setState(() => _newSubtaskTitles.remove(title)),
                       ),
+                      showDivider: false,
                     ),
                 ],
               ),
             Row(
               children: [
                 Expanded(
-                  child: TextField(
+                  child: AppTextField(
                     controller: _subtaskInputController,
-                    decoration: InputDecoration(hintText: l10n.addItemHint),
-                    onSubmitted: (_) => _addSubtaskField(),
+                    hintText: l10n.addItemHint,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => _addSubtaskField(),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.add_rounded),
+                  color: colors.primary,
                   onPressed: _addSubtaskField,
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _save,
-                child: Text(l10n.saveButton),
-              ),
+            AppButton.primary(
+              label: l10n.saveButton,
+              onPressed: _save,
+              expanded: true,
             ),
           ],
         ),
@@ -250,13 +298,15 @@ class _ExistingSubtasksList extends ConsumerWidget {
       data: (subtasks) => Column(
         children: [
           for (final subtask in subtasks)
-            CheckboxListTile(
-              contentPadding: EdgeInsets.zero,
-              controlAffinity: ListTileControlAffinity.leading,
-              value: subtask.isCompleted,
-              title: Text(subtask.title),
-              onChanged: (value) =>
-                  repo.setSubtaskCompleted(subtask.id, value ?? false),
+            ListRow(
+              leading: CompletionCheckbox(
+                value: subtask.isCompleted,
+                onComplete: () => repo.setSubtaskCompleted(subtask.id, true),
+                onUncomplete: () =>
+                    repo.setSubtaskCompleted(subtask.id, false),
+              ),
+              title: subtask.title,
+              showDivider: false,
             ),
         ],
       ),

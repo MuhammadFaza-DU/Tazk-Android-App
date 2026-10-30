@@ -14,6 +14,7 @@ class ListRow extends StatelessWidget {
     this.trailing,
     this.onTap,
     this.showDivider = true,
+    this.crossedOut = false,
   });
 
   final Widget? leading;
@@ -22,6 +23,11 @@ class ListRow extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onTap;
   final bool showDivider;
+
+  /// Marks the title as completed (strikethrough + dimmed). Paired with a
+  /// leading checkbox so the state is signalled by shape, never color alone
+  /// (DESIGN.md "Do's and Don'ts").
+  final bool crossedOut;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +59,11 @@ class ListRow extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: theme.textTheme.bodyLarge,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      decoration:
+                          crossedOut ? TextDecoration.lineThrough : null,
+                      color: crossedOut ? colors.inkMuted : null,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
 
 import 'package:tazk/data/database/database.dart';
+import 'package:tazk/core/theme/app_theme.dart';
 import 'package:tazk/features/habits/habit_form_screen.dart';
 import 'package:tazk/l10n/app_localizations.dart';
 import 'package:tazk/providers/database_provider.dart';
@@ -43,6 +44,7 @@ Future<void> _pumpForm(WidgetTester tester) async {
         ],
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('id'),
+        theme: AppTheme.light,
         home: Builder(
           builder: (context) => Scaffold(
             body: Center(

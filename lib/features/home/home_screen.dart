@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/app_button.dart';
+import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/animated_xp_progress.dart';
 import '../../core/widgets/celebration_overlay.dart';
 import '../../core/widgets/completion_checkbox.dart';
+import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/exact_alarm_banner.dart';
+import '../../core/widgets/list_row.dart';
 import '../../core/widgets/notification_permission_banner.dart';
+import '../../core/widgets/section_header.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
@@ -80,25 +85,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
           _paddedSliver(
-            SliverToBoxAdapter(
-              child: Text(l10n.homeTasksToday,
-                  style: Theme.of(context).textTheme.titleLarge),
-            ),
+            SliverToBoxAdapter(child: SectionHeader(title: l10n.homeTasksToday)),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 8)),
           ..._buildTaskSlivers(tasksAsync, l10n),
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
           _paddedSliver(
             SliverToBoxAdapter(
-              child: Text(l10n.homeHabitsToday,
-                  style: Theme.of(context).textTheme.titleLarge),
-            ),
+                child: SectionHeader(title: l10n.homeHabitsToday)),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 8)),
           if (todayHabits.isEmpty)
             _paddedSliver(
               SliverToBoxAdapter(
-                  child: _EmptyState(message: l10n.homeNoActiveHabits)),
+                  child: EmptyState(message: l10n.homeNoActiveHabits)),
             )
           else
             _paddedSliver(
@@ -113,17 +113,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
           _paddedSliver(
             SliverToBoxAdapter(
-              child: SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const PomodoroScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  label: Text(l10n.homeStartPomodoroButton),
-                ),
+              child: AppButton.primary(
+                label: l10n.homeStartPomodoroButton,
+                icon: Icons.play_arrow_rounded,
+                expanded: true,
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PomodoroScreen()),
+                  );
+                },
               ),
             ),
             bottom: 16,
@@ -147,7 +145,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ? [
               _paddedSliver(
                 SliverToBoxAdapter(
-                    child: _EmptyState(message: l10n.homeNoTasksToday)),
+                    child: EmptyState(message: l10n.homeNoTasksToday)),
               ),
             ]
           : [
@@ -163,7 +161,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       error: (error, _) => [
         _paddedSliver(
           SliverToBoxAdapter(
-            child: _EmptyState(message: l10n.errorLoadingTasks(error.toString())),
+            child: EmptyState(message: l10n.errorLoadingTasks(error.toString())),
           ),
         ),
       ],
@@ -186,24 +184,22 @@ class _GamificationSummary extends StatelessWidget {
     final streakDays = streak?.currentStreak ?? 0;
     final rankLabel = streakDays > 0 ? streakRankForDays(streakDays).label(context) : '-';
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.levelLabel(level), style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            AnimatedXpProgress(
-              value: needed == 0 ? 0 : xp / needed,
-              level: level,
-            ),
-            const SizedBox(height: 4),
-            Text(l10n.xpProgress(xp, needed)),
-            const SizedBox(height: 12),
-            Text(l10n.streakSummary(streakDays, rankLabel)),
-          ],
-        ),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.levelLabel(level),
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          AnimatedXpProgress(
+            value: needed == 0 ? 0 : xp / needed,
+            level: level,
+          ),
+          const SizedBox(height: 4),
+          Text(l10n.xpProgress(xp, needed)),
+          const SizedBox(height: 12),
+          Text(l10n.streakSummary(streakDays, rankLabel)),
+        ],
       ),
     );
   }
@@ -227,21 +223,16 @@ class _TaskTile extends ConsumerWidget {
       _priorityLabel(l10n),
       if (task.time != null) TimeOfDay.fromDateTime(task.time!).format(context),
     ];
-    return ListTile(
+    return ListRow(
       leading: CompletionCheckbox(
         value: task.isCompleted,
         onComplete: () => ref.read(taskRepositoryProvider).completeTask(task.id),
-        onUncomplete: () => ref.read(taskRepositoryProvider).uncompleteTask(task.id),
+        onUncomplete: () =>
+            ref.read(taskRepositoryProvider).uncompleteTask(task.id),
       ),
-      title: Text(
-        task.title,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: task.isCompleted
-            ? const TextStyle(decoration: TextDecoration.lineThrough)
-            : null,
-      ),
-      subtitle: Text(subtitleParts.join(' · '), maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: task.title,
+      subtitle: subtitleParts.join(' · '),
+      crossedOut: task.isCompleted,
     );
   }
 }
@@ -254,20 +245,15 @@ class _HabitTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ListTile(
+    return ListRow(
       leading: CompletionCheckbox(
         value: isCompleted,
         onComplete: () => ref.read(habitRepositoryProvider).completeHabitToday(habit.id),
-        onUncomplete: () => ref.read(habitRepositoryProvider).uncompleteHabitToday(habit.id),
+        onUncomplete: () =>
+            ref.read(habitRepositoryProvider).uncompleteHabitToday(habit.id),
       ),
-      title: Text(
-        habit.name,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: isCompleted
-            ? const TextStyle(decoration: TextDecoration.lineThrough)
-            : null,
-      ),
+      title: habit.name,
+      crossedOut: isCompleted,
     );
   }
 }
@@ -280,20 +266,6 @@ class _LoadingRow extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 16),
       child: Center(child: CircularProgressIndicator()),
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(message, style: Theme.of(context).textTheme.bodyMedium),
     );
   }
 }

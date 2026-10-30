@@ -2,6 +2,13 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/theme/app_colors.dart';
+import '../../core/widgets/app_button.dart';
+import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_chip.dart';
+import '../../core/widgets/app_snackbar.dart';
+import '../../core/widgets/app_text_field.dart';
+import '../../core/widgets/list_row.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
@@ -113,11 +120,9 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     if (_isCustomFrequency &&
         _customFrequencyType == 0 &&
         _customDaysOfWeek.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text(AppLocalizations.of(context)!.customDaysRequiredError),
-        ),
+      showAppSnackbar(
+        context,
+        AppLocalizations.of(context)!.customDaysRequiredError,
       );
       return;
     }
@@ -173,6 +178,8 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEditing ? l10n.editHabitTitle : l10n.addHabitTitle),
@@ -182,15 +189,15 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            TextFormField(
+            AppTextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: l10n.fieldNameLabel),
+              labelText: l10n.fieldNameLabel,
               validator: (value) => (value == null || value.trim().isEmpty)
                   ? l10n.habitNameRequiredError
                   : null,
             ),
             const SizedBox(height: 16),
-            Text(l10n.fieldFrequencyLabel, style: Theme.of(context).textTheme.titleSmall),
+            Text(l10n.fieldFrequencyLabel, style: theme.textTheme.labelLarge),
             RadioGroup<HabitFrequency>(
               groupValue: _frequency,
               onChanged: (value) => setState(() => _frequency = value!),
@@ -205,26 +212,28 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                 ],
               ),
             ),
-            
+
             // Custom frequency configuration
             if (_isCustomFrequency) ...[
               const SizedBox(height: 16),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.customFrequencyConfigTitle,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 12),
-                      // Custom type selector
-                      Text(l10n.customFrequencyTypeLabel, style: Theme.of(context).textTheme.titleSmall),
-                      RadioGroup<int>(
-                        groupValue: _customFrequencyType,
-                        onChanged: (value) => setState(() => _customFrequencyType = value!),
+              AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.customFrequencyConfigTitle,
+                      style: theme.textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 12),
+                    // Custom type selector
+                    Text(l10n.customFrequencyTypeLabel,
+                        style: theme.textTheme.labelLarge),
+                    RadioGroup<int>(
+                      groupValue: _customFrequencyType,
+                      onChanged: (value) =>
+                          setState(() => _customFrequencyType = value!),
+                      child: Material(
+                        type: MaterialType.transparency,
                         child: Column(
                           children: [
                             RadioListTile<int>(
@@ -245,103 +254,118 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      // Weekly days configuration
-                      if (_customFrequencyType == 0) ...[
-                        Text(l10n.customDaysOfWeekLabel, style: Theme.of(context).textTheme.titleSmall),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: List.generate(7, (index) {
-                            final dayValue = 1 << index;
-                            final isSelected = _customDaysOfWeek.contains(dayValue);
-                            final dayName = [
-                              l10n.weekdayMonShort,
-                              l10n.weekdayTueShort,
-                              l10n.weekdayWedShort,
-                              l10n.weekdayThuShort,
-                              l10n.weekdayFriShort,
-                              l10n.weekdaySatShort,
-                              l10n.weekdaySunShort,
-                            ][index];
-                            return FilterChip(
-                              label: Text(dayName),
-                              selected: isSelected,
-                              materialTapTargetSize: MaterialTapTargetSize.padded,
-                              onSelected: (_) => _toggleDayOfWeek(dayValue),
-                            );
-                          }),
-                        ),
-                        if (_customDaysOfWeek.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              l10n.customDaysRequiredError,
-                              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12),
+                    ),
+                    const SizedBox(height: 12),
+                    // Weekly days configuration
+                    if (_customFrequencyType == 0) ...[
+                      Text(l10n.customDaysOfWeekLabel,
+                          style: theme.textTheme.labelLarge),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: List.generate(7, (index) {
+                          final dayValue = 1 << index;
+                          final isSelected =
+                              _customDaysOfWeek.contains(dayValue);
+                          final dayName = [
+                            l10n.weekdayMonShort,
+                            l10n.weekdayTueShort,
+                            l10n.weekdayWedShort,
+                            l10n.weekdayThuShort,
+                            l10n.weekdayFriShort,
+                            l10n.weekdaySatShort,
+                            l10n.weekdaySunShort,
+                          ][index];
+                          return GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => _toggleDayOfWeek(dayValue),
+                            child: AppChip(
+                              label: dayName,
+                              backgroundColor: isSelected
+                                  ? colors.primaryContainer
+                                  : colors.surfaceAlt,
+                              foregroundColor: isSelected
+                                  ? colors.primary
+                                  : colors.inkMuted,
                             ),
+                          );
+                        }),
+                      ),
+                      if (_customDaysOfWeek.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            l10n.customDaysRequiredError,
+                            style: theme.textTheme.bodySmall
+                                ?.copyWith(color: colors.danger),
                           ),
-                      ],
-                      // Interval days configuration
-                      if (_customFrequencyType == 1) ...[
-                        TextFormField(
-                          controller: _customIntervalController,
-                          decoration: InputDecoration(
-                            labelText: l10n.customIntervalLabel,
-                            helperText: l10n.customIntervalHelper,
-                          ),
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (_customFrequencyType != 1) return null;
-                            final parsed = int.tryParse(value?.trim() ?? '');
-                            return (parsed == null || parsed <= 0)
-                                ? l10n.customIntervalInvalidError
-                                : null;
-                          },
-                          onChanged: (value) {
-                            final parsed = int.tryParse(value.trim());
-                            if (parsed != null && parsed > 0) {
-                              _customInterval = parsed;
-                            }
-                          },
                         ),
-                      ],
-                      // Monthly day configuration
-                      if (_customFrequencyType == 2) ...[
-                        TextFormField(
-                          initialValue: _customDayOfMonth.toString(),
-                          decoration: InputDecoration(
-                            labelText: l10n.customDayOfMonthLabel,
-                            helperText: l10n.customDayOfMonthHelper,
-                          ),
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (_customFrequencyType != 2) return null;
-                            final parsed = int.tryParse(value?.trim() ?? '');
-                            return (parsed == null || parsed < 1 || parsed > 31)
-                                ? l10n.customDayOfMonthInvalidError
-                                : null;
-                          },
-                          onChanged: (value) {
-                            final parsed = int.tryParse(value.trim());
-                            if (parsed != null && parsed >= 1 && parsed <= 31) {
-                              _customDayOfMonth = parsed;
-                            }
-                          },
-                        ),
-                      ],
                     ],
-                  ),
+                    // Interval days configuration
+                    if (_customFrequencyType == 1) ...[
+                      AppTextField(
+                        controller: _customIntervalController,
+                        labelText: l10n.customIntervalLabel,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (_customFrequencyType != 1) return null;
+                          final parsed = int.tryParse(value?.trim() ?? '');
+                          return (parsed == null || parsed <= 0)
+                              ? l10n.customIntervalInvalidError
+                              : null;
+                        },
+                        onChanged: (value) {
+                          final parsed = int.tryParse(value.trim());
+                          if (parsed != null && parsed > 0) {
+                            _customInterval = parsed;
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.customIntervalHelper,
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: colors.inkMuted),
+                      ),
+                    ],
+                    // Monthly day configuration
+                    if (_customFrequencyType == 2) ...[
+                      AppTextField(
+                        initialValue: _customDayOfMonth.toString(),
+                        labelText: l10n.customDayOfMonthLabel,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (_customFrequencyType != 2) return null;
+                          final parsed = int.tryParse(value?.trim() ?? '');
+                          return (parsed == null || parsed < 1 || parsed > 31)
+                              ? l10n.customDayOfMonthInvalidError
+                              : null;
+                        },
+                        onChanged: (value) {
+                          final parsed = int.tryParse(value.trim());
+                          if (parsed != null && parsed >= 1 && parsed <= 31) {
+                            _customDayOfMonth = parsed;
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.customDayOfMonthHelper,
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: colors.inkMuted),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
-            
+
             const SizedBox(height: 8),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.fieldScheduledTimeOptionalLabel),
-              subtitle: Text(
-                _scheduledTime == null ? '-' : _scheduledTime!.format(context),
-              ),
+            ListRow(
+              title: l10n.fieldScheduledTimeOptionalLabel,
+              subtitle:
+                  _scheduledTime == null ? '-' : _scheduledTime!.format(context),
               trailing: _scheduledTime == null
                   ? const Icon(Icons.access_time_rounded)
                   : IconButton(
@@ -349,9 +373,10 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                       onPressed: () => setState(() => _scheduledTime = null),
                     ),
               onTap: _pickTime,
+              showDivider: false,
             ),
             const SizedBox(height: 8),
-            Text(l10n.hasProgressLabel, style: Theme.of(context).textTheme.titleSmall),
+            Text(l10n.hasProgressLabel, style: theme.textTheme.labelLarge),
             RadioGroup<bool>(
               groupValue: _hasProgress,
               onChanged: (value) => setState(() => _hasProgress = value!),
@@ -372,9 +397,9 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
             ),
             if (_hasProgress) ...[
               const SizedBox(height: 8),
-              TextFormField(
+              AppTextField(
                 controller: _targetMinutesController,
-                decoration: InputDecoration(labelText: l10n.targetMinutesLabel),
+                labelText: l10n.targetMinutesLabel,
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (!_hasProgress) return null;
@@ -386,12 +411,10 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
               ),
             ],
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _save,
-                child: Text(l10n.saveButton),
-              ),
+            AppButton.primary(
+              label: l10n.saveButton,
+              onPressed: _save,
+              expanded: true,
             ),
           ],
         ),

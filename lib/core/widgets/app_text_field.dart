@@ -18,6 +18,7 @@ class AppTextField extends StatelessWidget {
     this.maxLines = 1,
     this.validator,
     this.onChanged,
+    this.onFieldSubmitted,
     this.suffixIcon,
     this.autofocus = false,
     this.enabled = true,
@@ -33,6 +34,7 @@ class AppTextField extends StatelessWidget {
   final int? maxLines;
   final FormFieldValidator<String>? validator;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onFieldSubmitted;
   final Widget? suffixIcon;
   final bool autofocus;
   final bool enabled;
@@ -66,6 +68,7 @@ class AppTextField extends StatelessWidget {
       maxLines: obscureText ? 1 : maxLines,
       validator: validator,
       onChanged: onChanged,
+      onFieldSubmitted: onFieldSubmitted,
       autofocus: autofocus,
       enabled: enabled,
       style: theme.textTheme.bodyLarge,
