@@ -20,7 +20,7 @@ import 'providers/settings_providers.dart';
 import 'providers/task_providers.dart';
 import 'widgets/home_widget_callback.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Best-effort: lets homescreen widget checkboxes complete tasks/habits
   // even while the app isn't running. No-op (and safe) if the platform
@@ -28,11 +28,20 @@ void main() async {
   HomeWidget.registerInteractivityCallback(
     homeWidgetBackgroundCallback,
   ).catchError((_) => null);
-  // Arms the native midnight alarm so the widgets and reminders roll over to the
-  // new day even when the app is closed.
-  await MidnightScheduler.initialize();
-  await MidnightScheduler.armNextMidnight();
   runApp(const ProviderScope(child: TazkApp()));
+  // Arms the native midnight alarm so the widgets and reminders roll over to the
+  // new day even when the app is closed. Deferred until after the first frame
+  // so the (potentially slow) platform-channel init and timezone lookup in
+  // MidnightScheduler/NotificationService don't block the first paint.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    unawaited(
+      MidnightScheduler.initialize()
+          .then((_) => MidnightScheduler.armNextMidnight())
+          .catchError((Object error) {
+        debugPrint('MidnightScheduler: background init failed: $error');
+      }),
+    );
+  });
 }
 
 class TazkApp extends ConsumerWidget {

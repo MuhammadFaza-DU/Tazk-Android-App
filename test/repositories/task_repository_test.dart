@@ -11,12 +11,13 @@ import 'package:tazk/widgets/home_widget_service.dart';
 void main() {
   late AppDatabase db;
   late TaskRepository tasks;
+  late HomeWidgetService widgets;
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
     final notifications = NotificationService.instance;
     final settings = SettingsRepository(db);
-    final widgets = HomeWidgetService(db, settings);
+    widgets = HomeWidgetService(db, settings);
     final gamification =
         GamificationRepository(db, notifications, settings, widgets);
     tasks = TaskRepository(db, gamification, notifications, settings, widgets);
@@ -71,6 +72,30 @@ void main() {
     expect(task.isCompleted, isTrue);
     expect(subtasks, hasLength(2));
     expect(subtasks.every((subtask) => subtask.isCompleted), isTrue);
+  });
+
+  test('completeTask pushes widgets exactly once', () async {
+    final taskId = await tasks.createTask(
+      title: 'Push sekali',
+      date: DateTime(2026, 7, 11),
+      priority: TaskPriority.medium,
+    );
+    widgets.debugPushCount = 0;
+
+    await tasks.completeTask(taskId);
+
+    expect(widgets.debugPushCount, 1);
+  });
+
+  test('refreshAll coalesces concurrent calls into a single push', () async {
+    widgets.debugPushCount = 0;
+    final pending = <Future<void>>[];
+    for (var i = 0; i < 5; i++) {
+      pending.add(widgets.refreshAll());
+    }
+    await Future.wait(pending);
+
+    expect(widgets.debugPushCount, 1);
   });
 
   test('duplicateTask copies details and subtask titles', () async {

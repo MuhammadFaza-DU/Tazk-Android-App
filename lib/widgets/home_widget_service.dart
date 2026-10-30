@@ -8,13 +8,21 @@ import '../data/models/enums.dart';
 import '../data/repositories/settings_repository.dart';
 import '../l10n/app_localizations.dart';
 import 'calendar_widget_models.dart';
+import 'widget_push_gate.dart';
 
 /// Pushes today's tasks/habits and current streak into Android homescreen widgets.
 class HomeWidgetService {
-  HomeWidgetService(this._db, this._settings);
+  HomeWidgetService(this._db, this._settings, {WidgetPushGate? gate})
+      : _gate = gate ?? WidgetPushGate();
 
   final AppDatabase _db;
   final SettingsRepository _settings;
+  final WidgetPushGate _gate;
+
+  /// Number of times [_pushAll] has actually run. Incremented at the start of
+  /// every real push, so it counts pushes — not callers of [refreshAll].
+  @visibleForTesting
+  int debugPushCount = 0;
 
   static const maxRows = 3;
   static const calendarMaxRows = 5;
@@ -54,12 +62,25 @@ class HomeWidgetService {
     return rows;
   }
 
-  Future<void> refreshAll() async {
+  Future<void>? _pendingRefresh;
+
+  Future<void> refreshAll() {
+    return _pendingRefresh ??= _pushAll().whenComplete(() {
+      _pendingRefresh = null;
+    });
+  }
+
+  Future<void> _pushAll() async {
+    debugPushCount++;
     try {
+      final mounted = await _gate.mountedProviders();
       await Future.wait([
-        _refreshTasksAndHabits(),
-        _refreshStreak(),
-        refreshCalendarWidget(),
+        if (mounted.contains('tasksHabits') ||
+            mounted.contains('tasksOnly') ||
+            mounted.contains('habitsOnly'))
+          _refreshTasksAndHabits(),
+        if (mounted.contains('streak')) _refreshStreak(),
+        if (mounted.contains('calendar')) refreshCalendarWidget(),
       ]);
     } catch (error) {
       debugPrint('HomeWidgetService: refreshAll failed: $error');

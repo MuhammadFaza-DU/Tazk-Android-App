@@ -42,12 +42,10 @@ Future<void> homeWidgetBackgroundCallback(Uri? uri) async {
       case 'completetask':
         if (id != null) {
           await taskRepository.completeTask(id);
-          await widgetService.refreshAll();
         }
       case 'completehabit':
         if (id != null) {
           await habitRepository.completeHabitToday(id);
-          await widgetService.refreshAll();
         }
       case 'calendarcompletetask':
         if (id != null) {

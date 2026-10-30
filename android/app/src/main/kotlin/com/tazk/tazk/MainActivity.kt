@@ -20,6 +20,20 @@ class MainActivity : FlutterActivity() {
                         openNotificationSettings()
                         result.success(null)
                     }
+                    "getMountedWidgets" -> {
+                        val providers = listOf(
+                            "tasksHabits" to TazkTasksHabitsWidgetProvider::class.java,
+                            "tasksOnly" to TazkTasksOnlyWidgetProvider::class.java,
+                            "habitsOnly" to TazkHabitsOnlyWidgetProvider::class.java,
+                            "streak" to TazkStreakWidgetProvider::class.java,
+                            "calendar" to TazkCalendarTasksHabitsWidgetProvider::class.java,
+                        )
+                        val am = android.appwidget.AppWidgetManager.getInstance(applicationContext)
+                        val mounted = providers.filter { (_, cls) ->
+                            am.getAppWidgetIds(android.content.ComponentName(applicationContext, cls)).isNotEmpty()
+                        }.map { it.first }
+                        result.success(mounted)
+                    }
                     else -> result.notImplemented()
                 }
             }

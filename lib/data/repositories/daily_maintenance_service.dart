@@ -16,13 +16,22 @@ class DailyMaintenanceService {
     this._tasks,
     this._habits,
     this._gamification,
-    this._widget,
-  );
+    this._widget, {
+    DateTime Function()? now,
+  }) : _now = now ?? DateTime.now;
 
   final TaskRepository _tasks;
   final HabitRepository _habits;
   final GamificationRepository _gamification;
   final HomeWidgetService _widget;
+  final DateTime Function() _now;
+
+  /// The last day (as a date-only value) this instance already ran the rollover
+  /// for. Lets the service skip redundant work while the app is alive across
+  /// many `resumed` lifecycle events within the same day.
+  DateTime? _lastRolloverDate;
+
+  DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
   Future<void> rescheduleAllReminders() async {
     await _tasks.rescheduleAllReminders();
@@ -30,6 +39,9 @@ class DailyMaintenanceService {
   }
 
   Future<void> runDailyRollover() async {
+    final today = _dateOnly(_now());
+    if (_lastRolloverDate == today) return;
+    _lastRolloverDate = today;
     await _gamification.evaluateMissedDay();
     await rescheduleAllReminders();
     await _gamification.refreshStreakWarningNotification();

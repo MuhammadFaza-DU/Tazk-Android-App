@@ -166,6 +166,51 @@ void main() {
       expect(controller.lastCompletedHabitName, 'Baca buku');
     },
   );
+
+  test('tick updates remaining without a full notifyListeners', () {
+    fakeAsync((async) {
+      var now = DateTime(2026, 7, 12, 10);
+      final controller = _controller(now: () => now);
+      var notifyCount = 0;
+      controller.addListener(() => notifyCount++);
+
+      controller.setDurationMinutes(10);
+      unawaited(
+        controller.start(completionTitle: 'Selesai', completionBody: 'Done'),
+      );
+      async.flushMicrotasks();
+      final countAfterStart = notifyCount;
+
+      now = now.add(const Duration(seconds: 1));
+      async.elapse(const Duration(seconds: 1));
+
+      expect(controller.remaining, const Duration(minutes: 9, seconds: 59));
+      expect(controller.remainingNotifier.value, controller.remaining);
+      expect(notifyCount, countAfterStart);
+    });
+  });
+
+  test('ticker is stopped when idle (after cancel/complete)', () {
+    fakeAsync((async) {
+      var now = DateTime(2026, 7, 12, 10);
+      final controller = _controller(now: () => now);
+
+      controller.setDurationMinutes(10);
+      unawaited(
+        controller.start(completionTitle: 'Selesai', completionBody: 'Done'),
+      );
+      async.flushMicrotasks();
+      unawaited(controller.cancel());
+      async.flushMicrotasks();
+      expect(controller.status, PomodoroSessionStatus.idle);
+      expect(controller.remaining, const Duration(minutes: 10));
+
+      now = now.add(const Duration(seconds: 2));
+      async.elapse(const Duration(seconds: 2));
+
+      expect(controller.remaining, const Duration(minutes: 10));
+    });
+  });
 }
 
 PomodoroController _controller({

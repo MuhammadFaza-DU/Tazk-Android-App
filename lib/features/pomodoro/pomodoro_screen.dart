@@ -28,6 +28,30 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
     _controller = ref.read(pomodoroControllerProvider);
     _handledCompletionSerial = _controller.completionSerial;
     _controller.addListener(_handlePomodoroCompletion);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _clearSelectedHabitIfUnavailable();
+    });
+  }
+
+  void _clearSelectedHabitIfUnavailable() {
+    final activeHabits = ref.read(activeHabitsProvider).valueOrNull;
+    if (activeHabits == null) return; // data not loaded yet
+    final habitRepository = ref.read(habitRepositoryProvider);
+    final completionByHabitId = <int, bool>{};
+    for (final habit in activeHabits) {
+      if (!habit.hasProgress || (habit.targetMinutes ?? 0) <= 0) continue;
+      completionByHabitId[habit.id] =
+          ref.read(habitTodayLogProvider(habit.id)).valueOrNull?.isCompleted ??
+          false;
+    }
+    final pomodoroHabits = availablePomodoroHabits(
+      habits: activeHabits,
+      isDueToday: habitRepository.isDueToday,
+      isCompletedToday: (habitId) => completionByHabitId[habitId] ?? false,
+    );
+    ref
+        .read(pomodoroControllerProvider)
+        .clearSelectedHabitIfUnavailable(pomodoroHabits);
   }
 
   @override
@@ -105,11 +129,6 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
       isCompletedToday: (habitId) => completionByHabitId[habitId] ?? false,
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(pomodoroControllerProvider)
-          .clearSelectedHabitIfUnavailable(pomodoroHabits);
-    });
     _syncDurationField(controller.durationMinutes);
 
     return AppScaffold(
@@ -183,14 +202,17 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
           ),
           const SizedBox(height: 32),
           Center(
-            child: Text(
-              _formatDuration(
-                controller.status == PomodoroSessionStatus.idle
-                    ? controller.sessionDuration
-                    : controller.remaining,
-              ),
-              style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                fontFeatures: const [FontFeature.tabularFigures()],
+            child: ValueListenableBuilder<Duration>(
+              valueListenable: controller.remainingNotifier,
+              builder: (context, remaining, _) => Text(
+                _formatDuration(
+                  controller.status == PomodoroSessionStatus.idle
+                      ? controller.sessionDuration
+                      : remaining,
+                ),
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
               ),
             ),
           ),

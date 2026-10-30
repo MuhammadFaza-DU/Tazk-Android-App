@@ -10,6 +10,49 @@ import 'package:tazk/data/repositories/task_repository.dart';
 import 'package:tazk/notifications/notification_service.dart';
 import 'package:tazk/widgets/home_widget_service.dart';
 
+class _CountingTaskRepository extends Fake implements TaskRepository {
+  int rescheduleCount = 0;
+
+  @override
+  Future<void> rescheduleAllReminders() async {
+    rescheduleCount++;
+  }
+}
+
+class _CountingHabitRepository extends Fake implements HabitRepository {
+  int rescheduleCount = 0;
+
+  @override
+  Future<void> rescheduleAllReminders() async {
+    rescheduleCount++;
+  }
+}
+
+class _CountingGamificationRepository extends Fake
+    implements GamificationRepository {
+  int evaluateCount = 0;
+  int refreshWarningCount = 0;
+
+  @override
+  Future<void> evaluateMissedDay() async {
+    evaluateCount++;
+  }
+
+  @override
+  Future<void> refreshStreakWarningNotification() async {
+    refreshWarningCount++;
+  }
+}
+
+class _CountingHomeWidgetService extends Fake implements HomeWidgetService {
+  int refreshAllCount = 0;
+
+  @override
+  Future<void> refreshAll() async {
+    refreshAllCount++;
+  }
+}
+
 void main() {
   late AppDatabase db;
   late TaskRepository tasks;
@@ -96,5 +139,40 @@ void main() {
     final row =
         await (db.select(db.tasks)..where((t) => t.id.equals(id))).getSingle();
     expect(row.isCompleted, isTrue);
+  });
+
+  test('runDailyRollover runs its work once per day (guard)', () async {
+    var clock = DateTime(2026, 1, 15, 8);
+    final tasks = _CountingTaskRepository();
+    final habits = _CountingHabitRepository();
+    final gamification = _CountingGamificationRepository();
+    final widgets = _CountingHomeWidgetService();
+    final service = DailyMaintenanceService(
+      tasks,
+      habits,
+      gamification,
+      widgets,
+      now: () => clock,
+    );
+
+    await service.runDailyRollover();
+    // Same day — the instance-level guard must skip the work entirely.
+    await service.runDailyRollover();
+
+    expect(tasks.rescheduleCount, 1);
+    expect(habits.rescheduleCount, 1);
+    expect(gamification.evaluateCount, 1);
+    expect(gamification.refreshWarningCount, 1);
+    expect(widgets.refreshAllCount, 1);
+
+    // A fresh calendar day on the same live instance — the rollover runs again.
+    clock = DateTime(2026, 1, 16, 8);
+    await service.runDailyRollover();
+
+    expect(tasks.rescheduleCount, 2);
+    expect(habits.rescheduleCount, 2);
+    expect(gamification.evaluateCount, 2);
+    expect(gamification.refreshWarningCount, 2);
+    expect(widgets.refreshAllCount, 2);
   });
 }

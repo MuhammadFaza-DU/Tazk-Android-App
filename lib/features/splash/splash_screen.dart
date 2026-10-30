@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
@@ -22,10 +24,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   static const _videoAsset = 'assets/videos/tazk_growth_splash.mp4';
   static const _transitionDuration = Duration(milliseconds: 450);
+  static const _maxSplashDuration = Duration(milliseconds: 1200);
 
   late final Future<Widget> _nextScreenFuture;
   VideoPlayerController? _videoController;
   late final AnimationController _fallbackController;
+  Timer? _maxSplashTimer;
   bool _videoReady = false;
   bool _showFallback = false;
   bool _showBranding = false;
@@ -40,12 +44,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     )..repeat(reverse: true);
     _nextScreenFuture = _prepareNextScreen();
     _initializeVideo();
-    // If video takes > 900ms to become ready, show the fallback tree so
-    // users never stare at a blank screen (tests and broken assets included).
-    Future<void>.delayed(const Duration(milliseconds: 900), () {
+    // Show a static fallback frame immediately while the video is still
+    // loading, so users never stare at a blank screen (tests and broken
+    // assets included). The video still replaces it once ready.
+    Future<void>.delayed(Duration.zero, () {
       if (!mounted || _videoReady) return;
       setState(() => _showFallback = true);
     });
+    // Never gate navigation on the full video length: force the transition
+    // once the max splash duration elapses, whichever trigger fires first.
+    _maxSplashTimer = Timer(_maxSplashDuration, _navigateNext);
   }
 
   Future<void> _initializeVideo() async {
@@ -112,6 +120,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   Future<void> _navigateNext() async {
     if (_isNavigating) return;
+    _maxSplashTimer?.cancel();
     _isNavigating = true;
     final nextScreen = await _nextScreenFuture;
     if (!mounted) return;
@@ -128,6 +137,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   void dispose() {
+    _maxSplashTimer?.cancel();
     _videoController?.removeListener(_handleVideoProgress);
     _videoController?.dispose();
     _fallbackController.dispose();

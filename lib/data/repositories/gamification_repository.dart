@@ -14,6 +14,9 @@ class GamificationRepository {
   final AppDatabase _db;
   final NotificationService _notifications;
   final SettingsRepository _settings;
+  // Widget refreshes are now owned by the calling repositories/services, but
+  // the service is retained on the public constructor for call-site stability.
+  // ignore: unused_field
   final HomeWidgetService _widget;
 
   Future<AppLocalizations> _l10n() async {
@@ -179,7 +182,6 @@ class GamificationRepository {
     await _notifications.cancelStreakWarning();
 
     await _unlockBadgeIfNeeded(newStreak);
-    await _widget.refreshAll();
   }
 
   /// Schedules or cancels tonight's streak-warning notification depending on
@@ -263,7 +265,6 @@ class GamificationRepository {
         }
       }
     }
-    await _widget.refreshAll();
   }
 
   DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);

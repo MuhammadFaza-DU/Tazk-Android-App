@@ -73,6 +73,8 @@ class PomodoroController extends ChangeNotifier {
   Timer? _ticker;
   int _completionSerial = 0;
   String? _lastCompletedHabitName;
+  final ValueNotifier<Duration> remainingNotifier =
+      ValueNotifier(const Duration(minutes: 25));
 
   bool get isHabitMode => _isHabitMode;
   Habit? get selectedHabit => _selectedHabit;
@@ -127,6 +129,7 @@ class PomodoroController extends ChangeNotifier {
     _durationMinutes = minutes;
     _sessionDuration = Duration(minutes: minutes);
     _remaining = _sessionDuration;
+    remainingNotifier.value = _remaining;
     if (notify) notifyListeners();
   }
 
@@ -138,6 +141,7 @@ class PomodoroController extends ChangeNotifier {
     final endTime = _now().add(_sessionDuration);
     _endTime = endTime;
     _remaining = _sessionDuration;
+    remainingNotifier.value = _remaining;
     _status = PomodoroSessionStatus.running;
     notifyListeners();
     _startTicker();
@@ -161,6 +165,7 @@ class PomodoroController extends ChangeNotifier {
     if (_status != PomodoroSessionStatus.paused) return;
     final endTime = _now().add(_remaining);
     _endTime = endTime;
+    remainingNotifier.value = _remaining;
     _status = PomodoroSessionStatus.running;
     notifyListeners();
     _startTicker();
@@ -175,6 +180,7 @@ class PomodoroController extends ChangeNotifier {
     _ticker?.cancel();
     _endTime = null;
     _remaining = _sessionDuration;
+    remainingNotifier.value = _remaining;
     _status = PomodoroSessionStatus.idle;
     notifyListeners();
     await cancelCompletionNotification();
@@ -183,6 +189,7 @@ class PomodoroController extends ChangeNotifier {
   Future<void> completeCurrentSession() async {
     _ticker?.cancel();
     _remaining = Duration.zero;
+    remainingNotifier.value = _remaining;
     _status = PomodoroSessionStatus.idle;
     _endTime = null;
 
@@ -213,7 +220,7 @@ class PomodoroController extends ChangeNotifier {
       return;
     }
     _remaining = remaining;
-    notifyListeners();
+    remainingNotifier.value = remaining;
   }
 
   void _pauseKeepingRemaining() {
@@ -222,6 +229,7 @@ class PomodoroController extends ChangeNotifier {
     if (endTime != null) {
       final remaining = endTime.difference(_now());
       _remaining = remaining.isNegative ? Duration.zero : remaining;
+      remainingNotifier.value = _remaining;
     }
     _endTime = null;
     _status = PomodoroSessionStatus.paused;
@@ -231,6 +239,7 @@ class PomodoroController extends ChangeNotifier {
   @override
   void dispose() {
     _ticker?.cancel();
+    remainingNotifier.dispose();
     super.dispose();
   }
 }
