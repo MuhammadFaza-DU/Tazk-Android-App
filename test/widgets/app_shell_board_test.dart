@@ -235,20 +235,23 @@ void main() {
       await _disposeShell(tester);
     });
 
-    testWidgets('isi sheet 3 tujuan; Statistik belum ada (deviasi T5)',
-        (tester) async {
+    testWidgets('isi sheet 4 tujuan: Statistik di atas, lalu Profil, Pengaturan, '
+        'Tentang', (tester) async {
       await _pumpShell(tester);
 
       await tester.tap(find.byKey(shellTabMoreKey));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.text('Profil'), findsOneWidget);
-      expect(find.text('Pengaturan'), findsOneWidget);
-      expect(find.text('Tentang'), findsOneWidget);
-      // Board 15 menyebut 4 item, tapi layar Statistik baru dibuat di T5:
-      // tidak boleh ada baris yang menunjuk layar yang tidak ada.
-      expect(find.text('Statistik'), findsNothing);
+      // Board 15: urutan Statistik · Profil · Pengaturan · Tentang.
+      final stats = tester.getTopLeft(find.text('Statistik')).dy;
+      final profile = tester.getTopLeft(find.text('Profil')).dy;
+      final settings = tester.getTopLeft(find.text('Pengaturan')).dy;
+      final about = tester.getTopLeft(find.text('Tentang')).dy;
+
+      expect(stats, lessThan(profile));
+      expect(profile, lessThan(settings));
+      expect(settings, lessThan(about));
 
       await _disposeShell(tester);
     });

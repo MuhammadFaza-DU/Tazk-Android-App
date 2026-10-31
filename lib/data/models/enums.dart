@@ -32,6 +32,8 @@ enum AppThemeMode { light, dark }
 
 enum AppLanguage { indonesian, english }
 
+enum XpSource { task, habit, streak, badge }
+
 StreakRank streakRankForDays(int days) {
   if (days >= 120) return StreakRank.legenda;
   if (days >= 90) return StreakRank.sangMaster;

@@ -256,5 +256,53 @@
   "stateLoadingLabel": "Loading data",
   "stateErrorTitle": "Failed to load data",
   "stateErrorMessage": "Try again in a moment. Your local data is still safe.",
-  "stateRetryAction": "Try again"
+  "stateRetryAction": "Try again",
+
+  "navStats": "Statistics",
+  "statsPeriodWeek": "Week",
+  "statsPeriodMonth": "Month",
+  "statsPeriodYear": "Year",
+  "statsTasksDone": "tasks done",
+  "statsFocusTime": "focus time",
+  "statsDurationHoursMinutes": "{hours}h {minutes}m",
+  "@statsDurationHoursMinutes": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "statsDurationMinutes": "{minutes}m",
+  "@statsDurationMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "statsValueDash": "\u2013",
+  "statsXpWeek": "Weekly XP",
+  "statsXpMonth": "Monthly XP",
+  "statsXpYear": "Yearly XP",
+  "statsHabitConsistency": "Habit consistency",
+  "statsDaysCount": "{days} days",
+  "statsLegendRare": "rare",
+  "statsLegendFrequent": "regular",
+  "statsVsLastWeek": "vs last week",
+  "statsVsLastMonth": "vs last month",
+  "statsVsLastYear": "vs last year",
+  "statsEmptyWeek": "No data for this week yet",
+  "statsEmptyMonth": "No data for this month yet",
+  "statsEmptyYear": "No data for this year yet",
+  "statsEmptyHint": "Finish a task or run a focus session, then come back here.",
+  "statsFocusEmpty": "No focus sessions yet",
+  "statsXpEmpty": "No XP yet",
+  "statsHeatmapEmpty": "No habit history yet",
+  "statsInsightTitle": "Insight",
+  "statsInsightProductive": "You are most productive on {day}.",
+  "statsInsightConsistentHabit": "{habit} has been your most consistent habit lately.",
+  "statsInsightEmpty": "Insights appear once you have finished some tasks and habits.",
+  "statsNoComparison": "no comparison yet",
+  "dayMonday": "Monday",
+  "dayTuesday": "Tuesday",
+  "dayWednesday": "Wednesday",
+  "dayThursday": "Thursday",
+  "dayFriday": "Friday",
+  "daySaturday": "Saturday",
+  "daySunday": "Sunday"
 }

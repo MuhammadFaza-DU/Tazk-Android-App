@@ -93,24 +93,24 @@ class GamificationRepository {
       _db.select(_db.cosmeticUnlocks).watch();
 
   Future<void> onTaskCompleted() async {
-    await _awardXp(taskXp);
+    await _awardXp(taskXp, XpSource.task);
     await _registerActiveDay();
   }
 
   Future<void> onTaskUncompleted() async {
-    await _deductXp(taskXp);
+    await _deductXp(taskXp, XpSource.task);
   }
 
   Future<void> onHabitCompleted() async {
-    await _awardXp(habitXp);
+    await _awardXp(habitXp, XpSource.habit);
     await _registerActiveDay();
   }
 
   Future<void> onHabitUncompleted() async {
-    await _deductXp(habitXp);
+    await _deductXp(habitXp, XpSource.habit);
   }
 
-  Future<void> _awardXp(int amount) async {
+  Future<void> _awardXp(int amount, XpSource source) async {
     final profile = await ensureProfile();
     var xp = profile.xp + amount;
     var level = profile.level;
@@ -127,9 +127,12 @@ class GamificationRepository {
     }
     await (_db.update(_db.userProfile)..where((u) => u.id.equals(profile.id)))
         .write(UserProfileCompanion(xp: Value(xp), level: Value(level)));
+    await _db.into(_db.xpEvents).insert(
+          XpEventsCompanion.insert(amount: amount, source: source),
+        );
   }
 
-  Future<void> _deductXp(int amount) async {
+  Future<void> _deductXp(int amount, XpSource source) async {
     final profile = await ensureProfile();
     var xp = profile.xp - amount;
     var level = profile.level;
@@ -141,6 +144,9 @@ class GamificationRepository {
     if (xp < 0) xp = 0;
     await (_db.update(_db.userProfile)..where((u) => u.id.equals(profile.id)))
         .write(UserProfileCompanion(xp: Value(xp), level: Value(level)));
+    await _db.into(_db.xpEvents).insert(
+          XpEventsCompanion.insert(amount: -amount, source: source),
+        );
   }
 
   Future<void> _registerActiveDay() async {

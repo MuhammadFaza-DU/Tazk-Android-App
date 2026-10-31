@@ -773,4 +773,130 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get stateRetryAction => 'Coba lagi';
+
+  @override
+  String get navStats => 'Statistik';
+
+  @override
+  String get statsPeriodWeek => 'Minggu';
+
+  @override
+  String get statsPeriodMonth => 'Bulan';
+
+  @override
+  String get statsPeriodYear => 'Tahun';
+
+  @override
+  String get statsTasksDone => 'task selesai';
+
+  @override
+  String get statsFocusTime => 'waktu fokus';
+
+  @override
+  String statsDurationHoursMinutes(int hours, int minutes) {
+    return '${hours}j ${minutes}m';
+  }
+
+  @override
+  String statsDurationMinutes(int minutes) {
+    return '${minutes}m';
+  }
+
+  @override
+  String get statsValueDash => '–';
+
+  @override
+  String get statsXpWeek => 'XP mingguan';
+
+  @override
+  String get statsXpMonth => 'XP bulanan';
+
+  @override
+  String get statsXpYear => 'XP tahunan';
+
+  @override
+  String get statsHabitConsistency => 'Konsistensi habit';
+
+  @override
+  String statsDaysCount(int days) {
+    return '$days hari';
+  }
+
+  @override
+  String get statsLegendRare => 'jarang';
+
+  @override
+  String get statsLegendFrequent => 'rutin';
+
+  @override
+  String get statsVsLastWeek => 'vs minggu lalu';
+
+  @override
+  String get statsVsLastMonth => 'vs bulan lalu';
+
+  @override
+  String get statsVsLastYear => 'vs tahun lalu';
+
+  @override
+  String get statsEmptyWeek => 'Belum ada data minggu ini';
+
+  @override
+  String get statsEmptyMonth => 'Belum ada data bulan ini';
+
+  @override
+  String get statsEmptyYear => 'Belum ada data tahun ini';
+
+  @override
+  String get statsEmptyHint =>
+      'Selesaikan tugas atau jalankan sesi fokus, lalu kembali ke sini.';
+
+  @override
+  String get statsFocusEmpty => 'Belum ada sesi fokus';
+
+  @override
+  String get statsXpEmpty => 'Belum ada XP';
+
+  @override
+  String get statsHeatmapEmpty => 'Belum ada catatan habit';
+
+  @override
+  String get statsInsightTitle => 'Insight';
+
+  @override
+  String statsInsightProductive(String day) {
+    return 'Kamu paling produktif hari $day.';
+  }
+
+  @override
+  String statsInsightConsistentHabit(String habit) {
+    return '$habit paling konsisten belakangan ini.';
+  }
+
+  @override
+  String get statsInsightEmpty =>
+      'Insight muncul setelah kamu menyelesaikan beberapa tugas dan habit.';
+
+  @override
+  String get statsNoComparison => 'belum ada pembanding';
+
+  @override
+  String get dayMonday => 'Senin';
+
+  @override
+  String get dayTuesday => 'Selasa';
+
+  @override
+  String get dayWednesday => 'Rabu';
+
+  @override
+  String get dayThursday => 'Kamis';
+
+  @override
+  String get dayFriday => 'Jumat';
+
+  @override
+  String get daySaturday => 'Sabtu';
+
+  @override
+  String get daySunday => 'Minggu';
 }

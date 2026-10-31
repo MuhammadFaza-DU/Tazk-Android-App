@@ -27,6 +27,8 @@ final databaseRecoveredFromCorruption = ValueNotifier<bool>(false);
   UserProfile,
   CosmeticUnlocks,
   AppSettings,
+  FocusSessions,
+  XpEvents,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -34,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -56,6 +58,14 @@ class AppDatabase extends _$AppDatabase {
                 'CREATE INDEX IF NOT EXISTS idx_habits_is_active ON habits(is_active);');
             await customStatement(
                 'CREATE INDEX IF NOT EXISTS idx_subtasks_task_id ON subtasks(task_id);');
+          }
+          if (from < 4) {
+            await m.createTable(focusSessions);
+            await m.createTable(xpEvents);
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_xp_events_created_at ON xp_events(created_at);');
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_focus_sessions_started_at ON focus_sessions(started_at);');
           }
         },
       );

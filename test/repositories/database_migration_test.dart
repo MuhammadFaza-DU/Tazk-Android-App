@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tazk/data/database/database.dart';
@@ -144,6 +145,123 @@ void main() {
 
       final subtaskIndexes = await indexNames('subtasks');
       expect(subtaskIndexes, contains('idx_subtasks_task_id'));
+    } finally {
+      await db.close();
+      await tempDir.delete(recursive: true);
+    }
+  });
+
+  test('opens a version 3 database and adds focus_sessions + xp_events',
+      () async {
+    final tempDir = await Directory.systemTemp.createTemp('tazk_db_migration_');
+    final dbFile =
+        File('${tempDir.path}${Platform.pathSeparator}tazk.sqlite');
+    final db = AppDatabase.forTesting(
+      NativeDatabase(
+        dbFile,
+        setup: (rawDb) {
+          rawDb.execute('''
+            CREATE TABLE tasks (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              title TEXT NOT NULL,
+              date INTEGER NOT NULL,
+              time INTEGER,
+              priority INTEGER NOT NULL,
+              is_completed INTEGER NOT NULL DEFAULT 0 CHECK (is_completed IN (0, 1)),
+              location TEXT,
+              created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000)
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE subtasks (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              task_id INTEGER NOT NULL REFERENCES tasks (id) ON DELETE CASCADE,
+              title TEXT NOT NULL,
+              is_completed INTEGER NOT NULL DEFAULT 0 CHECK (is_completed IN (0, 1))
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE habits (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL,
+              frequency INTEGER NOT NULL,
+              scheduled_time INTEGER,
+              has_progress INTEGER NOT NULL DEFAULT 0 CHECK (has_progress IN (0, 1)),
+              target_minutes INTEGER,
+              is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+              created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000),
+              custom_days_of_week INTEGER,
+              custom_interval INTEGER,
+              custom_day_of_month INTEGER,
+              custom_frequency_type INTEGER
+            );
+          ''');
+          rawDb.execute(
+            "INSERT INTO tasks (id, title, date, priority) "
+            "VALUES (1, 'Belanja bulanan', strftime('%s', 'now'), 1);",
+          );
+          rawDb.execute(
+            "INSERT INTO habits (id, name, frequency) "
+            "VALUES (1, 'Minum air', 0);",
+          );
+          rawDb.execute('PRAGMA user_version = 3;');
+        },
+      ),
+    );
+    try {
+      final task = await (db.select(db.tasks)..where((row) => row.id.equals(1)))
+          .getSingle();
+      expect(task.title, 'Belanja bulanan');
+
+      Future<List<String>> columnNames(String table) async {
+        final rows = await db.customSelect("PRAGMA table_info('$table')").get();
+        return rows.map((row) => row.read<String>('name')).toList();
+      }
+
+      Future<Set<String>> indexNames(String table) async {
+        final rows = await db.customSelect("PRAGMA index_list('$table')").get();
+        return rows.map((row) => row.read<String>('name')).toSet();
+      }
+
+      expect(
+        await columnNames('focus_sessions'),
+        ['id', 'started_at', 'minutes', 'habit_id', 'completed'],
+      );
+      expect(
+        await columnNames('xp_events'),
+        ['id', 'created_at', 'amount', 'source'],
+      );
+
+      final focusIndexes = await indexNames('focus_sessions');
+      expect(focusIndexes, contains('idx_focus_sessions_started_at'));
+      final xpIndexes = await indexNames('xp_events');
+      expect(xpIndexes, contains('idx_xp_events_created_at'));
+
+      final habit = await (db.select(db.habits)..where((row) => row.id.equals(1)))
+          .getSingle();
+
+      final sessionId = await db.into(db.focusSessions).insert(
+            FocusSessionsCompanion.insert(
+              startedAt: DateTime(2026, 7, 12, 10),
+              minutes: 25,
+              habitId: Value(habit.id),
+            ),
+          );
+      final session = await (db.select(db.focusSessions)
+            ..where((row) => row.id.equals(sessionId)))
+          .getSingle();
+      expect(session.minutes, 25);
+      expect(session.habitId, habit.id);
+      expect(session.completed, isTrue);
+
+      final eventId = await db.into(db.xpEvents).insert(
+            XpEventsCompanion.insert(amount: 10, source: XpSource.task),
+          );
+      final event = await (db.select(db.xpEvents)
+            ..where((row) => row.id.equals(eventId)))
+          .getSingle();
+      expect(event.amount, 10);
+      expect(event.source, XpSource.task);
     } finally {
       await db.close();
       await tempDir.delete(recursive: true);

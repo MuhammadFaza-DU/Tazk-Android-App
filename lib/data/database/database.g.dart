@@ -3697,6 +3697,663 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   }
 }
 
+class $FocusSessionsTable extends FocusSessions
+    with TableInfo<$FocusSessionsTable, FocusSession> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FocusSessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _minutesMeta = const VerificationMeta(
+    'minutes',
+  );
+  @override
+  late final GeneratedColumn<int> minutes = GeneratedColumn<int>(
+    'minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _habitIdMeta = const VerificationMeta(
+    'habitId',
+  );
+  @override
+  late final GeneratedColumn<int> habitId = GeneratedColumn<int>(
+    'habit_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES habits (id) ON DELETE SET NULL',
+    ),
+  );
+  static const VerificationMeta _completedMeta = const VerificationMeta(
+    'completed',
+  );
+  @override
+  late final GeneratedColumn<bool> completed = GeneratedColumn<bool>(
+    'completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("completed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    startedAt,
+    minutes,
+    habitId,
+    completed,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'focus_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FocusSession> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('minutes')) {
+      context.handle(
+        _minutesMeta,
+        minutes.isAcceptableOrUnknown(data['minutes']!, _minutesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_minutesMeta);
+    }
+    if (data.containsKey('habit_id')) {
+      context.handle(
+        _habitIdMeta,
+        habitId.isAcceptableOrUnknown(data['habit_id']!, _habitIdMeta),
+      );
+    }
+    if (data.containsKey('completed')) {
+      context.handle(
+        _completedMeta,
+        completed.isAcceptableOrUnknown(data['completed']!, _completedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FocusSession map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FocusSession(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}started_at'],
+      )!,
+      minutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}minutes'],
+      )!,
+      habitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}habit_id'],
+      ),
+      completed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}completed'],
+      )!,
+    );
+  }
+
+  @override
+  $FocusSessionsTable createAlias(String alias) {
+    return $FocusSessionsTable(attachedDatabase, alias);
+  }
+}
+
+class FocusSession extends DataClass implements Insertable<FocusSession> {
+  final int id;
+  final DateTime startedAt;
+  final int minutes;
+  final int? habitId;
+  final bool completed;
+  const FocusSession({
+    required this.id,
+    required this.startedAt,
+    required this.minutes,
+    this.habitId,
+    required this.completed,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['started_at'] = Variable<DateTime>(startedAt);
+    map['minutes'] = Variable<int>(minutes);
+    if (!nullToAbsent || habitId != null) {
+      map['habit_id'] = Variable<int>(habitId);
+    }
+    map['completed'] = Variable<bool>(completed);
+    return map;
+  }
+
+  FocusSessionsCompanion toCompanion(bool nullToAbsent) {
+    return FocusSessionsCompanion(
+      id: Value(id),
+      startedAt: Value(startedAt),
+      minutes: Value(minutes),
+      habitId: habitId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(habitId),
+      completed: Value(completed),
+    );
+  }
+
+  factory FocusSession.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FocusSession(
+      id: serializer.fromJson<int>(json['id']),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      minutes: serializer.fromJson<int>(json['minutes']),
+      habitId: serializer.fromJson<int?>(json['habitId']),
+      completed: serializer.fromJson<bool>(json['completed']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'minutes': serializer.toJson<int>(minutes),
+      'habitId': serializer.toJson<int?>(habitId),
+      'completed': serializer.toJson<bool>(completed),
+    };
+  }
+
+  FocusSession copyWith({
+    int? id,
+    DateTime? startedAt,
+    int? minutes,
+    Value<int?> habitId = const Value.absent(),
+    bool? completed,
+  }) => FocusSession(
+    id: id ?? this.id,
+    startedAt: startedAt ?? this.startedAt,
+    minutes: minutes ?? this.minutes,
+    habitId: habitId.present ? habitId.value : this.habitId,
+    completed: completed ?? this.completed,
+  );
+  FocusSession copyWithCompanion(FocusSessionsCompanion data) {
+    return FocusSession(
+      id: data.id.present ? data.id.value : this.id,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      minutes: data.minutes.present ? data.minutes.value : this.minutes,
+      habitId: data.habitId.present ? data.habitId.value : this.habitId,
+      completed: data.completed.present ? data.completed.value : this.completed,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FocusSession(')
+          ..write('id: $id, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('minutes: $minutes, ')
+          ..write('habitId: $habitId, ')
+          ..write('completed: $completed')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, startedAt, minutes, habitId, completed);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FocusSession &&
+          other.id == this.id &&
+          other.startedAt == this.startedAt &&
+          other.minutes == this.minutes &&
+          other.habitId == this.habitId &&
+          other.completed == this.completed);
+}
+
+class FocusSessionsCompanion extends UpdateCompanion<FocusSession> {
+  final Value<int> id;
+  final Value<DateTime> startedAt;
+  final Value<int> minutes;
+  final Value<int?> habitId;
+  final Value<bool> completed;
+  const FocusSessionsCompanion({
+    this.id = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.minutes = const Value.absent(),
+    this.habitId = const Value.absent(),
+    this.completed = const Value.absent(),
+  });
+  FocusSessionsCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime startedAt,
+    required int minutes,
+    this.habitId = const Value.absent(),
+    this.completed = const Value.absent(),
+  }) : startedAt = Value(startedAt),
+       minutes = Value(minutes);
+  static Insertable<FocusSession> custom({
+    Expression<int>? id,
+    Expression<DateTime>? startedAt,
+    Expression<int>? minutes,
+    Expression<int>? habitId,
+    Expression<bool>? completed,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (startedAt != null) 'started_at': startedAt,
+      if (minutes != null) 'minutes': minutes,
+      if (habitId != null) 'habit_id': habitId,
+      if (completed != null) 'completed': completed,
+    });
+  }
+
+  FocusSessionsCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? startedAt,
+    Value<int>? minutes,
+    Value<int?>? habitId,
+    Value<bool>? completed,
+  }) {
+    return FocusSessionsCompanion(
+      id: id ?? this.id,
+      startedAt: startedAt ?? this.startedAt,
+      minutes: minutes ?? this.minutes,
+      habitId: habitId ?? this.habitId,
+      completed: completed ?? this.completed,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (minutes.present) {
+      map['minutes'] = Variable<int>(minutes.value);
+    }
+    if (habitId.present) {
+      map['habit_id'] = Variable<int>(habitId.value);
+    }
+    if (completed.present) {
+      map['completed'] = Variable<bool>(completed.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FocusSessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('minutes: $minutes, ')
+          ..write('habitId: $habitId, ')
+          ..write('completed: $completed')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $XpEventsTable extends XpEvents with TableInfo<$XpEventsTable, XpEvent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $XpEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<int> amount = GeneratedColumn<int>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<XpSource, int> source =
+      GeneratedColumn<int>(
+        'source',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<XpSource>($XpEventsTable.$convertersource);
+  @override
+  List<GeneratedColumn> get $columns => [id, createdAt, amount, source];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'xp_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<XpEvent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  XpEvent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return XpEvent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount'],
+      )!,
+      source: $XpEventsTable.$convertersource.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}source'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $XpEventsTable createAlias(String alias) {
+    return $XpEventsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<XpSource, int, int> $convertersource =
+      const EnumIndexConverter<XpSource>(XpSource.values);
+}
+
+class XpEvent extends DataClass implements Insertable<XpEvent> {
+  final int id;
+  final DateTime createdAt;
+  final int amount;
+  final XpSource source;
+  const XpEvent({
+    required this.id,
+    required this.createdAt,
+    required this.amount,
+    required this.source,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['amount'] = Variable<int>(amount);
+    {
+      map['source'] = Variable<int>(
+        $XpEventsTable.$convertersource.toSql(source),
+      );
+    }
+    return map;
+  }
+
+  XpEventsCompanion toCompanion(bool nullToAbsent) {
+    return XpEventsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      amount: Value(amount),
+      source: Value(source),
+    );
+  }
+
+  factory XpEvent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return XpEvent(
+      id: serializer.fromJson<int>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      amount: serializer.fromJson<int>(json['amount']),
+      source: $XpEventsTable.$convertersource.fromJson(
+        serializer.fromJson<int>(json['source']),
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'amount': serializer.toJson<int>(amount),
+      'source': serializer.toJson<int>(
+        $XpEventsTable.$convertersource.toJson(source),
+      ),
+    };
+  }
+
+  XpEvent copyWith({
+    int? id,
+    DateTime? createdAt,
+    int? amount,
+    XpSource? source,
+  }) => XpEvent(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    amount: amount ?? this.amount,
+    source: source ?? this.source,
+  );
+  XpEvent copyWithCompanion(XpEventsCompanion data) {
+    return XpEvent(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      source: data.source.present ? data.source.value : this.source,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpEvent(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('amount: $amount, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, createdAt, amount, source);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is XpEvent &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.amount == this.amount &&
+          other.source == this.source);
+}
+
+class XpEventsCompanion extends UpdateCompanion<XpEvent> {
+  final Value<int> id;
+  final Value<DateTime> createdAt;
+  final Value<int> amount;
+  final Value<XpSource> source;
+  const XpEventsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.source = const Value.absent(),
+  });
+  XpEventsCompanion.insert({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    required int amount,
+    required XpSource source,
+  }) : amount = Value(amount),
+       source = Value(source);
+  static Insertable<XpEvent> custom({
+    Expression<int>? id,
+    Expression<DateTime>? createdAt,
+    Expression<int>? amount,
+    Expression<int>? source,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (amount != null) 'amount': amount,
+      if (source != null) 'source': source,
+    });
+  }
+
+  XpEventsCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? createdAt,
+    Value<int>? amount,
+    Value<XpSource>? source,
+  }) {
+    return XpEventsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      amount: amount ?? this.amount,
+      source: source ?? this.source,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<int>(amount.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<int>(
+        $XpEventsTable.$convertersource.toSql(source.value),
+      );
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('amount: $amount, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3711,6 +4368,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $FocusSessionsTable focusSessions = $FocusSessionsTable(this);
+  late final $XpEventsTable xpEvents = $XpEventsTable(this);
   late final Index idxTasksDate = Index(
     'idx_tasks_date',
     'CREATE INDEX idx_tasks_date ON tasks (date)',
@@ -3727,6 +4386,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_habits_is_active',
     'CREATE INDEX idx_habits_is_active ON habits (is_active)',
   );
+  late final Index idxFocusSessionsStartedAt = Index(
+    'idx_focus_sessions_started_at',
+    'CREATE INDEX idx_focus_sessions_started_at ON focus_sessions (started_at)',
+  );
+  late final Index idxXpEventsCreatedAt = Index(
+    'idx_xp_events_created_at',
+    'CREATE INDEX idx_xp_events_created_at ON xp_events (created_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3741,10 +4408,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     userProfile,
     cosmeticUnlocks,
     appSettings,
+    focusSessions,
+    xpEvents,
     idxTasksDate,
     idxTasksIsCompleted,
     idxSubtasksTaskId,
     idxHabitsIsActive,
+    idxFocusSessionsStartedAt,
+    idxXpEventsCreatedAt,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3761,6 +4432,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('habit_logs', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'habits',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('focus_sessions', kind: UpdateKind.update)],
     ),
   ]);
 }
@@ -4456,6 +5134,24 @@ final class $$HabitsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$FocusSessionsTable, List<FocusSession>>
+  _focusSessionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.focusSessions,
+    aliasName: 'habits__id__focus_sessions__habit_id',
+  );
+
+  $$FocusSessionsTableProcessedTableManager get focusSessionsRefs {
+    final manager = $$FocusSessionsTableTableManager(
+      $_db,
+      $_db.focusSessions,
+    ).filter((f) => f.habitId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_focusSessionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$HabitsTableFilterComposer
@@ -4544,6 +5240,31 @@ class $$HabitsTableFilterComposer
           }) => $$HabitLogsTableFilterComposer(
             $db: $db,
             $table: $db.habitLogs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> focusSessionsRefs(
+    Expression<bool> Function($$FocusSessionsTableFilterComposer f) f,
+  ) {
+    final $$FocusSessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.focusSessions,
+      getReferencedColumn: (t) => t.habitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FocusSessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.focusSessions,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4707,6 +5428,31 @@ class $$HabitsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> focusSessionsRefs<T extends Object>(
+    Expression<T> Function($$FocusSessionsTableAnnotationComposer a) f,
+  ) {
+    final $$FocusSessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.focusSessions,
+      getReferencedColumn: (t) => t.habitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FocusSessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.focusSessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$HabitsTableTableManager
@@ -4722,7 +5468,7 @@ class $$HabitsTableTableManager
           $$HabitsTableUpdateCompanionBuilder,
           (Habit, $$HabitsTableReferences),
           Habit,
-          PrefetchHooks Function({bool habitLogsRefs})
+          PrefetchHooks Function({bool habitLogsRefs, bool focusSessionsRefs})
         > {
   $$HabitsTableTableManager(_$AppDatabase db, $HabitsTable table)
     : super(
@@ -4797,28 +5543,63 @@ class $$HabitsTableTableManager
                     (e.readTable(table), $$HabitsTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({habitLogsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (habitLogsRefs) db.habitLogs],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (habitLogsRefs)
-                    await $_getPrefetchedData<Habit, $HabitsTable, HabitLog>(
-                      currentTable: table,
-                      referencedTable: $$HabitsTableReferences
-                          ._habitLogsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$HabitsTableReferences(db, table, p0).habitLogsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.habitId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({habitLogsRefs = false, focusSessionsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (habitLogsRefs) db.habitLogs,
+                    if (focusSessionsRefs) db.focusSessions,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (habitLogsRefs)
+                        await $_getPrefetchedData<
+                          Habit,
+                          $HabitsTable,
+                          HabitLog
+                        >(
+                          currentTable: table,
+                          referencedTable: $$HabitsTableReferences
+                              ._habitLogsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$HabitsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).habitLogsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.habitId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (focusSessionsRefs)
+                        await $_getPrefetchedData<
+                          Habit,
+                          $HabitsTable,
+                          FocusSession
+                        >(
+                          currentTable: table,
+                          referencedTable: $$HabitsTableReferences
+                              ._focusSessionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$HabitsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).focusSessionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.habitId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -4835,7 +5616,7 @@ typedef $$HabitsTableProcessedTableManager =
       $$HabitsTableUpdateCompanionBuilder,
       (Habit, $$HabitsTableReferences),
       Habit,
-      PrefetchHooks Function({bool habitLogsRefs})
+      PrefetchHooks Function({bool habitLogsRefs, bool focusSessionsRefs})
     >;
 typedef $$HabitLogsTableCreateCompanionBuilder =
     HabitLogsCompanion Function({
@@ -6136,6 +6917,491 @@ typedef $$AppSettingsTableProcessedTableManager =
       AppSetting,
       PrefetchHooks Function()
     >;
+typedef $$FocusSessionsTableCreateCompanionBuilder =
+    FocusSessionsCompanion Function({
+      Value<int> id,
+      required DateTime startedAt,
+      required int minutes,
+      Value<int?> habitId,
+      Value<bool> completed,
+    });
+typedef $$FocusSessionsTableUpdateCompanionBuilder =
+    FocusSessionsCompanion Function({
+      Value<int> id,
+      Value<DateTime> startedAt,
+      Value<int> minutes,
+      Value<int?> habitId,
+      Value<bool> completed,
+    });
+
+final class $$FocusSessionsTableReferences
+    extends BaseReferences<_$AppDatabase, $FocusSessionsTable, FocusSession> {
+  $$FocusSessionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $HabitsTable _habitIdTable(_$AppDatabase db) =>
+      db.habits.createAlias('focus_sessions__habit_id__habits__id');
+
+  $$HabitsTableProcessedTableManager? get habitId {
+    final $_column = $_itemColumn<int>('habit_id');
+    if ($_column == null) return null;
+    final manager = $$HabitsTableTableManager(
+      $_db,
+      $_db.habits,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_habitIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FocusSessionsTableFilterComposer
+    extends Composer<_$AppDatabase, $FocusSessionsTable> {
+  $$FocusSessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minutes => $composableBuilder(
+    column: $table.minutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get completed => $composableBuilder(
+    column: $table.completed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$HabitsTableFilterComposer get habitId {
+    final $$HabitsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.habitId,
+      referencedTable: $db.habits,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HabitsTableFilterComposer(
+            $db: $db,
+            $table: $db.habits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FocusSessionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FocusSessionsTable> {
+  $$FocusSessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minutes => $composableBuilder(
+    column: $table.minutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get completed => $composableBuilder(
+    column: $table.completed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$HabitsTableOrderingComposer get habitId {
+    final $$HabitsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.habitId,
+      referencedTable: $db.habits,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HabitsTableOrderingComposer(
+            $db: $db,
+            $table: $db.habits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FocusSessionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FocusSessionsTable> {
+  $$FocusSessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get minutes =>
+      $composableBuilder(column: $table.minutes, builder: (column) => column);
+
+  GeneratedColumn<bool> get completed =>
+      $composableBuilder(column: $table.completed, builder: (column) => column);
+
+  $$HabitsTableAnnotationComposer get habitId {
+    final $$HabitsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.habitId,
+      referencedTable: $db.habits,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HabitsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.habits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FocusSessionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FocusSessionsTable,
+          FocusSession,
+          $$FocusSessionsTableFilterComposer,
+          $$FocusSessionsTableOrderingComposer,
+          $$FocusSessionsTableAnnotationComposer,
+          $$FocusSessionsTableCreateCompanionBuilder,
+          $$FocusSessionsTableUpdateCompanionBuilder,
+          (FocusSession, $$FocusSessionsTableReferences),
+          FocusSession,
+          PrefetchHooks Function({bool habitId})
+        > {
+  $$FocusSessionsTableTableManager(_$AppDatabase db, $FocusSessionsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FocusSessionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FocusSessionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FocusSessionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> startedAt = const Value.absent(),
+                Value<int> minutes = const Value.absent(),
+                Value<int?> habitId = const Value.absent(),
+                Value<bool> completed = const Value.absent(),
+              }) => FocusSessionsCompanion(
+                id: id,
+                startedAt: startedAt,
+                minutes: minutes,
+                habitId: habitId,
+                completed: completed,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime startedAt,
+                required int minutes,
+                Value<int?> habitId = const Value.absent(),
+                Value<bool> completed = const Value.absent(),
+              }) => FocusSessionsCompanion.insert(
+                id: id,
+                startedAt: startedAt,
+                minutes: minutes,
+                habitId: habitId,
+                completed: completed,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FocusSessionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({habitId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (habitId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.habitId,
+                                referencedTable: $$FocusSessionsTableReferences
+                                    ._habitIdTable(db),
+                                referencedColumn: $$FocusSessionsTableReferences
+                                    ._habitIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FocusSessionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FocusSessionsTable,
+      FocusSession,
+      $$FocusSessionsTableFilterComposer,
+      $$FocusSessionsTableOrderingComposer,
+      $$FocusSessionsTableAnnotationComposer,
+      $$FocusSessionsTableCreateCompanionBuilder,
+      $$FocusSessionsTableUpdateCompanionBuilder,
+      (FocusSession, $$FocusSessionsTableReferences),
+      FocusSession,
+      PrefetchHooks Function({bool habitId})
+    >;
+typedef $$XpEventsTableCreateCompanionBuilder =
+    XpEventsCompanion Function({
+      Value<int> id,
+      Value<DateTime> createdAt,
+      required int amount,
+      required XpSource source,
+    });
+typedef $$XpEventsTableUpdateCompanionBuilder =
+    XpEventsCompanion Function({
+      Value<int> id,
+      Value<DateTime> createdAt,
+      Value<int> amount,
+      Value<XpSource> source,
+    });
+
+class $$XpEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $XpEventsTable> {
+  $$XpEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<XpSource, XpSource, int> get source =>
+      $composableBuilder(
+        column: $table.source,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+}
+
+class $$XpEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $XpEventsTable> {
+  $$XpEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$XpEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $XpEventsTable> {
+  $$XpEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<XpSource, int> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+}
+
+class $$XpEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $XpEventsTable,
+          XpEvent,
+          $$XpEventsTableFilterComposer,
+          $$XpEventsTableOrderingComposer,
+          $$XpEventsTableAnnotationComposer,
+          $$XpEventsTableCreateCompanionBuilder,
+          $$XpEventsTableUpdateCompanionBuilder,
+          (XpEvent, BaseReferences<_$AppDatabase, $XpEventsTable, XpEvent>),
+          XpEvent,
+          PrefetchHooks Function()
+        > {
+  $$XpEventsTableTableManager(_$AppDatabase db, $XpEventsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$XpEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$XpEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$XpEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> amount = const Value.absent(),
+                Value<XpSource> source = const Value.absent(),
+              }) => XpEventsCompanion(
+                id: id,
+                createdAt: createdAt,
+                amount: amount,
+                source: source,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                required int amount,
+                required XpSource source,
+              }) => XpEventsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                amount: amount,
+                source: source,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$XpEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $XpEventsTable,
+      XpEvent,
+      $$XpEventsTableFilterComposer,
+      $$XpEventsTableOrderingComposer,
+      $$XpEventsTableAnnotationComposer,
+      $$XpEventsTableCreateCompanionBuilder,
+      $$XpEventsTableUpdateCompanionBuilder,
+      (XpEvent, BaseReferences<_$AppDatabase, $XpEventsTable, XpEvent>),
+      XpEvent,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6158,4 +7424,8 @@ class $AppDatabaseManager {
       $$CosmeticUnlocksTableTableManager(_db, _db.cosmeticUnlocks);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$FocusSessionsTableTableManager get focusSessions =>
+      $$FocusSessionsTableTableManager(_db, _db.focusSessions);
+  $$XpEventsTableTableManager get xpEvents =>
+      $$XpEventsTableTableManager(_db, _db.xpEvents);
 }

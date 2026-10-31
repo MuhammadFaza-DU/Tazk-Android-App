@@ -109,3 +109,21 @@ class AppSettings extends Table {
   BoolColumn get notifyFreezeUsed =>
       boolean().withDefault(const Constant(true))();
 }
+
+@TableIndex(name: 'idx_focus_sessions_started_at', columns: {#startedAt})
+class FocusSessions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get startedAt => dateTime()();
+  IntColumn get minutes => integer()();
+  IntColumn get habitId =>
+      integer().references(Habits, #id, onDelete: KeyAction.setNull).nullable()();
+  BoolColumn get completed => boolean().withDefault(const Constant(true))();
+}
+
+@TableIndex(name: 'idx_xp_events_created_at', columns: {#createdAt})
+class XpEvents extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  IntColumn get amount => integer()();
+  IntColumn get source => intEnum<XpSource>()();
+}

@@ -1477,6 +1477,234 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Coba lagi'**
   String get stateRetryAction;
+
+  /// No description provided for @navStats.
+  ///
+  /// In id, this message translates to:
+  /// **'Statistik'**
+  String get navStats;
+
+  /// No description provided for @statsPeriodWeek.
+  ///
+  /// In id, this message translates to:
+  /// **'Minggu'**
+  String get statsPeriodWeek;
+
+  /// No description provided for @statsPeriodMonth.
+  ///
+  /// In id, this message translates to:
+  /// **'Bulan'**
+  String get statsPeriodMonth;
+
+  /// No description provided for @statsPeriodYear.
+  ///
+  /// In id, this message translates to:
+  /// **'Tahun'**
+  String get statsPeriodYear;
+
+  /// No description provided for @statsTasksDone.
+  ///
+  /// In id, this message translates to:
+  /// **'task selesai'**
+  String get statsTasksDone;
+
+  /// No description provided for @statsFocusTime.
+  ///
+  /// In id, this message translates to:
+  /// **'waktu fokus'**
+  String get statsFocusTime;
+
+  /// No description provided for @statsDurationHoursMinutes.
+  ///
+  /// In id, this message translates to:
+  /// **'{hours}j {minutes}m'**
+  String statsDurationHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @statsDurationMinutes.
+  ///
+  /// In id, this message translates to:
+  /// **'{minutes}m'**
+  String statsDurationMinutes(int minutes);
+
+  /// No description provided for @statsValueDash.
+  ///
+  /// In id, this message translates to:
+  /// **'–'**
+  String get statsValueDash;
+
+  /// No description provided for @statsXpWeek.
+  ///
+  /// In id, this message translates to:
+  /// **'XP mingguan'**
+  String get statsXpWeek;
+
+  /// No description provided for @statsXpMonth.
+  ///
+  /// In id, this message translates to:
+  /// **'XP bulanan'**
+  String get statsXpMonth;
+
+  /// No description provided for @statsXpYear.
+  ///
+  /// In id, this message translates to:
+  /// **'XP tahunan'**
+  String get statsXpYear;
+
+  /// No description provided for @statsHabitConsistency.
+  ///
+  /// In id, this message translates to:
+  /// **'Konsistensi habit'**
+  String get statsHabitConsistency;
+
+  /// No description provided for @statsDaysCount.
+  ///
+  /// In id, this message translates to:
+  /// **'{days} hari'**
+  String statsDaysCount(int days);
+
+  /// No description provided for @statsLegendRare.
+  ///
+  /// In id, this message translates to:
+  /// **'jarang'**
+  String get statsLegendRare;
+
+  /// No description provided for @statsLegendFrequent.
+  ///
+  /// In id, this message translates to:
+  /// **'rutin'**
+  String get statsLegendFrequent;
+
+  /// No description provided for @statsVsLastWeek.
+  ///
+  /// In id, this message translates to:
+  /// **'vs minggu lalu'**
+  String get statsVsLastWeek;
+
+  /// No description provided for @statsVsLastMonth.
+  ///
+  /// In id, this message translates to:
+  /// **'vs bulan lalu'**
+  String get statsVsLastMonth;
+
+  /// No description provided for @statsVsLastYear.
+  ///
+  /// In id, this message translates to:
+  /// **'vs tahun lalu'**
+  String get statsVsLastYear;
+
+  /// No description provided for @statsEmptyWeek.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada data minggu ini'**
+  String get statsEmptyWeek;
+
+  /// No description provided for @statsEmptyMonth.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada data bulan ini'**
+  String get statsEmptyMonth;
+
+  /// No description provided for @statsEmptyYear.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada data tahun ini'**
+  String get statsEmptyYear;
+
+  /// No description provided for @statsEmptyHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesaikan tugas atau jalankan sesi fokus, lalu kembali ke sini.'**
+  String get statsEmptyHint;
+
+  /// No description provided for @statsFocusEmpty.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada sesi fokus'**
+  String get statsFocusEmpty;
+
+  /// No description provided for @statsXpEmpty.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada XP'**
+  String get statsXpEmpty;
+
+  /// No description provided for @statsHeatmapEmpty.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada catatan habit'**
+  String get statsHeatmapEmpty;
+
+  /// No description provided for @statsInsightTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Insight'**
+  String get statsInsightTitle;
+
+  /// No description provided for @statsInsightProductive.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu paling produktif hari {day}.'**
+  String statsInsightProductive(String day);
+
+  /// No description provided for @statsInsightConsistentHabit.
+  ///
+  /// In id, this message translates to:
+  /// **'{habit} paling konsisten belakangan ini.'**
+  String statsInsightConsistentHabit(String habit);
+
+  /// No description provided for @statsInsightEmpty.
+  ///
+  /// In id, this message translates to:
+  /// **'Insight muncul setelah kamu menyelesaikan beberapa tugas dan habit.'**
+  String get statsInsightEmpty;
+
+  /// No description provided for @statsNoComparison.
+  ///
+  /// In id, this message translates to:
+  /// **'belum ada pembanding'**
+  String get statsNoComparison;
+
+  /// No description provided for @dayMonday.
+  ///
+  /// In id, this message translates to:
+  /// **'Senin'**
+  String get dayMonday;
+
+  /// No description provided for @dayTuesday.
+  ///
+  /// In id, this message translates to:
+  /// **'Selasa'**
+  String get dayTuesday;
+
+  /// No description provided for @dayWednesday.
+  ///
+  /// In id, this message translates to:
+  /// **'Rabu'**
+  String get dayWednesday;
+
+  /// No description provided for @dayThursday.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamis'**
+  String get dayThursday;
+
+  /// No description provided for @dayFriday.
+  ///
+  /// In id, this message translates to:
+  /// **'Jumat'**
+  String get dayFriday;
+
+  /// No description provided for @daySaturday.
+  ///
+  /// In id, this message translates to:
+  /// **'Sabtu'**
+  String get daySaturday;
+
+  /// No description provided for @daySunday.
+  ///
+  /// In id, this message translates to:
+  /// **'Minggu'**
+  String get daySunday;
 }
 
 class _AppLocalizationsDelegate

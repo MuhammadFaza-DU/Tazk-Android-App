@@ -7,6 +7,8 @@ Terakhir diperbarui: **2026-10-31**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-10-31 — **T5 Statistik & Insight tuntas (T5-A..D) + verifikasi HP**: schema **v4** (`focus_sessions` + `xp_events`, 2 index, migrasi v3→v4 terbukti di perangkat nyata), titik tulis XP & sesi fokus, `StatsRepository` (completion rate + delta, menit fokus + delta, XP per bucket net, heatmap 13×7, insight 90 hari), 5 provider, layar Statistik + segmented Minggu/Bulan/Tahun (`BarChart` + `HabitHeatmap` via `CustomPainter`, tanpa dependency baru), entri "Statistik" di sheet "Lainnya" (4 item). **Tanpa angka palsu**: empty state per periode, `–` bila metrik belum punya data. **2 bug data-asli ditemukan & diperbaiki** (kartu tersembunyi saat hanya ada data habit; "0 XP" vs "Belum ada XP"). 306 test hijau, analyze 0, APK arm64 32.3 MB terpasang & dipotret di Galaxy A52 (light+dark). Bukti: `docs/artifacts/` — *(belum commit)*
+
 - 2026-10-31 — **Checkpoint `stable-2026-10-31-v1`**: fidelity 15 board tuntas + ikon otter final + gutter 20dp + i18n Habit Detail. Rencana T5 (jalur A: schema v4 `focus_sessions`+`xp_events`) ditulis di ledger — *(commit ini)*
 
 - 2026-10-31 — **Fidelity batch 4** (Onboarding, Task Form, Habit Form, Habit Detail, Celebration, Tentang) + **gutter diseragamkan 20dp** (board) + ikon launcher final otter terpasang (adaptive + notifikasi). 255 test hijau — *(commit ini)*
@@ -33,8 +35,10 @@ Terakhir diperbarui: **2026-10-31**
 Tazk sedang diupgrade dari v1 ke v2. **Fase desain selesai**. **T1 Performa selesai** (8/8),
 **T2 design system selesai** (font, 19 token, ColorScheme, widget kit 12), **T3 redesign
 layar selesai** (tab bar 5 + sheet "Lainnya" tanpa drawer, 12 layar pakai widget kit + token),
-dan **T4 motion selesai** (token motion di kode, tanpa `easeIn`/`scale(0)`/ticker idle,
-reduced-motion dihormati di semua animasi). Fase berikutnya: **T5 — statistik & insight**.
+**T4 motion selesai** (token motion di kode, tanpa `easeIn`/`scale(0)`/ticker idle,
+reduced-motion dihormati di semua animasi), dan **T5 statistik selesai** (schema v4
+`focus_sessions` + `xp_events`, query agregat, layar Statistik dengan chart + heatmap,
+tanpa angka palsu). Fase berikutnya: **T6 — subtask & lokasi**.
 
 ---
 
@@ -127,6 +131,76 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 
 ---
 
+## T5 — fidelity board 07 Statistik
+
+Board acuan: `design-export/07 Statistik.png` (780×1492 px @2x → **390×746 dp**), diukur
+piksel-per-piksel (bukan diperkirakan). Render pembanding:
+`docs/artifacts/07-statistik-render.png` (widget test, font asli, 780×1492 px).
+Angka "implementasi" di bawah diambil dari `tester.getRect` pada render itu.
+
+| Elemen | Board (dp) | Implementasi (dp) | Selisih / alasan |
+|---|---|---|---|
+| Header: lingkaran back + judul | Ø36, cap 18 | Ø40, Fredoka 24 | `AppScaffold` existing — sudah diterima di audit batch 1 (board 06 identik) |
+| Gutter kiri/kanan | 19.5–20 | 20 | 0 |
+| Segmented: lebar / tinggi visual | 350 / 39 | 350 / 39 | 0 |
+| Segmented: padding dalam | 4.5 | 4 | −0.5 |
+| Segmented: tap target | (tidak diukur) | **48** | +9 vs visual 39 → a11y wajib ≥48 dp (deviasi disengaja) |
+| Segmented: label | 13 | 13 (`labelLarge`) | 0 |
+| Jarak segmented → kartu | 16 | 16 | 0 |
+| Kartu stat: lebar / gap | 171 / 9.5 | 171 / 8 | gap −1.5 (token `spacing.sm`) |
+| Kartu stat: tinggi | 102.5 | **124** (delta 2 baris) / 107 (delta 1 baris) | delta dibiarkan membungkus 2 baris supaya **tidak terpotong**; board 1 baris karena contohnya pendek |
+| Kartu stat: radius / padding | 14–15 / 16 | 14 / 16 | ≤1 |
+| Label / nilai / delta | 12 / ≈28 / 12 | `bodySmall` 12 / `displayLarge` 30 / `bodySmall` 12 | nilai +2 (token `display`) |
+| Kartu XP: lebar / tinggi | 351 / 167.5 | 350 / **177** | +9.5 → label sumbu memakai line-height token 1.4 (board ≈1.2) |
+| Bar: lebar / gap / pitch | 36.5 / 10.5 / 47 | 36.6 / 10 / 46.6 | ≤0.5 |
+| Bar: tinggi plot / radius | 87.5 / 7 | 88 / 7 | +0.5 |
+| Bar: warna | `primaryContainer` / `honey` / `surfaceAlt` | idem | 0 |
+| Label hari | S S R K J S M (Senin..Minggu) | idem, `isToday` = honey | 0 |
+| Kartu heatmap: tinggi | 181.5 | 194.5 | +13 → baris legenda `bodySmall` (1.4) vs board ≈12 |
+| Heatmap: sel / gap | 21.5×11.5 / 3.5 | 21.3×11.5 / 3.5 | ≤0.2 |
+| Heatmap: grid | 13 kolom × 7 baris = 91 | idem, baris 0 = Senin | 0 |
+| Heatmap: 4 level warna | `surfaceAlt`→`pC`→`pSoft`→`primary` | idem | 0 |
+| Trailing hari | "90 hari" | "**91** hari" | board menulis 90 tapi grid-nya 13×7 = 91 → pakai 91 (jujur ke data) |
+| Legenda | swatch 11×11 gap 5, rata kanan | idem | 0 |
+| Kartu insight: ukuran | 351×55.5 | 350×58 | +2.5 |
+| Ikon insight | ≈20 | 20 | 0 |
+| Teks insight | 12–13, 2 baris | `bodySmall` 12 | ≤1 |
+| Jarak antar blok | 16–17 | 16 | ≤1 |
+
+**Deviasi yang tidak diperbaiki (dengan alasan):**
+- Kalimat kedua insight board ("Pertahankan ritual pagi.") **tidak** dirender — itu klaim tentang
+  kebiasaan pengguna yang tidak berasal dari data. Diganti kalimat kedua yang dihitung dari data
+  ("{habit} paling konsisten belakangan ini."). Bila tidak ada dasar data → teks
+  "Insight muncul setelah kamu menyelesaikan beberapa tugas dan habit."
+- Tinggi kartu stat mengikuti isi (1–2 baris delta). Board 102.5 dp tercapai saat delta muat
+  satu baris; dipilih membungkus daripada memotong informasi.
+
+**Tidak terverifikasi:** —
+
+**Verifikasi di HP (2026-10-31, Galaxy A52 / SM-A525F, Android 14, 1080×2400 @420dpi):**
+APK release arm64 di-install ulang di atas data asli (schema **v3 → v4 dimigrasikan di perangkat
+nyata**, aplikasi langsung jalan, XP/level/streak/habit utuh). Yang terbukti di perangkat:
+- Sheet "Lainnya" **4 baris** (Statistik · Profil · Pengaturan · Tentang), Statistik membuka layar.
+- Segmented 3 periode berfungsi: kosong per periode berganti teks ("minggu"/"bulan"/"tahun") dan
+  pil aktif berpindah. Tap target terukur **126 px / 420 dpi = 48 dp** (a11y).
+- **Dua bug yang hanya muncul di data asli, ditemukan & diperbaiki di sesi ini:**
+  1. Kelima kartu (termasuk heatmap habit) tersembunyi saat pengguna hanya punya data habit —
+     `EmptyState` hanya memeriksa task+fokus. Sekarang XP & heatmap ikut dihitung.
+  2. Kartu XP menampilkan "0 XP" bersamaan dengan "Belum ada XP". Sekarang total disembunyikan
+     saat tidak ada event XP.
+- `–` + "belum ada pembanding" tampil benar saat metrik belum punya data (`waktu fokus` di Tahun,
+  kedua kartu di Minggu) — **tidak ada `0%` palsu**.
+- Insight memakai data nyata: "Kamu paling produktif hari Senin. Strecing + Joging paling
+  konsisten belakangan ini."
+- **Tema gelap** dipotret (`hp-07-statistik-minggu-dark-id.png`): canvas/kartu/segmented/heatmap/
+  insight konsisten, tidak ada teks hilang.
+- Setelan perangkat dikembalikan seperti semula (Light + English) setelah pengujian.
+
+**Yang tetap perlu dicatat:** heatmap level-0 vs kartu hanya **1.17:1** (light) / 1.12 (dark) —
+lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
+
+---
+
 ## Yang BELUM selesai
 
 ### Status 16 tahap
@@ -138,7 +212,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 | T2 Design system | ✅ selesai | font Fredoka+PJS, 19 token `ThemeExtension`, `ColorScheme` eksplisit (bukan fromSeed), widget kit 12 komponen + preview dev-only |
 | T3 Redesign layar | ✅ selesai | app shell tab bar 5 + sheet "Lainnya" (tanpa drawer); 12 layar pakai widget kit + token; shared-widget & 0 `AppColors.*` deprecated |
 | T4 Animasi | ✅ selesai | motion token di kode (`app_motion.dart`), `AppPageRoute` 220ms fade+slide, press scale, celebration one-shot (ticker idle hilang), XP glow composite-only, shine sweep, reduced-motion (`MediaQuery.disableAnimations`) di semua animasi |
-| T5 Statistik | 🟡 desain selesai | Layar 07 digambar, fitur belum |
+| T5 Statistik | ✅ selesai | schema v4 `focus_sessions` + `xp_events` (index), titik tulis XP (net, termasuk refund) + sesi fokus, `StatsRepository` + 5 provider, layar board 07 (segmented 3 periode, 2 kartu stat + delta, bar chart 7/30/12 bucket, heatmap 13×7, kartu insight), entri sheet "Lainnya" 4 item. Empty state per periode, `–` bila metrik belum ada data. 304 test |
 | T6 Subtask & Lokasi | ⬜ belum | |
 | T7 Kategori/tag & pencarian | 🟡 desain selesai | Board 26, fitur belum |
 | T8 Widget | 🟡 desain selesai | 5 varian + state kosong digambar; scroll butuh `RemoteViewsService` (belum ada) |
@@ -160,7 +234,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
    | 22 Splash | ✅ sesuai | dibangun ulang dari board (maskot lingkaran 220dp `honeyContainer`, wordmark Fredoka 46, tagline `bodySmall`, progress 120×4). Video v1 + pohon gambar tangan **dihapus**; dep `video_player` dicabut |
    | 11 States | ✅ sesuai | `EmptyState` (maskot `ClipOval` + judul + subjudul + aksi), `SkeletonList`, `ErrorState` |
    | 01 Home | ✅ sesuai | kartu level `primary` r24 + pill streak + XP bar; avatar 48 + tanggal; kartu per item + chip prioritas + jam; CTA auto-width |
-   | 01b/15 | ⚠️ sebagian | tab bar floating pill ✅; sheet **3 item** (Statistik butuh T5), sub-judul sheet belum ada |
+   | 01b/15 | ✅ sesuai | tab bar floating pill ✅; sheet **4 item** (Statistik · Profil · Pengaturan · Tentang) sesuai board 15. Deviasi: sub-judul sheet belum ada (butuh key l10n) |
    | 02 Tasks | ✅ sesuai | section + count, kartu per item, chip + jam. Deviasi: chip filter kategori (T7), "x/y subtask" (T6), judul AppBar 24 (DESIGN token `title` 22) |
    | 03 Habits | ✅ sesuai | ringkasan `primaryContainer` + badge persen, kartu per item + streak + menit |
    | 04 Kalender | ✅ sesuai | grid kartu r24, pill hari terpilih 44×40, dot honey, panel harian kartu-per-item; label "Habits (harian)" **dihapus** |
@@ -174,7 +248,8 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
    | 25 Habit Detail | ✅ sesuai | 3 kartu statistik, kartu ringkasan 3 baris, **grid histori 7×4** (bukan strip 7 hari), legenda 4 swatch. **Perbaikan logika:** hari masa depan / tidak dijadwalkan tidak lagi ditandai gagal |
    | 27 Celebration | ✅ sesuai | maskot 100dp, pill rank, CTA; one-shot 750ms + reduced-motion (T4 dipertahankan) |
    | 23 Tentang | ✅ sesuai | petak maskot 84dp rounded, nama, versi dari `package_info_plus` (tidak hardcode), deskripsi. Deviasi: 4 baris aksi (privasi/lisensi/rating/masukan) belum dibangun — butuh tujuan nyata |
-   | 07 Statistik, 20/21/26 | 🔒 | menunggu T5/T8/T9/T10 |
+   | 07 Statistik | ✅ sesuai | board 07 dibangun + **diverifikasi di HP (Galaxy A52, Android 14)**. Tabel selisih lengkap di section "T5 — fidelity board 07 Statistik". Screenshot HP: `docs/artifacts/hp-07-statistik-*.png` (light Mingu/Tahun, dark), render pembanding `07-statistik-render.png` |
+   | 20/21/26 | 🔒 | menunggu T8/T9/T10 |
 
    **Gutter:** diseragamkan **20dp** (nilai board 19.5–20) di `AppScaffold.gutter` + Kalender/Habits/Tasks/HabitDetail/Pengaturan/NotifSettings/Home/HabitForm/Profil. Onboarding tetap 24 sesuai board 09.
 
@@ -189,6 +264,9 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 7. **Provider `.env` lama mati** (`vyceai.com` HTTP 503). Sudah diganti ke SEKAI `/v2` (`ds/deepseek-v4.1-flash`). Nebius juga 401.
 8. **Kanvas masih pakai 3 warna untuk "teks di atas primary"** — `$surface` (17×), `$canvas` (9×), `#DDE3D6` (3×). Semua lolos kontras (7.03 / 6.56 / 5.65:1), tapi `DESIGN.md` sekarang mendeklarasikan dua: `on-primary` (`#FBF9F4`) dan `on-primary-muted` (`#DDE3D6`). **Perlu normalisasi kanvas**: 9 node `$canvas` → `$surface`.
 9. **Kontras grab handle masih 1.32:1** (`#E2DACB` di atas `#FBF9F4`) — hampir tak terlihat. Owner minta hanya ditengahkan, jadi kontras sengaja dibiarkan. Kalau mau dibuat terlihat, standar elemen non-teks = 3:1; kandidat `#918A7C` (3.26:1) / dark `#6A7A6E` (3.63:1).
+10. ~~Screenshot HP layar Statistik belum ada~~ **Selesai 2026-10-31** — device tersambung, APK release di-install di atas data asli (migrasi v3→v4 terbukti jalan di perangkat), 6 screenshot di `docs/artifacts/`.
+11. ~~Tema gelap layar Statistik belum dipotret~~ **Selesai 2026-10-31** — `hp-07-statistik-minggu-dark-id.png`.
+12. **Kontras GRAPHIC pada chart/heatmap di bawah 3:1 (light)** — dihitung, bukan ditebak: batang `primaryContainer` vs `surface` = **1.24**, batang terpilih `honey` vs `surface` = **2.34**, level-0 heatmap `surfaceAlt` vs `surface` = **1.17**, `primaryContainer` vs `surfaceAlt` = **1.06**, `primary` vs `primarySoft` (level 2 vs 3) = **1.70**. Semua **teks** lolos AA (`ink` di `primaryContainer` 11.73/11.12, `inkMuted` di `surface` 5.46/7.11). Ini warisan board 07 → **menunggu keputusan owner** (pertahankan board vs pertegas ramp). Kandidat pertegas tanpa ubah token: beri tepi 1px `border` pada batang/sel.
 
 ---
 
@@ -231,7 +309,7 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 # 1. App masih jalan?
 flutter pub get
 dart analyze          # harus: No issues found!
-flutter test          # harus: 111/111 lulus
+flutter test          # harus: 306/306 lulus
 
 # 2. DESIGN.md masih valid?
 npx @google/design.md lint DESIGN.md          # harus: 0 errors

@@ -50,6 +50,7 @@ void main() {
       cancelCompletionNotification: () async {},
       completeHabitToday: (_) async {},
       logHabitProgress: (_, _) async {},
+      logFocusSession: (_, _) async {},
     );
   });
 

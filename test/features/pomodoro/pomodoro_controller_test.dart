@@ -105,6 +105,7 @@ void main() {
         },
         completeHabitToday: (_) async {},
         logHabitProgress: (_, _) async {},
+        logFocusSession: (_, _) async {},
       );
 
       controller.setDurationMinutes(10);
@@ -217,6 +218,7 @@ PomodoroController _controller({
   DateTime Function()? now,
   Future<void> Function(int habitId)? completeHabitToday,
   Future<void> Function(int habitId, int minutes)? logHabitProgress,
+  Future<void> Function(int minutes, int? habitId)? logFocusSession,
 }) {
   return PomodoroController(
     now: now,
@@ -224,6 +226,7 @@ PomodoroController _controller({
     cancelCompletionNotification: () async {},
     completeHabitToday: completeHabitToday ?? (_) async {},
     logHabitProgress: logHabitProgress ?? (_, _) async {},
+    logFocusSession: logFocusSession ?? (_, _) async {},
   );
 }
 

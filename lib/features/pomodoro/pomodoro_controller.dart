@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/database.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/repository_providers.dart';
+import '../../providers/stats_repository_provider.dart';
 
 enum PomodoroSessionStatus { idle, running, paused }
 
@@ -45,6 +46,7 @@ final pomodoroControllerProvider = ChangeNotifierProvider<PomodoroController>((
     cancelCompletionNotification: notifications.cancelFocusSessionComplete,
     logHabitProgress: habitRepository.logProgress,
     completeHabitToday: habitRepository.completeHabitToday,
+    logFocusSession: ref.watch(statsRepositoryProvider).logFocusSession,
   );
 });
 
@@ -54,6 +56,7 @@ class PomodoroController extends ChangeNotifier {
     required this.cancelCompletionNotification,
     required this.logHabitProgress,
     required this.completeHabitToday,
+    required this.logFocusSession,
     DateTime Function()? now,
   }) : _now = now ?? DateTime.now;
 
@@ -61,6 +64,7 @@ class PomodoroController extends ChangeNotifier {
   final Future<void> Function() cancelCompletionNotification;
   final Future<void> Function(int habitId, int minutes) logHabitProgress;
   final Future<void> Function(int habitId) completeHabitToday;
+  final Future<void> Function(int minutes, int? habitId) logFocusSession;
   final DateTime Function() _now;
 
   bool _isHabitMode = false;
@@ -200,6 +204,7 @@ class PomodoroController extends ChangeNotifier {
     notifyListeners();
 
     await cancelCompletionNotification();
+    await logFocusSession(_sessionDuration.inMinutes, habit?.id);
     if (habit != null) {
       await logHabitProgress(habit.id, _sessionDuration.inMinutes);
       await completeHabitToday(habit.id);

@@ -373,5 +373,62 @@
   "stateLoadingLabel": "Memuat data",
   "stateErrorTitle": "Gagal memuat data",
   "stateErrorMessage": "Coba lagi sebentar. Data lokalmu tetap aman.",
-  "stateRetryAction": "Coba lagi"
+  "stateRetryAction": "Coba lagi",
+
+  "navStats": "Statistik",
+  "statsPeriodWeek": "Minggu",
+  "statsPeriodMonth": "Bulan",
+  "statsPeriodYear": "Tahun",
+  "statsTasksDone": "task selesai",
+  "statsFocusTime": "waktu fokus",
+  "statsDurationHoursMinutes": "{hours}j {minutes}m",
+  "@statsDurationHoursMinutes": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "statsDurationMinutes": "{minutes}m",
+  "@statsDurationMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "statsValueDash": "\u2013",
+  "statsXpWeek": "XP mingguan",
+  "statsXpMonth": "XP bulanan",
+  "statsXpYear": "XP tahunan",
+  "statsHabitConsistency": "Konsistensi habit",
+  "statsDaysCount": "{days} hari",
+  "@statsDaysCount": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "statsLegendRare": "jarang",
+  "statsLegendFrequent": "rutin",
+  "statsVsLastWeek": "vs minggu lalu",
+  "statsVsLastMonth": "vs bulan lalu",
+  "statsVsLastYear": "vs tahun lalu",
+  "statsEmptyWeek": "Belum ada data minggu ini",
+  "statsEmptyMonth": "Belum ada data bulan ini",
+  "statsEmptyYear": "Belum ada data tahun ini",
+  "statsEmptyHint": "Selesaikan tugas atau jalankan sesi fokus, lalu kembali ke sini.",
+  "statsFocusEmpty": "Belum ada sesi fokus",
+  "statsXpEmpty": "Belum ada XP",
+  "statsHeatmapEmpty": "Belum ada catatan habit",
+  "statsInsightTitle": "Insight",
+  "statsInsightProductive": "Kamu paling produktif hari {day}.",
+  "@statsInsightProductive": {
+    "placeholders": { "day": { "type": "String" } }
+  },
+  "statsInsightConsistentHabit": "{habit} paling konsisten belakangan ini.",
+  "@statsInsightConsistentHabit": {
+    "placeholders": { "habit": { "type": "String" } }
+  },
+  "statsInsightEmpty": "Insight muncul setelah kamu menyelesaikan beberapa tugas dan habit.",
+  "statsNoComparison": "belum ada pembanding",
+  "dayMonday": "Senin",
+  "dayTuesday": "Selasa",
+  "dayWednesday": "Rabu",
+  "dayThursday": "Kamis",
+  "dayFriday": "Jumat",
+  "daySaturday": "Sabtu",
+  "daySunday": "Minggu"
 }

@@ -8,6 +8,7 @@ import '../../features/home/home_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/settings/about_screen.dart';
 import '../../features/settings/settings_screen.dart';
+import '../../features/stats/stats_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
 import '../../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
@@ -263,10 +264,8 @@ class _PillTabItem extends StatelessWidget {
   }
 }
 
-/// Items of the "Lainnya" sheet (DESIGN `sheet`): Profil, Pengaturan, Tentang.
-///
-/// Statistik (T5) is deliberately absent — no screen exists yet, and a tab or
-/// row must never point at a screen that does not exist (board `15`).
+/// Items of the "Lainnya" sheet (DESIGN `sheet`, board `15`): Statistik,
+/// Profil, Pengaturan, Tentang.
 class _MoreSheet extends StatelessWidget {
   const _MoreSheet();
 
@@ -284,6 +283,13 @@ class _MoreSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Text(l10n.navMore, style: theme.textTheme.titleLarge),
+          ),
+          ListRow(
+            showDivider: false,
+            leading: _SheetIcon(icon: Icons.insights_outlined),
+            title: l10n.navStats,
+            trailing: Icon(Icons.chevron_right_rounded, color: colors.inkMuted),
+            onTap: () => _push(context, const StatsScreen()),
           ),
           ListRow(
             showDivider: false,

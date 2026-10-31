@@ -785,4 +785,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stateRetryAction => 'Try again';
+
+  @override
+  String get navStats => 'Statistics';
+
+  @override
+  String get statsPeriodWeek => 'Week';
+
+  @override
+  String get statsPeriodMonth => 'Month';
+
+  @override
+  String get statsPeriodYear => 'Year';
+
+  @override
+  String get statsTasksDone => 'tasks done';
+
+  @override
+  String get statsFocusTime => 'focus time';
+
+  @override
+  String statsDurationHoursMinutes(int hours, int minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String statsDurationMinutes(int minutes) {
+    return '${minutes}m';
+  }
+
+  @override
+  String get statsValueDash => '–';
+
+  @override
+  String get statsXpWeek => 'Weekly XP';
+
+  @override
+  String get statsXpMonth => 'Monthly XP';
+
+  @override
+  String get statsXpYear => 'Yearly XP';
+
+  @override
+  String get statsHabitConsistency => 'Habit consistency';
+
+  @override
+  String statsDaysCount(int days) {
+    return '$days days';
+  }
+
+  @override
+  String get statsLegendRare => 'rare';
+
+  @override
+  String get statsLegendFrequent => 'regular';
+
+  @override
+  String get statsVsLastWeek => 'vs last week';
+
+  @override
+  String get statsVsLastMonth => 'vs last month';
+
+  @override
+  String get statsVsLastYear => 'vs last year';
+
+  @override
+  String get statsEmptyWeek => 'No data for this week yet';
+
+  @override
+  String get statsEmptyMonth => 'No data for this month yet';
+
+  @override
+  String get statsEmptyYear => 'No data for this year yet';
+
+  @override
+  String get statsEmptyHint =>
+      'Finish a task or run a focus session, then come back here.';
+
+  @override
+  String get statsFocusEmpty => 'No focus sessions yet';
+
+  @override
+  String get statsXpEmpty => 'No XP yet';
+
+  @override
+  String get statsHeatmapEmpty => 'No habit history yet';
+
+  @override
+  String get statsInsightTitle => 'Insight';
+
+  @override
+  String statsInsightProductive(String day) {
+    return 'You are most productive on $day.';
+  }
+
+  @override
+  String statsInsightConsistentHabit(String habit) {
+    return '$habit has been your most consistent habit lately.';
+  }
+
+  @override
+  String get statsInsightEmpty =>
+      'Insights appear once you have finished some tasks and habits.';
+
+  @override
+  String get statsNoComparison => 'no comparison yet';
+
+  @override
+  String get dayMonday => 'Monday';
+
+  @override
+  String get dayTuesday => 'Tuesday';
+
+  @override
+  String get dayWednesday => 'Wednesday';
+
+  @override
+  String get dayThursday => 'Thursday';
+
+  @override
+  String get dayFriday => 'Friday';
+
+  @override
+  String get daySaturday => 'Saturday';
+
+  @override
+  String get daySunday => 'Sunday';
 }
