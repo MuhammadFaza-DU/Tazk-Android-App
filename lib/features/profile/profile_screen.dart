@@ -511,8 +511,9 @@ class _SectionHeading extends StatelessWidget {
   }
 }
 
-/// Enam badge sejajar (board: 6 kolom). Lebar tiap kartu dihitung dari lebar
-/// yang tersedia supaya tetap 6 kolom di layar sempit dan teks tetap terbaca.
+/// Enam badge sejajar (board: 6 kolom). Nama panjang ("Conqueror", "Legend")
+/// dibiarkan membungkus maksimal 2 baris alih-alih memotong grid, supaya
+/// jumlah kolom tetap sesuai board dan label tetap terbaca.
 class _BadgeGrid extends StatelessWidget {
   const _BadgeGrid({required this.unlockedRanks});
 
@@ -738,7 +739,9 @@ class _CollectionTile extends StatelessWidget {
           const SizedBox(height: 4), // spacing.xs
           Text(
             label,
-            maxLines: 1,
+            // Nama seperti "Conqueror"/"Legend" butuh 2 baris di kartu 53dp;
+            // memotongnya jadi "Conq…" lebih buruk daripada baris kedua.
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(

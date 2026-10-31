@@ -157,7 +157,7 @@
   "editNameTooltip": "Edit Name",
   "noNamePlaceholder": "(No name yet)",
   "profileStreakDaysLabel": "day streak",
-  "profileTasksDoneTodayLabel": "tasks done today",
+  "profileTasksDoneTodayLabel": "tasks done",
   "profileBadgesLabel": "badges",
   "badgeCollectionTitle": "Badge Collection",
   "badgesUnlockedCount": "{unlocked} of {total}",

@@ -48,7 +48,7 @@ class NotificationService {
     }
 
     try {
-      const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidInit = AndroidInitializationSettings('@drawable/ic_notification');
       const initSettings = InitializationSettings(android: androidInit);
       await _plugin.initialize(initSettings);
       _initialized = true;

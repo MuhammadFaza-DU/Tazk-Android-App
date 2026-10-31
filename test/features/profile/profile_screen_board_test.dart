@@ -158,7 +158,7 @@ void main() {
       await _disposeScreen(tester);
     });
 
-    testWidgets('tiga stat tile: streak, tugas selesai hari ini, badge', (
+    testWidgets('tiga stat tile: streak, tugas selesai, badge', (
       tester,
     ) async {
       final db = AppDatabase.forTesting(NativeDatabase.memory());
@@ -194,7 +194,7 @@ void main() {
 
       // Label kecil.
       expect(find.text('hari streak'), findsOneWidget);
-      expect(find.text('tugas selesai hari ini'), findsOneWidget);
+      expect(find.text('tugas selesai'), findsOneWidget);
       expect(find.text('badge'), findsOneWidget);
 
       // Ikon: api (streak), centang (tugas), medali (badge).
@@ -278,7 +278,8 @@ void main() {
       expect(statRow.width, 390 - 32);
       expect(statRow.top - card.bottom, 16); // jarak antar blok
 
-      // 6 kolom badge: (358 - 5*8) / 6 = 53.
+      // 6 kolom badge: (358 - 5*8) / 6 = 53. Nama panjang membungkus 2 baris
+      // (bukan memotong grid) supaya jumlah kolom tetap sesuai board.
       final badgeTile = tester.getSize(
         find.byKey(profileBadgeTileKey(StreakRank.perintis)),
       );

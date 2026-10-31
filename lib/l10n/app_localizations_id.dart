@@ -482,7 +482,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get profileStreakDaysLabel => 'hari streak';
 
   @override
-  String get profileTasksDoneTodayLabel => 'tugas selesai hari ini';
+  String get profileTasksDoneTodayLabel => 'tugas selesai';
 
   @override
   String get profileBadgesLabel => 'badge';

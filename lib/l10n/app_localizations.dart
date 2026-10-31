@@ -959,7 +959,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileTasksDoneTodayLabel.
   ///
   /// In id, this message translates to:
-  /// **'tugas selesai hari ini'**
+  /// **'tugas selesai'**
   String get profileTasksDoneTodayLabel;
 
   /// No description provided for @profileBadgesLabel.

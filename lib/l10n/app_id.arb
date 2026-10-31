@@ -245,7 +245,7 @@
   "editNameTooltip": "Edit Nama",
   "noNamePlaceholder": "(Belum ada nama)",
   "profileStreakDaysLabel": "hari streak",
-  "profileTasksDoneTodayLabel": "tugas selesai hari ini",
+  "profileTasksDoneTodayLabel": "tugas selesai",
   "profileBadgesLabel": "badge",
   "badgeCollectionTitle": "Koleksi Badge",
   "badgesUnlockedCount": "{unlocked} dari {total}",

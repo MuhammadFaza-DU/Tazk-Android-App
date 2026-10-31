@@ -7,6 +7,8 @@ Terakhir diperbarui: **2026-10-31**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-10-31 — **Audit fidelity kanvas** (gerbang AGENTS §11) batch 1–3: Splash, States, Home, tab bar floating, Tasks, Habits, Kalender, Pomodoro, Profil, Pengaturan, AppScaffold back-bulat dibangun ulang dari board `design-export/` (diukur piksel). Video v1 dihapus. Fix Gradle `splits` vs `abiFilters`. 199 test hijau — *(commit ini)*
+
 - 2026-10-31 — Verifikasi visual HP (Galaxy A52, 24 screenshot) + fix bug: FAB menutupi baris terakhir (Habits), plural "1 days", kalimat dialog hapus (ICU apostrophe), tombol Delete jadi `danger`, XP bar Profile disamakan (AnimatedXpProgress). **Aturan baru AGENTS §11: gerbang fidelity kanvas.** 60fps terukur (0 jank/126 frame) — *(commit ini)*
 
 - 2026-10-31 — T4 Motion tuntas: token motion di kode (`AppMotion` + `context.reduceMotion`) + `AppPageRoute`; press scale 0.97; checkbox pop/confetti reduced-motion; XP glow composite-only; celebration `repeat()`→one-shot; progress fill `Transform.scale`; sheet/dialog motion; badge shine sweep; entrance EmptyState/Onboarding; splash sway tergerbangi — commit `714d14d` (+ `dfd17b8`, `ec348dc`), 111/111 test
@@ -148,13 +150,25 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
 
 ### Isu terbuka yang harus diingat
 
-0. **DEVIASI FIDELITY KANVAS (ditemukan 2026-10-31, gerbang baru AGENTS §11)** — implementasi belum dibandingkan dengan board `design.pen`:
-   - **Splash** masih memakai **video v1** + pohon gambar tangan (`_TreePainter`). DESIGN: *`otter-with-sprout` carries the splash*. → **belum diperbaiki**, menunggu board 22 Splash.
-   - **Empty state** hanya menempel PNG maskot yang **berlatar krem opaque** → kotak terang di tema gelap. Butuh PNG transparan (aset) atau perlakuan kanvas (board 11 States). → **belum diperbaiki**.
-   - **History grid habit** menampilkan X untuk hari yang belum terjadi. → ditunda (butuh keputusan produk, T13).
-   - **Kalender** memberi judul "Habits (daily)" padahal berisi habit *Custom*. → ditunda (l10n/logika, T13).
-   - **Profil** menampilkan "Level 4" dua kali (kartu avatar + kartu XP) → menunggu konfirmasi board 06 Profil.
-   - Status: **semua belum diverifikasi terhadap kanvas**; `execute` pencil MCP di mesin ini tidak mengekspos API (`Get`/`TakeScreenshot` missing) → butuh export board dari owner.
+0. **AUDIT FIDELITY KANVAS (2026-10-31) — status per board:**
+
+   | Board | Status | Catatan deviasi |
+   |---|---|---|
+   | 22 Splash | ✅ sesuai | dibangun ulang dari board (maskot lingkaran 220dp `honeyContainer`, wordmark Fredoka 46, tagline `bodySmall`, progress 120×4). Video v1 + pohon gambar tangan **dihapus**; dep `video_player` dicabut |
+   | 11 States | ✅ sesuai | `EmptyState` (maskot `ClipOval` + judul + subjudul + aksi), `SkeletonList`, `ErrorState` |
+   | 01 Home | ✅ sesuai | kartu level `primary` r24 + pill streak + XP bar; avatar 48 + tanggal; kartu per item + chip prioritas + jam; CTA auto-width |
+   | 01b/15 | ⚠️ sebagian | tab bar floating pill ✅; sheet **3 item** (Statistik butuh T5), sub-judul sheet belum ada |
+   | 02 Tasks | ✅ sesuai | section + count, kartu per item, chip + jam. Deviasi: chip filter kategori (T7), "x/y subtask" (T6), judul AppBar 24 (DESIGN token `title` 22) |
+   | 03 Habits | ✅ sesuai | ringkasan `primaryContainer` + badge persen, kartu per item + streak + menit |
+   | 04 Kalender | ✅ sesuai | grid kartu r24, pill hari terpilih 44×40, dot honey, panel harian kartu-per-item; label "Habits (harian)" **dihapus** |
+   | 05 Pomodoro | ✅ sesuai | cakram 261 + cincin honey, chip durasi 15/25/45/60, stop persegi. **Regresi: input durasi bebas dihapus** (board hanya chip) |
+   | 06 Profil | ✅ sesuai | kartu maskot + **Level sekali** (duplikat dihapus) + 3 stat tile + badge/kosmetik kartu kotak. Deviasi: "Bergabung X bulan lalu" tidak bisa (tabel tanpa `createdAt`), "tugas selesai" → "hari ini" |
+   | 08 Pengaturan | ✅ sesuai | grup + ListRow + chevron + segmented. Deviasi: grup DATA (backup/ekspor) belum ada (T10), label "PEMBERITAHUAN" belum ada key |
+   | AppScaffold | ✅ sesuai | back **lingkaran** 40dp (board 37) `canvas` + border, judul Fredoka 24 rata kiri, aksi debug dipindah ke sheet dev-only |
+   | 09 Onboarding, 10 Task Form, 24 Habit Form, 25 Habit Detail, 27 Celebration, 23 Tentang | ⏳ belum diaudit | batch 4 |
+   | 07 Statistik, 20/21/26 | 🔒 | menunggu T5/T8/T9/T10 |
+
+   **Keputusan yang menunggu owner:** (a) `DESIGN.md` token `title` = 22 vs board 24 → samakan ke 24?; (b) XP fill `honey` di track `primarySoft` = 1,77:1 (di bawah 3:1 non-teks) — pertahankan board atau ganti track; (c) durasi Pomodoro bebas dikembalikan?; (d) `createdAt` profil (butuh migrasi schema) untuk "Bergabung X bulan lalu".
 
 1. ~~Font v2 belum diunduh.~~ **Selesai di T2** — `assets/fonts/` berisi Fredoka + Plus Jakarta Sans (3 file), terdaftar di `pubspec.yaml`.
 2. **Ikon app persegi belum ada.** Yang ada baru wordmark horizontal (`assets/logo/tazk-logo.png`) yang **terpotong** kalau dipakai di kotak persegi. Prompt ada di `docs/design/ikon-logo-prompts.md` §2.
