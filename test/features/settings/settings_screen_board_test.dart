@@ -180,7 +180,7 @@ void main() {
       await _disposeScreen(tester);
     });
 
-    testWidgets('geometri: gutter 16, kartu penuh lebar, jarak antar-grup 24', (
+    testWidgets('geometri: gutter 20, kartu penuh lebar, jarak antar-grup 24', (
       tester,
     ) async {
       await _pumpScreen(tester);
@@ -189,12 +189,12 @@ void main() {
       expect(cards, findsNWidgets(4));
 
       final first = tester.getRect(cards.at(0));
-      expect(first.left, 16); // gutter
-      expect(first.width, 390 - 32);
+      expect(first.left, 20); // gutter
+      expect(first.width, 390 - 40);
 
       // Label grup rata tepi kartu (tanpa inset kiri).
       final label = tester.getRect(find.text('TAMPILAN'));
-      expect(label.left, 16);
+      expect(label.left, 20);
 
       // Kartu grup berikutnya: 24 (spacing.xl) + tinggi label + 16 (spacing.lg).
       final second = tester.getRect(cards.at(1));

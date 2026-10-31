@@ -209,14 +209,68 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingWelcome.
   ///
   /// In id, this message translates to:
-  /// **'Selamat datang di Tazk!'**
+  /// **'Halo! Aku Tazk'**
   String get onboardingWelcome;
 
   /// No description provided for @onboardingAskName.
   ///
   /// In id, this message translates to:
-  /// **'Siapa nama kamu?'**
+  /// **'Aku akan bantu kamu menyelesaikan hal kecil setiap hari. Siapa namamu?'**
   String get onboardingAskName;
+
+  /// No description provided for @onboardingNameLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama kamu'**
+  String get onboardingNameLabel;
+
+  /// No description provided for @onboardingNameHelper.
+  ///
+  /// In id, this message translates to:
+  /// **'Bisa diubah kapan saja di Profil'**
+  String get onboardingNameHelper;
+
+  /// No description provided for @onboardingPickTheme.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih tema'**
+  String get onboardingPickTheme;
+
+  /// No description provided for @onboardingPickThemeHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Terang atau gelap, sesukamu. Bisa diganti kapan saja di Pengaturan.'**
+  String get onboardingPickThemeHint;
+
+  /// No description provided for @onboardingPickLanguage.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih bahasa'**
+  String get onboardingPickLanguage;
+
+  /// No description provided for @onboardingPickLanguageHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih bahasa yang paling nyaman buatmu. Bisa diganti kapan saja.'**
+  String get onboardingPickLanguageHint;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjut'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingFinish.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesai'**
+  String get onboardingFinish;
+
+  /// No description provided for @onboardingStepProgress.
+  ///
+  /// In id, this message translates to:
+  /// **'{current} dari {total}'**
+  String onboardingStepProgress(int current, int total);
 
   /// No description provided for @fieldNameLabel.
   ///
@@ -1052,6 +1106,18 @@ abstract class AppLocalizations {
   /// **'Legenda'**
   String get rankLegenda;
 
+  /// No description provided for @celebrationRankTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Rank Baru!'**
+  String get celebrationRankTitle;
+
+  /// No description provided for @celebrationContinueAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjutkan'**
+  String get celebrationContinueAction;
+
   /// No description provided for @settingsScreenTitle.
   ///
   /// In id, this message translates to:
@@ -1229,7 +1295,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutScreenTitle.
   ///
   /// In id, this message translates to:
-  /// **'Tentang App'**
+  /// **'Tentang Tazk'**
   String get aboutScreenTitle;
 
   /// No description provided for @aboutVersionLabel.
@@ -1241,7 +1307,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutDescription.
   ///
   /// In id, this message translates to:
-  /// **'Tazk menggabungkan manajemen tugas, pelacakan kebiasaan, dan gamifikasi RPG dalam satu aplikasi 100% offline.'**
+  /// **'Task, habit, dan fokus dalam satu tempat. Semua data tersimpan di HP-mu.'**
   String get aboutDescription;
 
   /// No description provided for @notifTaskReminderTitle.

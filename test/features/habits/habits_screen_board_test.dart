@@ -203,7 +203,7 @@ void main() {
       await _disposeScreen(tester);
     });
 
-    testWidgets('geometri board pada layar 390dp: gutter 16, jarak 12, '
+    testWidgets('geometri board pada layar 390dp: gutter 20, jarak 12, '
         'badge persen 54dp', (tester) async {
       tester.view.physicalSize = const Size(390 * 3, 844 * 3);
       tester.view.devicePixelRatio = 3;
@@ -220,8 +220,8 @@ void main() {
       // Tinggi kartu tidak diuji di sini: `flutter test` memakai font kotak,
       // jadi tinggi yang mengikuti teks tidak mewakili render sebenarnya.
       final summary = tester.getRect(find.byKey(habitsSummaryKey));
-      expect(summary.left, 16); // gutter kiri
-      expect(summary.width, 390 - 32);
+      expect(summary.left, 20); // gutter kiri
+      expect(summary.width, 390 - 40);
 
       final badge = tester.getSize(find.byKey(habitsSummaryBadgeKey));
       expect(badge.width, 54);
@@ -229,7 +229,7 @@ void main() {
 
       final firstCard = tester.getRect(find.byKey(habitCardKey(first.id)));
       final secondCard = tester.getRect(find.byKey(habitCardKey(second.id)));
-      expect(firstCard.left, 16);
+      expect(firstCard.left, 20);
       expect(secondCard.top - firstCard.bottom, 12); // jarak antar kartu
       // Ringkasan berhenti 12dp sebelum kartu habit pertama.
       expect(firstCard.top - summary.bottom, 12);

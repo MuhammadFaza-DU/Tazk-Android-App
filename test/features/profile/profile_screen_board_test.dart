@@ -255,7 +255,7 @@ void main() {
       await _disposeScreen(tester);
     });
 
-    testWidgets('geometri board pada layar 390dp: gutter 16, kartu 358, '
+    testWidgets('geometri board pada layar 390dp: gutter 20, kartu 350, '
         'kartu kotak 6 kolom dan 4 kolom', (tester) async {
       tester.view.physicalSize = const Size(390 * 3, 844 * 3);
       tester.view.devicePixelRatio = 3;
@@ -270,26 +270,26 @@ void main() {
       await _pumpScreen(tester, db);
 
       final card = tester.getRect(find.byKey(profileCardKey));
-      expect(card.left, 16); // gutter
-      expect(card.width, 390 - 32);
+      expect(card.left, 20); // gutter
+      expect(card.width, 390 - 40);
 
       final statRow = tester.getRect(find.byKey(profileStatRowKey));
-      expect(statRow.left, 16);
-      expect(statRow.width, 390 - 32);
+      expect(statRow.left, 20);
+      expect(statRow.width, 390 - 40);
       expect(statRow.top - card.bottom, 16); // jarak antar blok
 
-      // 6 kolom badge: (358 - 5*8) / 6 = 53. Nama panjang membungkus 2 baris
+      // 6 kolom badge: (350 - 5*8) / 6 = 51.67. Nama panjang membungkus 2 baris
       // (bukan memotong grid) supaya jumlah kolom tetap sesuai board.
       final badgeTile = tester.getSize(
         find.byKey(profileBadgeTileKey(StreakRank.perintis)),
       );
-      expect(badgeTile.width, closeTo(53, 0.01));
+      expect(badgeTile.width, closeTo(51.67, 0.05));
 
-      // 4 kolom kosmetik: (358 - 3*8) / 4 = 83.5.
+      // 4 kolom kosmetik: (350 - 3*8) / 4 = 81.5.
       final cosmeticTile = tester.getSize(
         find.byKey(profileCosmeticTileKey(10)),
       );
-      expect(cosmeticTile.width, closeTo(83.5, 0.01));
+      expect(cosmeticTile.width, closeTo(81.5, 0.05));
 
       await _disposeScreen(tester);
     });

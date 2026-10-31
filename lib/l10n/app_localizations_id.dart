@@ -65,10 +65,42 @@ class AppLocalizationsId extends AppLocalizations {
   String get noLabel => 'Tidak';
 
   @override
-  String get onboardingWelcome => 'Selamat datang di Tazk!';
+  String get onboardingWelcome => 'Halo! Aku Tazk';
 
   @override
-  String get onboardingAskName => 'Siapa nama kamu?';
+  String get onboardingAskName =>
+      'Aku akan bantu kamu menyelesaikan hal kecil setiap hari. Siapa namamu?';
+
+  @override
+  String get onboardingNameLabel => 'Nama kamu';
+
+  @override
+  String get onboardingNameHelper => 'Bisa diubah kapan saja di Profil';
+
+  @override
+  String get onboardingPickTheme => 'Pilih tema';
+
+  @override
+  String get onboardingPickThemeHint =>
+      'Terang atau gelap, sesukamu. Bisa diganti kapan saja di Pengaturan.';
+
+  @override
+  String get onboardingPickLanguage => 'Pilih bahasa';
+
+  @override
+  String get onboardingPickLanguageHint =>
+      'Pilih bahasa yang paling nyaman buatmu. Bisa diganti kapan saja.';
+
+  @override
+  String get onboardingNext => 'Lanjut';
+
+  @override
+  String get onboardingFinish => 'Selesai';
+
+  @override
+  String onboardingStepProgress(int current, int total) {
+    return '$current dari $total';
+  }
 
   @override
   String get fieldNameLabel => 'Nama';
@@ -538,6 +570,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get rankLegenda => 'Legenda';
 
   @override
+  String get celebrationRankTitle => 'Rank Baru!';
+
+  @override
+  String get celebrationContinueAction => 'Lanjutkan';
+
+  @override
   String get settingsScreenTitle => 'Pengaturan';
 
   @override
@@ -629,7 +667,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get exactAlarmInactive => 'Mati — pengingat bisa telat';
 
   @override
-  String get aboutScreenTitle => 'Tentang App';
+  String get aboutScreenTitle => 'Tentang Tazk';
 
   @override
   String aboutVersionLabel(String version) {
@@ -638,7 +676,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get aboutDescription =>
-      'Tazk menggabungkan manajemen tugas, pelacakan kebiasaan, dan gamifikasi RPG dalam satu aplikasi 100% offline.';
+      'Task, habit, dan fokus dalam satu tempat. Semua data tersimpan di HP-mu.';
 
   @override
   String notifTaskReminderTitle(String title) {

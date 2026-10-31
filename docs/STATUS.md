@@ -7,6 +7,7 @@ Terakhir diperbarui: **2026-10-31**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-10-31 — **Fidelity batch 4** (Onboarding, Task Form, Habit Form, Habit Detail, Celebration, Tentang) + **gutter diseragamkan 20dp** (board) + ikon launcher final otter terpasang (adaptive + notifikasi). 255 test hijau — *(commit ini)*
 - 2026-10-31 — **Audit fidelity kanvas** (gerbang AGENTS §11) batch 1–3: Splash, States, Home, tab bar floating, Tasks, Habits, Kalender, Pomodoro, Profil, Pengaturan, AppScaffold back-bulat dibangun ulang dari board `design-export/` (diukur piksel). Video v1 dihapus. Fix Gradle `splits` vs `abiFilters`. 199 test hijau — *(commit ini)*
 
 - 2026-10-31 — Verifikasi visual HP (Galaxy A52, 24 screenshot) + fix bug: FAB menutupi baris terakhir (Habits), plural "1 days", kalimat dialog hapus (ICU apostrophe), tombol Delete jadi `danger`, XP bar Profile disamakan (AnimatedXpProgress). **Aturan baru AGENTS §11: gerbang fidelity kanvas.** 60fps terukur (0 jank/126 frame) — *(commit ini)*
@@ -165,8 +166,15 @@ Token dipecah: **`on-primary`** `#FBF9F4` (teks utama) + **`on-primary-muted`** 
    | 06 Profil | ✅ sesuai | kartu maskot + **Level sekali** (duplikat dihapus) + 3 stat tile + badge/kosmetik kartu kotak. Deviasi: "Bergabung X bulan lalu" tidak bisa (tabel tanpa `createdAt`), "tugas selesai" → "hari ini" |
    | 08 Pengaturan | ✅ sesuai | grup + ListRow + chevron + segmented. Deviasi: grup DATA (backup/ekspor) belum ada (T10), label "PEMBERITAHUAN" belum ada key |
    | AppScaffold | ✅ sesuai | back **lingkaran** 40dp (board 37) `canvas` + border, judul Fredoka 24 rata kiri, aksi debug dipindah ke sheet dev-only |
-   | 09 Onboarding, 10 Task Form, 24 Habit Form, 25 Habit Detail, 27 Celebration, 23 Tentang | ⏳ belum diaudit | batch 4 |
+   | 09 Onboarding | ✅ sesuai | maskot `ClipOval` 168dp, judul 26, dots 3 halaman, field+CTA; overflow keyboard diperbaiki (scrollable) |
+   | 10 Task Form | ✅ sesuai | prioritas **segmented 3 kotak** (bukan radio), tanggal+jam sejajar h42, checklist 40dp, simpan full-width. Deviasi: field Lokasi dipertahankan (ada di DB), X hapus subtask dipertahankan |
+   | 24 Habit Form | ✅ sesuai | 4 chip frekuensi sejajar, pill jam + hapus, kartu progress + switch, simpan full-width, gutter 20 |
+   | 25 Habit Detail | ✅ sesuai | 3 kartu statistik, kartu ringkasan 3 baris, **grid histori 7×4** (bukan strip 7 hari), legenda 4 swatch. **Perbaikan logika:** hari masa depan / tidak dijadwalkan tidak lagi ditandai gagal |
+   | 27 Celebration | ✅ sesuai | maskot 100dp, pill rank, CTA; one-shot 750ms + reduced-motion (T4 dipertahankan) |
+   | 23 Tentang | ✅ sesuai | petak maskot 84dp rounded, nama, versi dari `package_info_plus` (tidak hardcode), deskripsi. Deviasi: 4 baris aksi (privasi/lisensi/rating/masukan) belum dibangun — butuh tujuan nyata |
    | 07 Statistik, 20/21/26 | 🔒 | menunggu T5/T8/T9/T10 |
+
+   **Gutter:** diseragamkan **20dp** (nilai board 19.5–20) di `AppScaffold.gutter` + Kalender/Habits/Tasks/HabitDetail/Pengaturan/NotifSettings/Home/HabitForm/Profil. Onboarding tetap 24 sesuai board 09.
 
    **Keputusan yang menunggu owner:** (a) `DESIGN.md` token `title` = 22 vs board 24 → samakan ke 24?; (b) XP fill `honey` di track `primarySoft` = 1,77:1 (di bawah 3:1 non-teks) — pertahankan board atau ganti track; (c) durasi Pomodoro bebas dikembalikan?; (d) `createdAt` profil (butuh migrasi schema) untuk "Bergabung X bulan lalu".
 

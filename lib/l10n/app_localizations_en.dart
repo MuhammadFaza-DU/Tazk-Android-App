@@ -65,10 +65,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noLabel => 'No';
 
   @override
-  String get onboardingWelcome => 'Welcome to Tazk!';
+  String get onboardingWelcome => 'Hi, I\'m Tazk';
 
   @override
-  String get onboardingAskName => 'What\'s your name?';
+  String get onboardingAskName =>
+      'I help you finish the small things every day. What\'s your name?';
+
+  @override
+  String get onboardingNameLabel => 'Your name';
+
+  @override
+  String get onboardingNameHelper => 'You can change it anytime in Profile';
+
+  @override
+  String get onboardingPickTheme => 'Pick a theme';
+
+  @override
+  String get onboardingPickThemeHint =>
+      'Light or dark, your call. You can change it anytime in Settings.';
+
+  @override
+  String get onboardingPickLanguage => 'Pick a language';
+
+  @override
+  String get onboardingPickLanguageHint =>
+      'Choose the language you\'re most comfortable with. You can change it anytime.';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingFinish => 'Done';
+
+  @override
+  String onboardingStepProgress(int current, int total) {
+    return '$current of $total';
+  }
 
   @override
   String get fieldNameLabel => 'Name';
@@ -550,6 +582,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rankLegenda => 'Legend';
 
   @override
+  String get celebrationRankTitle => 'New Rank!';
+
+  @override
+  String get celebrationContinueAction => 'Continue';
+
+  @override
   String get settingsScreenTitle => 'Settings';
 
   @override
@@ -641,7 +679,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exactAlarmInactive => 'Off — reminders may be late';
 
   @override
-  String get aboutScreenTitle => 'About App';
+  String get aboutScreenTitle => 'About Tazk';
 
   @override
   String aboutVersionLabel(String version) {
@@ -650,7 +688,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutDescription =>
-      'Tazk combines task management, habit tracking, and RPG-style gamification in one 100% offline app.';
+      'Tasks, habits, and focus in one place. All your data stays on your phone.';
 
   @override
   String notifTaskReminderTitle(String title) {

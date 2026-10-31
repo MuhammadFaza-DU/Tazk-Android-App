@@ -22,8 +22,23 @@
   "yesLabel": "Yes",
   "noLabel": "No",
 
-  "onboardingWelcome": "Welcome to Tazk!",
-  "onboardingAskName": "What's your name?",
+  "onboardingWelcome": "Hi, I'm Tazk",
+  "onboardingAskName": "I help you finish the small things every day. What's your name?",
+  "onboardingNameLabel": "Your name",
+  "onboardingNameHelper": "You can change it anytime in Profile",
+  "onboardingPickTheme": "Pick a theme",
+  "onboardingPickThemeHint": "Light or dark, your call. You can change it anytime in Settings.",
+  "onboardingPickLanguage": "Pick a language",
+  "onboardingPickLanguageHint": "Choose the language you're most comfortable with. You can change it anytime.",
+  "onboardingNext": "Next",
+  "onboardingFinish": "Done",
+  "onboardingStepProgress": "{current} of {total}",
+  "@onboardingStepProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
   "fieldNameLabel": "Name",
   "onboardingNameEmptyError": "Name cannot be empty",
 
@@ -176,6 +191,9 @@
   "rankSangMaster": "Master",
   "rankLegenda": "Legend",
 
+  "celebrationRankTitle": "New Rank!",
+  "celebrationContinueAction": "Continue",
+
   "settingsScreenTitle": "Settings",
   "settingsNotifications": "Notifications",
   "settingsNotificationsSubtitle": "Task, Habit, Streak Warning, Freeze",
@@ -205,9 +223,9 @@
   "exactAlarmSettingsTitle": "Exact alarm",
   "exactAlarmActive": "On",
   "exactAlarmInactive": "Off — reminders may be late",
-  "aboutScreenTitle": "About App",
+  "aboutScreenTitle": "About Tazk",
   "aboutVersionLabel": "Version {version}",
-  "aboutDescription": "Tazk combines task management, habit tracking, and RPG-style gamification in one 100% offline app.",
+  "aboutDescription": "Tasks, habits, and focus in one place. All your data stays on your phone.",
 
   "notifTaskReminderTitle": "Time for: {title}",
   "notifTaskReminderBody": "This task is scheduled now. Let's get it done!",

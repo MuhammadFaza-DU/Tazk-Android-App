@@ -2,10 +2,25 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
+import '../../l10n/app_localizations_id.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_motion.dart';
 import 'app_button.dart';
 
+/// Key kartu dialog (permukaan `surface`, radius `xl`).
+const Key celebrationCardKey = ValueKey('celebration-card');
+
+/// Key lingkaran maskot `otter-waving`.
+const Key celebrationMascotKey = ValueKey('celebration-mascot');
+
+/// Key pill label rank.
+const Key celebrationRankPillKey = ValueKey('celebration-rank-pill');
+
+/// Momen reward "rank baru" — board `27 Celebration` (kolom MILESTONE).
+///
+/// Komposisi dari board (diukur @2x → /2): maskot `otter-waving` dalam
+/// lingkaran, judul Fredoka, label rank sebagai pill, lalu CTA `primary`.
 Future<void> showRankCelebration(
   BuildContext context, {
   required String rankLabel,
@@ -32,6 +47,15 @@ class _CelebrationDialog extends StatefulWidget {
   const _CelebrationDialog({required this.rankLabel});
 
   final String rankLabel;
+
+  /// Diameter lingkaran maskot. Board: 200px @2x.
+  static const double mascotDiameter = 100;
+
+  /// Lebar maksimum kartu. Board: kartu 714px @2x → 357dp.
+  static const double maxCardWidth = 360;
+
+  /// Gutter layar; menyisakan 334dp di frame 390 (board: kartu 357).
+  static const double screenGutter = 28;
 
   @override
   State<_CelebrationDialog> createState() => _CelebrationDialogState();
@@ -73,53 +97,77 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final theme = Theme.of(context);
     final reduce = context.reduceMotion;
+    // Fallback ke lokal template (id) hanya untuk host tanpa delegate
+    // `AppLocalizations` (mis. widget test yang memakai MaterialApp polos).
+    final l10n = AppLocalizations.of(context) ?? AppLocalizationsId();
 
     final card = Container(
-      margin: const EdgeInsets.symmetric(horizontal: 28),
-      padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+      key: celebrationCardKey,
+      padding: const EdgeInsets.all(24), // spacing.xl
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24), // rounded.xl
         border: Border.all(color: colors.border),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.celebration_rounded, size: 56, color: colors.honey),
-          const SizedBox(height: 12),
-          Text(
-            'Rank Baru!',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 6),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            key: celebrationMascotKey,
+            width: _CelebrationDialog.mascotDiameter,
+            height: _CelebrationDialog.mascotDiameter,
             decoration: BoxDecoration(
-              color: colors.honey.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(999),
+              shape: BoxShape.circle,
+              color: colors.surfaceAlt,
             ),
-            child: Text(
-              widget.rankLabel,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: colors.clay,
-                    fontWeight: FontWeight.w700,
-                  ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/mascot/otter-waving.png',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Icon(
+                  Icons.pets_rounded,
+                  size: 40,
+                  color: colors.inkMuted,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24), // board: lingkaran → judul
+          Text(
+            l10n.celebrationRankTitle,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall?.copyWith(color: colors.ink),
+          ),
+          const SizedBox(height: 12), // board: judul → pill
+          _RankPill(label: widget.rankLabel),
+          const SizedBox(height: 12), // board: pill → CTA
           AppButton.primary(
-            label: 'Lanjutkan',
+            label: l10n.celebrationContinueAction,
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
       ),
     );
 
+    final sized = Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: _CelebrationDialog.screenGutter,
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: _CelebrationDialog.maxCardWidth,
+        ),
+        // Board: kartu mengisi lebar frame (357dp), bukan selebar isinya.
+        child: SizedBox(width: double.infinity, child: card),
+      ),
+    );
+
     if (reduce) {
       // Tanpa confetti sama sekali: tidak ada AnimatedBuilder/painter yang dibuat.
       return Center(
-        child: Material(color: Colors.transparent, child: card),
+        child: Material(color: Colors.transparent, child: sized),
       );
     }
 
@@ -148,9 +196,55 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
                 ),
               ),
             ),
-            card,
+            sized,
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Pill label rank — token `chip-priority` (`honey-container` + `warning-strong`,
+/// 4.78:1) supaya tetap terbaca di atas kartu `surface`; board memakai
+/// `surface` + border karena kartunya `canvas` (lihat laporan).
+class _RankPill extends StatelessWidget {
+  const _RankPill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final theme = Theme.of(context);
+
+    return Container(
+      key: celebrationRankPillKey,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: colors.honeyContainer,
+        borderRadius: BorderRadius.circular(999), // rounded.pill
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Rosette = tanda pangkat; board menaruh ikon reward di pill.
+          Icon(
+            Icons.workspace_premium_rounded,
+            size: 18,
+            color: colors.warningStrong,
+          ),
+          const SizedBox(width: 8), // spacing.sm
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colors.warningStrong,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

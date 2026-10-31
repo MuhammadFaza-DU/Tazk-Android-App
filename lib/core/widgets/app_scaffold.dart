@@ -39,7 +39,7 @@ class AppScaffold extends StatelessWidget {
 
   /// Gutter kiri/kanan header: `spacing.lg`, sama dengan gutter body layar
   /// (`TasksScreen._gutter`) supaya tombol back sejajar tepi kartu di bawahnya.
-  static const double gutter = 16;
+  static const double gutter = 20;
 
   /// Jarak lingkaran back ke judul: `spacing.md`.
   static const double titleGap = 12;

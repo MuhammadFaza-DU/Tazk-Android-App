@@ -78,7 +78,7 @@ class SettingsScreen extends ConsumerWidget {
     return AppScaffold(
       title: l10n.settingsScreenTitle,
       body: ListView(
-        padding: const EdgeInsets.all(16), // spacing.lg
+        padding: const EdgeInsets.all(20), // gutter board
         children: [
           // --- Pemberitahuan ---
           _SectionLabel(l10n.settingsNotifications),

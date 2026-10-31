@@ -25,8 +25,23 @@
   "yesLabel": "Ya",
   "noLabel": "Tidak",
 
-  "onboardingWelcome": "Selamat datang di Tazk!",
-  "onboardingAskName": "Siapa nama kamu?",
+  "onboardingWelcome": "Halo! Aku Tazk",
+  "onboardingAskName": "Aku akan bantu kamu menyelesaikan hal kecil setiap hari. Siapa namamu?",
+  "onboardingNameLabel": "Nama kamu",
+  "onboardingNameHelper": "Bisa diubah kapan saja di Profil",
+  "onboardingPickTheme": "Pilih tema",
+  "onboardingPickThemeHint": "Terang atau gelap, sesukamu. Bisa diganti kapan saja di Pengaturan.",
+  "onboardingPickLanguage": "Pilih bahasa",
+  "onboardingPickLanguageHint": "Pilih bahasa yang paling nyaman buatmu. Bisa diganti kapan saja.",
+  "onboardingNext": "Lanjut",
+  "onboardingFinish": "Selesai",
+  "onboardingStepProgress": "{current} dari {total}",
+  "@onboardingStepProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
   "fieldNameLabel": "Nama",
   "onboardingNameEmptyError": "Nama tidak boleh kosong",
 
@@ -279,6 +294,9 @@
   "rankSangMaster": "Sang Master",
   "rankLegenda": "Legenda",
 
+  "celebrationRankTitle": "Rank Baru!",
+  "celebrationContinueAction": "Lanjutkan",
+
   "settingsScreenTitle": "Pengaturan",
   "settingsNotifications": "Notifikasi",
   "settingsNotificationsSubtitle": "Task, Habit, Streak Warning, Freeze",
@@ -308,12 +326,12 @@
   "exactAlarmSettingsTitle": "Alarm presisi",
   "exactAlarmActive": "Aktif",
   "exactAlarmInactive": "Mati — pengingat bisa telat",
-  "aboutScreenTitle": "Tentang App",
+  "aboutScreenTitle": "Tentang Tazk",
   "aboutVersionLabel": "Versi {version}",
   "@aboutVersionLabel": {
     "placeholders": { "version": { "type": "String" } }
   },
-  "aboutDescription": "Tazk menggabungkan manajemen tugas, pelacakan kebiasaan, dan gamifikasi RPG dalam satu aplikasi 100% offline.",
+  "aboutDescription": "Task, habit, dan fokus dalam satu tempat. Semua data tersimpan di HP-mu.",
 
   "notifTaskReminderTitle": "Waktunya: {title}",
   "@notifTaskReminderTitle": {

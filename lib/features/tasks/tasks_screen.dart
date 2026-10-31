@@ -26,7 +26,7 @@ class TasksScreen extends ConsumerWidget {
   const TasksScreen({super.key});
 
   /// `spacing.lg` — screen gutter, applied once outside the list.
-  static const double _gutter = 16;
+  static const double _gutter = 20;
 
   /// `spacing.md` — gap between two task cards.
   static const double _cardGap = 12;

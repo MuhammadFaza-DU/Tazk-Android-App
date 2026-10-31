@@ -33,7 +33,7 @@ class HabitsScreen extends ConsumerWidget {
   const HabitsScreen({super.key});
 
   /// `spacing.lg` — gutter layar, dipakai sekali di luar daftar.
-  static const double _gutter = 16;
+  static const double _gutter = 20;
 
   /// `spacing.md` — jarak antar kartu (board: 27px ≈ 13.5dp, token 12).
   static const double _cardGap = 12;

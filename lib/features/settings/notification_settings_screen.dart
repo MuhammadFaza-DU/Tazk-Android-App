@@ -21,7 +21,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
     return AppScaffold(
       title: l10n.notificationsScreenTitle,
       body: ListView(
-        padding: const EdgeInsets.all(16), // spacing.lg
+        padding: const EdgeInsets.all(20), // gutter board
         children: [
           AppCard(
             padding: EdgeInsets.zero,

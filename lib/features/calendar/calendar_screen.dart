@@ -35,7 +35,7 @@ import '../tasks/task_form_screen.dart';
 /// radius kartu grid 24dp. Angka token (`DESIGN.md`) menang bila board memakai
 /// ukuran di bawah lantai sistem (mis. label chip 9,5dp di board → `labelLarge`
 /// 13, dan nama hari 10,5dp → `caption` 12).
-const double _gutter = 16; // spacing.lg
+const double _gutter = 20; // spacing board: 19.5-20dp
 const double _cardGap = 12; // spacing.md
 const double _sectionGap = 16; // jarak kartu grid → judul section (board ~14dp)
 const double _gridRadius = 24; // rounded.xl (board ≈ 22dp)
