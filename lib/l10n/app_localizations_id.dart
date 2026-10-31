@@ -899,4 +899,62 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get daySunday => 'Minggu';
+
+  @override
+  String habitsSummaryHeadline(int done, int total) {
+    return '$done dari $total habit hari ini';
+  }
+
+  @override
+  String get habitsSummaryStart => 'Mulai satu habit untuk menjaga ritme';
+
+  @override
+  String get habitsSummaryAllDone => 'Semua habit hari ini selesai';
+
+  @override
+  String get habitsSummaryOnTrack => 'Jaga ritme, kamu sedang on-track';
+
+  @override
+  String get aboutPrivacyTitle => 'Kebijakan privasi';
+
+  @override
+  String get aboutPrivacyBody =>
+      'Tazk bekerja sepenuhnya di HP-mu. Tidak ada akun, tidak ada server kami, dan tidak ada data yang dikirim ke siapa pun. Aplikasi tidak meminta izin kamera, mikrofon, lokasi, atau penyimpanan. Semua catatan tugas, habit, dan sesi fokus tersimpan di database lokal perangkatmu. Cadangan hanya dibuat bila kamu sendiri mengaktifkan backup ke Google Drive milikmu, dan file itu tetap di Drive-mu, bukan di tempat kami. Menghapus aplikasi menghapus seluruh data lokal.';
+
+  @override
+  String get aboutLicensesTitle => 'Lisensi open source';
+
+  @override
+  String get aboutFooter =>
+      'Dibuat dengan Flutter. Gratis, tanpa iklan, tanpa akun.';
+
+  @override
+  String get pomodoroStatusIdle => 'Siap fokus';
+
+  @override
+  String get pomodoroStatusRunning => 'Fokus berjalan';
+
+  @override
+  String get pomodoroStatusPaused => 'Dijeda';
+
+  @override
+  String get pomodoroDurationHint => 'Ketuk angka waktu untuk mengubah durasi';
+
+  @override
+  String get customDurationTitle => 'Atur durasi';
+
+  @override
+  String get customDurationFieldLabel => 'Menit';
+
+  @override
+  String get customDurationHint => '1 sampai 180 menit';
+
+  @override
+  String get customDurationInvalid => 'Masukkan 1 sampai 180 menit';
+
+  @override
+  String get presetEditTitle => 'Ubah chip durasi';
+
+  @override
+  String get presetEditHint => 'Tekan lama chip untuk mengubah nilainya';
 }

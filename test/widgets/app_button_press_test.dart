@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tazk/core/theme/app_colors.dart';
 import 'package:tazk/core/theme/app_motion.dart';
 import 'package:tazk/core/theme/app_theme.dart';
 import 'package:tazk/core/widgets/app_button.dart';
@@ -93,5 +94,53 @@ void main() {
     await gesture.up();
     await tester.pump();
     expect(scaleOf(tester).scale, 1.0);
+  });
+
+  testWidgets('primary tanpa height memakai minHeight 48 (perilaku lama)',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: const Scaffold(
+          body: Center(child: AppButton.primary(label: 'x')),
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byType(AppButton)).height, 48);
+  });
+
+  testWidgets('primary dengan height 59 menghasilkan tinggi 59', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: const Scaffold(
+          body: Center(child: AppButton.primary(label: 'x', height: 59)),
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byType(AppButton)).height, 59);
+  });
+
+  testWidgets('labelStyle dipakai namun warna foreground tetap onPrimary',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: const Scaffold(
+          body: Center(
+            child: AppButton.primary(
+              label: 'x',
+              labelStyle: TextStyle(fontSize: 15),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final text = tester.widget<Text>(find.text('x'));
+    expect(text.style?.fontSize, 15);
+    expect(text.style?.color, AppColors.light.onPrimary);
   });
 }

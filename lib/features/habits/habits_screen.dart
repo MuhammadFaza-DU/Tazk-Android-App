@@ -169,14 +169,14 @@ class _HabitsSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final percent = total == 0 ? 0 : ((done / total) * 100).round();
 
-    // TODO(l10n): belum ada key l10n untuk judul + kalimat kartu ringkasan.
-    final headline = '$done dari $total habit hari ini';
+    final headline = l10n.habitsSummaryHeadline(done, total);
     final support = switch (done) {
-      0 => 'Mulai satu habit untuk menjaga ritme',
-      _ when done >= total => 'Semua habit hari ini selesai',
-      _ => 'Jaga ritme, kamu sedang on-track',
+      0 => l10n.habitsSummaryStart,
+      _ when done >= total => l10n.habitsSummaryAllDone,
+      _ => l10n.habitsSummaryOnTrack,
     };
 
     return Container(
@@ -197,12 +197,21 @@ class _HabitsSummary extends StatelessWidget {
               color: colors.primary,
               shape: BoxShape.circle,
             ),
-            child: Text(
-              '$percent%',
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: colors.onPrimary,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '$percent%',
+                  maxLines: 1,
+                  softWrap: false,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: colors.onPrimary,
+                  ),
+                ),
               ),
             ),
           ),

@@ -511,9 +511,9 @@ class _SectionHeading extends StatelessWidget {
   }
 }
 
-/// Enam badge sejajar (board: 6 kolom). Nama panjang ("Conqueror", "Legend")
-/// dibiarkan membungkus maksimal 2 baris alih-alih memotong grid, supaya
-/// jumlah kolom tetap sesuai board dan label tetap terbaca.
+/// Enam badge dalam grid 3 kolom (2 baris). Lebar longgar 111dp membuat label
+/// Indonesia dua kata ("Sang Master") muat satu baris; area label dipatok dua
+/// baris supaya dasar label sejajar antar-tile dalam satu baris.
 class _BadgeGrid extends StatelessWidget {
   const _BadgeGrid({required this.unlockedRanks});
 
@@ -528,8 +528,14 @@ class _BadgeGrid extends StatelessWidget {
       key: profileBadgeGridKey,
       builder: (context, constraints) {
         const gap = 8.0; // spacing.sm
+        const columns = 3;
         final tileWidth =
-            (constraints.maxWidth - gap * (ranks.length - 1)) / ranks.length;
+            (constraints.maxWidth - gap * (columns - 1)) / columns;
+
+        // Area label = 2 baris bodySmall (12/1.4) mengikuti textScaler supaya
+        // tile berlabel satu baris sejajar dengan yang dua baris.
+        final labelAreaHeight =
+            MediaQuery.textScalerOf(context).scale(12) * 1.4 * 2;
 
         return Wrap(
           spacing: gap,
@@ -551,6 +557,7 @@ class _BadgeGrid extends StatelessWidget {
                     unlockedBackground: colors.honeyContainer,
                     unlockedIconColor: colors.warningStrong,
                     shine: shining,
+                    labelAreaHeight: labelAreaHeight,
                   ),
                 ),
               ),
@@ -704,6 +711,7 @@ class _CollectionTile extends StatelessWidget {
     required this.unlockedBackground,
     required this.unlockedIconColor,
     this.shine = false,
+    this.labelAreaHeight,
   });
 
   final bool isUnlocked;
@@ -715,12 +723,27 @@ class _CollectionTile extends StatelessWidget {
   /// `true` hanya sesaat setelah item ini baru unlock.
   final bool shine;
 
+  /// Tinggi area label tetap (dua baris). `null` = ikuti isi (kosmetik),
+  /// supaya tile berlabel satu baris tetap sama tinggi dengan yang dua baris.
+  final double? labelAreaHeight;
+
   static const BorderRadius _radius = BorderRadius.all(Radius.circular(12));
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final theme = Theme.of(context);
+
+    final labelText = Text(
+      label,
+      maxLines: 2,
+      softWrap: true,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
+      style: theme.textTheme.bodySmall?.copyWith(
+        color: isUnlocked ? colors.ink : colors.inkMuted,
+      ),
+    );
 
     final tile = Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -737,17 +760,16 @@ class _CollectionTile extends StatelessWidget {
             color: isUnlocked ? unlockedIconColor : colors.inkMuted,
           ),
           const SizedBox(height: 4), // spacing.xs
-          Text(
-            label,
-            // Nama seperti "Conqueror"/"Legend" butuh 2 baris di kartu 53dp;
-            // memotongnya jadi "Conq…" lebih buruk daripada baris kedua.
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: isUnlocked ? colors.ink : colors.inkMuted,
+          if (labelAreaHeight == null)
+            labelText
+          else
+            SizedBox(
+              height: labelAreaHeight,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: labelText,
+              ),
             ),
-          ),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../theme/app_colors.dart';
 
@@ -36,6 +37,15 @@ class BarChart extends StatelessWidget {
   final double plotHeight;
   final double barGap;
 
+  /// Gap tetap [preferredGap] untuk chart renggang (≤ 10 batang, board 7 =
+  /// 10 dp). Chart padat (Bulan 30) menyusutkan gap supaya batang tidak jadi
+  /// garis rambut; gap tidak turun di bawah 2 dp agar batang & celah terpisah.
+  static double resolveBarGap(double width, int count, double preferredGap) {
+    if (count <= 10) return preferredGap;
+    final scaled = width / (count * 3.2);
+    return math.max(2.0, math.min(preferredGap, scaled));
+  }
+
   /// Geometri batang untuk lebar tertentu. Dipakai painter DAN test.
   @visibleForTesting
   static List<Rect> barRects(
@@ -46,14 +56,15 @@ class BarChart extends StatelessWidget {
   }) {
     final n = data.length;
     if (n == 0) return const [];
-    final slotWidth = (width - barGap * (n - 1)) / n;
+    final gap = resolveBarGap(width, n, barGap);
+    final slotWidth = (width - gap * (n - 1)) / n;
     var maxValue = 1;
     for (final d in data) {
       maxValue = math.max(maxValue, d.value.abs());
     }
     return List<Rect>.generate(n, (i) {
       final d = data[i];
-      final left = i * (slotWidth + barGap);
+      final left = i * (slotWidth + gap);
       final height =
           d.value > 0 ? math.max(6.0, plotHeight * d.value / maxValue) : 6.0;
       final top = plotHeight - height;
@@ -61,11 +72,11 @@ class BarChart extends StatelessWidget {
     });
   }
 
-  // Label adaptif (keputusan PM): tampilkan semua bila tiap slot ≥ 22dp; bila
-  // lebih sempit, tampilkan setiap ((n + 6) ~/ 7)-th supaya 30 batang (bulan)
-  // tidak menumpuk. Slot yang disembunyikan dirender tanpa `Text`.
+  // Label adaptif (keputusan PM): tampilkan semua bila tiap slot ≥ 12dp (1–2
+  // karakter muat); bila lebih sempit, tampilkan setiap ((n + 6) ~/ 7)-th supaya
+  // 30 batang (bulan) tidak menumpuk. Slot yang disembunyikan dirender tanpa `Text`.
   static List<String> _labels(int n, List<BarDatum> data, double slotWidth) {
-    if (slotWidth >= 22) {
+    if (slotWidth >= 12) {
       return [for (final d in data) d.label];
     }
     final step = (n + 6) ~/ 7;
@@ -84,9 +95,10 @@ class BarChart extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
+        final gap = BarChart.resolveBarGap(width, n, barGap);
         final rects =
             BarChart.barRects(width, data, barGap: barGap, plotHeight: plotHeight);
-        final slotWidth = (width - barGap * (n - 1)) / n;
+        final slotWidth = (width - gap * (n - 1)) / n;
         final labels = _labels(n, data, slotWidth);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -100,17 +112,27 @@ class BarChart extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                for (var i = 0; i < n; i++)
-                  Expanded(
+                for (var i = 0; i < n; i++) ...[
+                  if (i > 0) SizedBox(width: gap),
+                  SizedBox(
+                    width: slotWidth,
                     child: labels[i].isEmpty
                         ? const SizedBox.shrink()
-                        : Text(
-                            labels[i],
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodySmall
-                                ?.copyWith(color: colors.inkMuted),
+                        : OverflowBox(
+                            minWidth: 0,
+                            maxWidth: 64,
+                            fit: OverflowBoxFit.deferToChild,
+                            child: Text(
+                              labels[i],
+                              maxLines: 1,
+                              softWrap: false,
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodySmall
+                                  ?.copyWith(color: colors.inkMuted),
+                            ),
                           ),
                   ),
+                ],
               ],
             ),
           ],

@@ -206,6 +206,12 @@ void main() {
 
     testWidgets('koleksi badge: 6 kartu kotak + gembok untuk yang terkunci, '
         'label "3 dari 6"', (tester) async {
+      // Badge 3 kolom (tile lebih tinggi) mendorong bagian Kosmetik melewati
+      // viewport default 600dp — perlebar supaya seluruh konten ikut terbangun.
+      tester.view.physicalSize = const Size(800 * 3, 1200 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
       final db = AppDatabase.forTesting(NativeDatabase.memory());
       addTearDown(db.close);
 
@@ -237,6 +243,12 @@ void main() {
 
     testWidgets('kosmetik: kartu lebih lebar dengan "Lv {n}", dua berikutnya '
         'masih terkunci', (tester) async {
+      // Badge 3 kolom (tile lebih tinggi) mendorong bagian Kosmetik melewati
+      // viewport default 600dp — perlebar supaya seluruh konten ikut terbangun.
+      tester.view.physicalSize = const Size(800 * 3, 1200 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
       final db = AppDatabase.forTesting(NativeDatabase.memory());
       addTearDown(db.close);
 
@@ -256,7 +268,7 @@ void main() {
     });
 
     testWidgets('geometri board pada layar 390dp: gutter 20, kartu 350, '
-        'kartu kotak 6 kolom dan 4 kolom', (tester) async {
+        'kartu kotak 3 kolom (badge) dan 4 kolom (kosmetik)', (tester) async {
       tester.view.physicalSize = const Size(390 * 3, 844 * 3);
       tester.view.devicePixelRatio = 3;
       addTearDown(tester.view.reset);
@@ -278,18 +290,79 @@ void main() {
       expect(statRow.width, 390 - 40);
       expect(statRow.top - card.bottom, 16); // jarak antar blok
 
-      // 6 kolom badge: (350 - 5*8) / 6 = 51.67. Nama panjang membungkus 2 baris
-      // (bukan memotong grid) supaya jumlah kolom tetap sesuai board.
+      // 3 kolom badge: (350 - 2*8) / 3 = 111.33. Lebar longgar supaya label
+      // Indonesia dua kata ("Sang Master") muat satu baris dan sejajar.
+      final grid = tester.getRect(find.byKey(profileBadgeGridKey));
+      expect(grid.left, 20);
+      expect(grid.width, 350);
+
       final badgeTile = tester.getSize(
         find.byKey(profileBadgeTileKey(StreakRank.perintis)),
       );
-      expect(badgeTile.width, closeTo(51.67, 0.05));
+      expect(badgeTile.width, closeTo(111.33, 0.05));
 
       // 4 kolom kosmetik: (350 - 3*8) / 4 = 81.5.
       final cosmeticTile = tester.getSize(
         find.byKey(profileCosmeticTileKey(10)),
       );
       expect(cosmeticTile.width, closeTo(81.5, 0.05));
+
+      await _disposeScreen(tester);
+    });
+
+    testWidgets('tinggi tile badge seragam per baris (3 kolom, 2 baris)', (
+      tester,
+    ) async {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      await _insertProfile(db);
+      await _unlockBadges(db, StreakRank.values);
+
+      await _pumpScreen(tester, db);
+
+      // Baris pertama: Perintis, Petarung, Penakluk.
+      final rowOne = [
+        tester.getSize(find.byKey(profileBadgeTileKey(StreakRank.perintis))),
+        tester.getSize(find.byKey(profileBadgeTileKey(StreakRank.petarung))),
+        tester.getSize(find.byKey(profileBadgeTileKey(StreakRank.penakluk))),
+      ];
+      expect(rowOne[0].height, rowOne[1].height);
+      expect(rowOne[1].height, rowOne[2].height);
+
+      // Baris kedua: Sang Ahli, Sang Master, Legenda.
+      final rowTwo = [
+        tester.getSize(find.byKey(profileBadgeTileKey(StreakRank.sangAhli))),
+        tester.getSize(find.byKey(profileBadgeTileKey(StreakRank.sangMaster))),
+        tester.getSize(find.byKey(profileBadgeTileKey(StreakRank.legenda))),
+      ];
+      expect(rowTwo[0].height, rowTwo[1].height);
+      expect(rowTwo[1].height, rowTwo[2].height);
+
+      await _disposeScreen(tester);
+    });
+
+    testWidgets('label "Sang Master" utuh, tidak melebihi area label 2 baris', (
+      tester,
+    ) async {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      await _insertProfile(db);
+      await _unlockBadges(db, StreakRank.values);
+
+      await _pumpScreen(tester, db);
+
+      final sangMaster = find.text('Sang Master');
+      expect(sangMaster, findsOneWidget);
+
+      // Area label = 2 baris bodySmall (12/1.4) mengikuti textScaler.
+      final context = tester.element(sangMaster);
+      final scaler = MediaQuery.textScalerOf(context);
+      final labelAreaHeight = scaler.scale(12) * 1.4 * 2;
+
+      final textSize = tester.getSize(sangMaster);
+      expect(textSize.height, lessThanOrEqualTo(labelAreaHeight));
 
       await _disposeScreen(tester);
     });

@@ -911,4 +911,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get daySunday => 'Sunday';
+
+  @override
+  String habitsSummaryHeadline(int done, int total) {
+    return '$done of $total habits today';
+  }
+
+  @override
+  String get habitsSummaryStart => 'Start one habit to keep your rhythm';
+
+  @override
+  String get habitsSummaryAllDone => 'All habits done today';
+
+  @override
+  String get habitsSummaryOnTrack => 'Keep the rhythm, you are on track';
+
+  @override
+  String get aboutPrivacyTitle => 'Privacy policy';
+
+  @override
+  String get aboutPrivacyBody =>
+      'Tazk runs entirely on your phone. There is no account, no server of ours, and no data sent to anyone. The app never asks for camera, microphone, location, or storage permission. Every task, habit, and focus session lives in the device\'s local database. A backup exists only if you turn on backup to your own Google Drive, and that file stays in your Drive, not with us. Uninstalling the app removes all local data.';
+
+  @override
+  String get aboutLicensesTitle => 'Open source licenses';
+
+  @override
+  String get aboutFooter => 'Built with Flutter. Free, no ads, no account.';
+
+  @override
+  String get pomodoroStatusIdle => 'Ready to focus';
+
+  @override
+  String get pomodoroStatusRunning => 'Focus running';
+
+  @override
+  String get pomodoroStatusPaused => 'Paused';
+
+  @override
+  String get pomodoroDurationHint => 'Tap the time to change duration';
+
+  @override
+  String get customDurationTitle => 'Set duration';
+
+  @override
+  String get customDurationFieldLabel => 'Minutes';
+
+  @override
+  String get customDurationHint => '1 to 180 minutes';
+
+  @override
+  String get customDurationInvalid => 'Enter 1 to 180 minutes';
+
+  @override
+  String get presetEditTitle => 'Edit duration chip';
+
+  @override
+  String get presetEditHint => 'Long-press a chip to change its value';
 }

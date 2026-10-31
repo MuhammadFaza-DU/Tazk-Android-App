@@ -81,17 +81,26 @@ Future<void> _insertLog(
 Future<void> _pumpScreen(
   WidgetTester tester,
   AppDatabase db, {
+  Locale locale = const Locale('id'),
+  double textScale = 1.0,
   List<Override> extraOverrides = const [],
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [appDatabaseProvider.overrideWithValue(db), ...extraOverrides],
       child: MaterialApp(
-        locale: const Locale('id'),
+        locale: locale,
         theme: AppTheme.light,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const HabitsScreen(),
+        home: Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(textScale),
+            ),
+            child: const HabitsScreen(),
+          ),
+        ),
       ),
     ),
   );
@@ -331,6 +340,121 @@ void main() {
 
       expect(find.byType(ErrorState), findsOneWidget);
       expect(find.text('Coba lagi'), findsOneWidget);
+
+      await _disposeScreen(tester);
+    });
+  });
+
+  group('HabitsScreen — ringkasan: 100% muat & l10n', () {
+    testWidgets('100% mengecil via FittedBox agar tidak meluber keluar '
+        'lingkaran 54dp', (tester) async {
+      tester.view.physicalSize = const Size(390 * 3, 844 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      for (final name in const [
+        'Bangun pagi',
+        'Baca buku',
+        'Jalan kaki',
+        'Minum air',
+      ]) {
+        final habit = await _insertHabit(db, name: name);
+        await _insertLog(db, habitId: habit.id, date: _today());
+      }
+
+      await _pumpScreen(tester, db);
+
+      expect(find.text('100%'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      // Lebar teks yang benar-benar dirender (setelah skala FittedBox, bila
+      // ada) harus <= 54 - 2*6 = 42dp.
+      final renderedWidth = tester.getRect(find.text('100%')).width;
+      // ignore: avoid_print
+      print('W3: rendered width of "100%" = $renderedWidth');
+      expect(renderedWidth, lessThanOrEqualTo(42));
+
+      // FittedBox di dalam badge mengecilkan teks bila perlu.
+      final fitted = find.descendant(
+        of: find.byKey(habitsSummaryBadgeKey),
+        matching: find.byType(FittedBox),
+      );
+      expect(fitted, findsOneWidget);
+      expect(tester.getSize(fitted).width, lessThanOrEqualTo(42));
+
+      await _disposeScreen(tester);
+    });
+
+    testWidgets('locale EN: 0 selesai menampilkan bahasa Inggris, bukan '
+        'Indonesia', (tester) async {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      await _insertHabit(db, name: 'Read a book');
+
+      await _pumpScreen(tester, db, locale: const Locale('en'));
+
+      expect(find.textContaining('of'), findsOneWidget);
+      expect(find.textContaining('dari'), findsNothing);
+
+      await _disposeScreen(tester);
+    });
+
+    testWidgets('locale ID: 0 selesai menampilkan "dari"', (tester) async {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      await _insertHabit(db, name: 'Baca buku');
+
+      await _pumpScreen(tester, db); // locale default id
+
+      expect(find.textContaining('dari'), findsOneWidget);
+
+      await _disposeScreen(tester);
+    });
+
+    testWidgets('semua selesai: locale EN menampilkan "All habits done today"', (
+      tester,
+    ) async {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      final habit = await _insertHabit(db, name: 'Read a book');
+      await _insertLog(db, habitId: habit.id, date: _today());
+
+      await _pumpScreen(tester, db, locale: const Locale('en'));
+
+      expect(find.text('All habits done today'), findsOneWidget);
+
+      await _disposeScreen(tester);
+    });
+
+    testWidgets('textScale 1.6 di layar 320dp: 100% tetap satu baris tanpa '
+        'overflow', (tester) async {
+      tester.view.physicalSize = const Size(320 * 3, 800 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      for (final name in const ['A', 'B', 'C', 'D']) {
+        final habit = await _insertHabit(db, name: name);
+        await _insertLog(db, habitId: habit.id, date: _today());
+      }
+
+      await _pumpScreen(tester, db, textScale: 1.6);
+
+      expect(find.text('100%'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      final fitted = find.descendant(
+        of: find.byKey(habitsSummaryBadgeKey),
+        matching: find.byType(FittedBox),
+      );
+      expect(tester.getSize(fitted).width, lessThanOrEqualTo(42));
 
       await _disposeScreen(tester);
     });

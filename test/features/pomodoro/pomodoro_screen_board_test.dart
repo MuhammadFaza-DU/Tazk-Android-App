@@ -369,4 +369,200 @@ void main() {
       await disposeScreen(tester);
     });
   });
+
+  group('PomodoroScreen — durasi bebas & chip dapat diubah', () {
+    Future<void> openSheet(WidgetTester tester) async {
+      await tester.tap(find.byKey(const Key('pomodoro_timer_text')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+
+    Future<void> pumpSheetClose(WidgetTester tester) async {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+
+    Future<void> expectTime(WidgetTester tester, String label) async {
+      final handle = tester.ensureSemantics();
+      expect(find.bySemanticsLabel(label), findsOneWidget);
+      handle.dispose();
+    }
+
+    testWidgets('ketuk angka waktu membuka sheet "Atur durasi" saat idle', (
+      tester,
+    ) async {
+      await pumpScreen(tester);
+
+      await openSheet(tester);
+
+      expect(find.text('Atur durasi'), findsOneWidget);
+
+      await disposeScreen(tester);
+    });
+
+    testWidgets('ubah durasi lewat sheet ke 90 menit', (tester) async {
+      await pumpScreen(tester);
+
+      await openSheet(tester);
+      await tester.enterText(
+        find.byKey(const Key('pomodoro_duration_field')),
+        '90',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('pomodoro_duration_save')));
+      await pumpSheetClose(tester);
+
+      expect(controller.durationMinutes, 90);
+      await expectTime(tester, '90:00');
+
+      await disposeScreen(tester);
+    });
+
+    testWidgets('input 0/181: galat + simpan nonaktif; batal tak mengubah', (
+      tester,
+    ) async {
+      await pumpScreen(tester);
+
+      await openSheet(tester);
+      await tester.enterText(
+        find.byKey(const Key('pomodoro_duration_field')),
+        '0',
+      );
+      await tester.pump();
+      expect(find.text('Masukkan 1 sampai 180 menit'), findsOneWidget);
+      final save = find.byKey(const Key('pomodoro_duration_save'));
+      expect(tester.widget<AppButton>(save).onPressed, isNull);
+
+      await tester.enterText(
+        find.byKey(const Key('pomodoro_duration_field')),
+        '181',
+      );
+      await tester.pump();
+      expect(find.text('Masukkan 1 sampai 180 menit'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('pomodoro_duration_cancel')));
+      await pumpSheetClose(tester);
+
+      expect(controller.durationMinutes, 25);
+      await expectTime(tester, '25:00');
+
+      await disposeScreen(tester);
+    });
+
+    testWidgets('batal: durasi tetap 25', (tester) async {
+      await pumpScreen(tester);
+
+      await openSheet(tester);
+      await tester.enterText(
+        find.byKey(const Key('pomodoro_duration_field')),
+        '90',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('pomodoro_duration_cancel')));
+      await pumpSheetClose(tester);
+
+      expect(controller.durationMinutes, 25);
+      await expectTime(tester, '25:00');
+
+      await disposeScreen(tester);
+    });
+
+    testWidgets('saat berjalan angka tidak bisa diketuk', (tester) async {
+      await controller.start(
+        completionTitle: 'Selesai',
+        completionBody: 'Done',
+      );
+      await pumpScreen(tester);
+
+      await tester.tap(find.byKey(const Key('pomodoro_timer_text')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('Atur durasi'), findsNothing);
+
+      await disposeScreen(tester);
+    });
+
+    testWidgets('tekan lama chip 15 membuka "Ubah chip durasi" & menyimpan 40', (
+      tester,
+    ) async {
+      await pumpScreen(tester);
+
+      await tester.longPress(
+        find.byKey(const Key('pomodoro_duration_chip_15')),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Ubah chip durasi'), findsOneWidget);
+
+      await tester.enterText(
+        find.byKey(const Key('pomodoro_duration_field')),
+        '40',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('pomodoro_duration_save')));
+      await pumpSheetClose(tester);
+
+      expect(find.byKey(const Key('pomodoro_duration_chip_40')), findsOneWidget);
+      expect(find.text('40'), findsOneWidget);
+
+      await disposeScreen(tester);
+    });
+
+    testWidgets('chip yang diubah nilainya berfungsi memilih durasi', (
+      tester,
+    ) async {
+      await pumpScreen(tester);
+
+      await tester.longPress(
+        find.byKey(const Key('pomodoro_duration_chip_15')),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.enterText(
+        find.byKey(const Key('pomodoro_duration_field')),
+        '40',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('pomodoro_duration_save')));
+      await pumpSheetClose(tester);
+
+      await tester.tap(find.byKey(const Key('pomodoro_duration_chip_40')));
+      await tester.pump();
+
+      expect(controller.durationMinutes, 40);
+      await expectTime(tester, '40:00');
+
+      await disposeScreen(tester);
+    });
+
+    testWidgets('caption status: idle / running / paused', (tester) async {
+      await pumpScreen(tester);
+      expect(find.text('Siap fokus'), findsOneWidget);
+
+      await controller.start(
+        completionTitle: 'Selesai',
+        completionBody: 'Done',
+      );
+      await tester.pump();
+      expect(find.text('Fokus berjalan'), findsOneWidget);
+
+      await controller.pause();
+      await tester.pump();
+      expect(find.text('Dijeda'), findsOneWidget);
+
+      await disposeScreen(tester);
+    });
+
+    testWidgets('idle: tidak ada ticker (hasScheduledFrame false)', (
+      tester,
+    ) async {
+      await pumpScreen(tester);
+
+      await tester.pumpAndSettle();
+      expect(tester.binding.hasScheduledFrame, isFalse);
+
+      await disposeScreen(tester);
+    });
+  });
 }

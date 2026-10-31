@@ -29,6 +29,8 @@ Future<void> _pumpScreen(
   String buildNumber = '1',
   double width = 390,
   double height = 844,
+  String locale = 'id',
+  double textScale = 1,
 }) async {
   PackageInfo.setMockInitialValues(
     appName: 'Tazk',
@@ -45,10 +47,16 @@ Future<void> _pumpScreen(
 
   await tester.pumpWidget(
     MaterialApp(
-      locale: const Locale('id'),
+      locale: Locale(locale),
       theme: AppTheme.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(
+          context,
+        ).copyWith(textScaler: TextScaler.linear(textScale)),
+        child: child!,
+      ),
       home: Builder(
         builder: (ctx) => Scaffold(
           body: Center(
@@ -183,6 +191,216 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(tester.getSize(find.byKey(aboutMascotKey)), const Size(84, 84));
       expect(find.byKey(aboutDescriptionKey), findsOneWidget);
+    });
+  });
+
+  // Board 23 juga memuat 4 baris aksi + footer. Yang dibangun hanya 2 baris
+  // (privasi + lisensi) karena keduanya punya tujuan nyata; "Beri rating" dan
+  // "Kirim masukan" dilewati (tidak ada toko aplikasi / alamat email).
+  group('AboutScreen — versi rilis v2', () {
+    testWidgets('baris versi menampilkan 2.0.0, bukan 1.1.5', (tester) async {
+      await _pumpScreen(tester, version: '2.0.0', buildNumber: '5');
+
+      expect(find.text('Versi 2.0.0'), findsOneWidget);
+      expect(find.textContaining('1.1.5'), findsNothing);
+
+      final version = tester.widget<Text>(find.byKey(aboutVersionKey));
+      expect(version.data, 'Versi 2.0.0');
+    });
+  });
+
+  group('AboutScreen — baris aksi board 23', () {
+    testWidgets('baris kebijakan privasi membuka dialog berisi teks nyata', (
+      tester,
+    ) async {
+      await _pumpScreen(tester);
+
+      expect(find.byKey(aboutPrivacyRowKey), findsOneWidget);
+
+      await tester.tap(find.byKey(aboutPrivacyRowKey));
+      await tester.pumpAndSettle();
+
+      final dialog = find.byType(AlertDialog);
+      expect(dialog, findsOneWidget);
+      // Judul dialog sama dengan label baris, jadi dicari di dalam dialog.
+      expect(
+        find.descendant(
+          of: dialog,
+          matching: find.text('Kebijakan privasi'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Tidak ada akun'), findsOneWidget);
+      expect(find.text('OK'), findsOneWidget);
+
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+
+    testWidgets('baris lisensi membuka LicensePage bawaan Flutter', (
+      tester,
+    ) async {
+      await _pumpScreen(tester);
+
+      expect(find.byKey(aboutLicensesRowKey), findsOneWidget);
+
+      await tester.tap(find.byKey(aboutLicensesRowKey));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LicensePage), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('footer board tampil di bawah baris aksi', (tester) async {
+      await _pumpScreen(tester);
+
+      expect(find.byKey(aboutFooterKey), findsOneWidget);
+      expect(find.textContaining('Dibuat dengan Flutter'), findsOneWidget);
+
+      final footer = tester.widget<Text>(find.byKey(aboutFooterKey));
+      expect(footer.textAlign, TextAlign.center);
+      expect(footer.style?.color, AppColors.light.inkMuted);
+      expect(footer.style?.fontSize, 12); // caption
+
+      // Jarak baris terakhir → footer = 24 dp.
+      final lastRow = tester.getRect(find.byKey(aboutLicensesRowKey));
+      expect(
+        tester.getRect(find.byKey(aboutFooterKey)).top - lastRow.bottom,
+        closeTo(24, 0.6),
+      );
+    });
+
+    testWidgets('tidak ada baris tanpa tujuan (Beri rating / Kirim masukan)', (
+      tester,
+    ) async {
+      await _pumpScreen(tester);
+
+      // Aturan R-26: tombol tanpa aksi nyata dilarang, jadi keduanya absen
+      // (deviasi dari board, dicatat di laporan).
+      expect(find.text('Beri rating'), findsNothing);
+      expect(find.text('Kirim masukan'), findsNothing);
+    });
+
+    testWidgets('geometri 390dp: tinggi 56, lebar 358, jarak 12', (
+      tester,
+    ) async {
+      await _pumpScreen(tester);
+
+      final privacy = tester.getRect(find.byKey(aboutPrivacyRowKey));
+      final licenses = tester.getRect(find.byKey(aboutLicensesRowKey));
+
+      expect(privacy.height, closeTo(56, 0.6));
+      expect(privacy.width, 390 - 2 * 16); // gutter 16
+      expect(licenses.height, closeTo(56, 0.6));
+      expect(licenses.width, 390 - 2 * 16);
+      expect(licenses.top - privacy.bottom, closeTo(12, 0.6));
+
+      // Kartu sendiri (bukan satu grup): isian `surface`, border 1px, radius 14.
+      final box = tester.widget<Container>(find.byKey(aboutPrivacyRowKey));
+      final decoration = box.decoration! as BoxDecoration;
+      expect(decoration.color, AppColors.light.surface);
+      expect(decoration.borderRadius, BorderRadius.circular(14));
+      expect((decoration.border! as Border).top.color, AppColors.light.border);
+      expect((decoration.border! as Border).top.width, 1);
+
+      // Isi baris: ikon 22 di kiri, chevron 20 di kanan.
+      final icon = find.descendant(
+        of: find.byKey(aboutPrivacyRowKey),
+        matching: find.byIcon(Icons.shield_outlined),
+      );
+      final chevron = find.descendant(
+        of: find.byKey(aboutPrivacyRowKey),
+        matching: find.byIcon(Icons.chevron_right_rounded),
+      );
+      expect(tester.getSize(icon), const Size(22, 22));
+      expect(tester.getSize(chevron), const Size(20, 20));
+      expect(tester.widget<Icon>(icon).color, AppColors.light.ink);
+      expect(tester.widget<Icon>(chevron).color, AppColors.light.inkMuted);
+
+      expect(
+        find.descendant(
+          of: find.byKey(aboutLicensesRowKey),
+          matching: find.byIcon(Icons.description_outlined),
+        ),
+        findsOneWidget,
+      );
+
+      // Baris aksi duduk 24 dp di bawah deskripsi.
+      final description = tester.getRect(find.byKey(aboutDescriptionKey));
+      expect(privacy.top - description.bottom, closeTo(24, 0.6));
+    });
+
+    testWidgets('tap target baris minimal 48dp', (tester) async {
+      await _pumpScreen(tester);
+
+      expect(
+        tester.getSize(find.byKey(aboutPrivacyRowKey)).height,
+        greaterThanOrEqualTo(48),
+      );
+      expect(
+        tester.getSize(find.byKey(aboutLicensesRowKey)).height,
+        greaterThanOrEqualTo(48),
+      );
+    });
+
+    testWidgets('baris memakai InkWell bertema, bukan GestureDetector polos', (
+      tester,
+    ) async {
+      await _pumpScreen(tester);
+
+      final inkWell = find.descendant(
+        of: find.byKey(aboutPrivacyRowKey),
+        matching: find.byType(InkWell),
+      );
+      expect(inkWell, findsOneWidget);
+      expect(tester.widget<InkWell>(inkWell).onTap, isNotNull);
+      // Umpan tekan = Material + InkWell (ripple), bukan GestureDetector
+      // tanpa affordance.
+      expect(
+        find.descendant(
+          of: find.byKey(aboutPrivacyRowKey),
+          matching: find.byType(Material),
+        ),
+        findsWidgets,
+      );
+    });
+  });
+
+  group('AboutScreen — locale Inggris', () {
+    testWidgets('label baris dan footer mengikuti locale en', (tester) async {
+      await _pumpScreen(tester, locale: 'en');
+
+      expect(find.text('Privacy policy'), findsOneWidget);
+      expect(find.text('Open source licenses'), findsOneWidget);
+      expect(find.textContaining('Built with Flutter'), findsOneWidget);
+      expect(find.text('About Tazk'), findsOneWidget);
+    });
+  });
+
+  group('AboutScreen — text scale', () {
+    testWidgets('textScale 1.6 di 320dp tidak overflow', (tester) async {
+      await _pumpScreen(tester, width: 320, textScale: 1.6);
+
+      expect(tester.takeException(), isNull);
+      expect(find.byKey(aboutPrivacyRowKey), findsOneWidget);
+      expect(find.byKey(aboutLicensesRowKey), findsOneWidget);
+
+      // Baris tumbuh mengikuti teks (bukan tinggi kaku), jadi tidak ada
+      // overflow; footer hanya perlu digulir karena konten jadi lebih tinggi.
+      expect(
+        tester.getSize(find.byKey(aboutPrivacyRowKey)).height,
+        greaterThanOrEqualTo(48),
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(aboutFooterKey),
+        120,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.byKey(aboutFooterKey), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 }

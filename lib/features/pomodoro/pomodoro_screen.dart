@@ -11,6 +11,7 @@ import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_dialog.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/app_sheet.dart';
+import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/list_row.dart';
 import '../../data/database/database.dart';
 import '../../l10n/app_localizations.dart';
@@ -71,8 +72,11 @@ class _Board {
   /// Radius kartu/chip/tombol = `rounded.md`.
   static const double radiusMd = 14;
 
-  /// Durasi preset di board: 15 / 25 / 45 / 60 menit.
-  static const List<int> presets = [15, 25, 45, 60];
+  /// Durasi preset awal di board: 15 / 25 / 45 / 60 menit.
+  ///
+  /// Nilai ini hanyalah titik awal; salinan yang bisa diubah disimpan sebagai
+  /// state layar (`_PomodoroScreenState._presets`).
+  static const List<int> defaultPresets = [15, 25, 45, 60];
 }
 
 class PomodoroScreen extends ConsumerStatefulWidget {
@@ -83,10 +87,9 @@ class PomodoroScreen extends ConsumerStatefulWidget {
 }
 
 class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
-  final _durationController = TextEditingController(text: '25');
   late final PomodoroController _controller;
   int _handledCompletionSerial = 0;
-  bool _isDurationInputValid = true;
+  List<int> _presets = [..._Board.defaultPresets];
 
   @override
   void initState() {
@@ -123,7 +126,6 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
   @override
   void dispose() {
     _controller.removeListener(_handlePomodoroCompletion);
-    _durationController.dispose();
     super.dispose();
   }
 
@@ -155,18 +157,8 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
     );
   }
 
-  void _syncDurationField(int minutes) {
-    if (!_isDurationInputValid) return;
-    final text = minutes.toString();
-    if (_durationController.text == text) return;
-    _durationController.value = TextEditingValue(
-      text: text,
-      selection: TextSelection.collapsed(offset: text.length),
-    );
-  }
-
   String _formatDuration(Duration duration) {
-    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final minutes = duration.inMinutes.toString().padLeft(2, '0');
     final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
@@ -226,7 +218,6 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
     );
 
     if (picked == null || !mounted) return;
-    setState(() => _isDurationInputValid = true);
     ref.read(pomodoroControllerProvider).selectHabit(picked);
   }
 
@@ -235,6 +226,49 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
     return habit != null
         ? l10n.sessionCompleteHabitMessage(habit.name)
         : l10n.sessionCompleteFreeMessage;
+  }
+
+  /// Buka sheet "ketuk angka → ubah durasi" untuk mode bebas.
+  Future<void> _openDurationEditor() async {
+    final l10n = AppLocalizations.of(context)!;
+    final minutes = await _showDurationEditor(
+      title: l10n.customDurationTitle,
+      helperText: l10n.customDurationHint,
+      initialValue: ref.read(pomodoroControllerProvider).durationMinutes,
+    );
+    if (minutes == null || !mounted) return;
+    ref.read(pomodoroControllerProvider).setDurationMinutes(minutes);
+  }
+
+  /// Buka sheet "tekan lama chip → ubah nilai chip" dan terapkan hasilnya.
+  Future<void> _editPreset(int index) async {
+    final l10n = AppLocalizations.of(context)!;
+    final minutes = await _showDurationEditor(
+      title: l10n.presetEditTitle,
+      helperText: l10n.presetEditHint,
+      initialValue: _presets[index],
+    );
+    if (minutes == null || !mounted) return;
+    setState(() {
+      _presets = List<int>.of(_presets)..[index] = minutes;
+    });
+  }
+
+  /// Sheet editor angka (1..180) yang mengembalikan nilai terkonfirmasi, atau
+  /// `null` bila dibatalkan.
+  Future<int?> _showDurationEditor({
+    required String title,
+    required String helperText,
+    required int initialValue,
+  }) {
+    return showAppSheet<int>(
+      context,
+      child: _DurationEditorSheet(
+        title: title,
+        helperText: helperText,
+        initialValue: initialValue,
+      ),
+    );
   }
 
   @override
@@ -260,8 +294,6 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
       isCompletedToday: (habitId) => completionByHabitId[habitId] ?? false,
     );
 
-    _syncDurationField(controller.durationMinutes);
-
     final isEditable = controller.isEditable;
     final selectedHabit = controller.selectedHabit;
 
@@ -281,7 +313,6 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
               isHabitMode: controller.isHabitMode,
               onChanged: isEditable
                   ? (value) {
-                      setState(() => _isDurationInputValid = true);
                       ref
                           .read(pomodoroControllerProvider)
                           .setHabitMode(value);
@@ -310,17 +341,22 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
               ),
             ],
             const SizedBox(height: _Board.sectionGap),
-            _FocusTimer(controller: controller, format: _formatDuration),
+            _FocusTimer(
+              controller: controller,
+              format: _formatDuration,
+              onTap: isEditable ? _openDurationEditor : null,
+            ),
             const SizedBox(height: _Board.sectionGap),
             _DurationPresets(
+              presets: _presets,
               selectedMinutes: controller.durationMinutes,
               enabled: isEditable,
               onSelected: (minutes) {
-                setState(() => _isDurationInputValid = true);
                 ref
                     .read(pomodoroControllerProvider)
                     .setDurationMinutes(minutes);
               },
+              onEdit: _editPreset,
             ),
             const SizedBox(height: _Board.sectionGap),
             _buildActions(controller, l10n),
@@ -336,7 +372,7 @@ class _PomodoroScreenState extends ConsumerState<PomodoroScreen> {
         key: const Key('pomodoro_start_button'),
         label: l10n.startButton,
         icon: Icons.play_arrow_rounded,
-        onPressed: controller.canStart && _isDurationInputValid
+        onPressed: controller.canStart
             ? () => ref.read(pomodoroControllerProvider).start(
                   completionTitle: l10n.sessionCompleteTitle,
                   completionBody: _completionBody(l10n, controller),
@@ -605,16 +641,30 @@ class _HabitCard extends StatelessWidget {
 /// `controller.remainingNotifier` supaya tick per detik hanya membangun ulang
 /// sub-tree ini, bukan seluruh layar.
 class _FocusTimer extends StatelessWidget {
-  const _FocusTimer({required this.controller, required this.format});
+  const _FocusTimer({
+    required this.controller,
+    required this.format,
+    required this.onTap,
+  });
 
   final PomodoroController controller;
   final String Function(Duration) format;
+
+  /// `null` saat sesi berjalan/jeda → angka tidak bisa diketuk.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isIdle = controller.status == PomodoroSessionStatus.idle;
+
+    final statusCaption = switch (controller.status) {
+      PomodoroSessionStatus.idle => l10n.pomodoroStatusIdle,
+      PomodoroSessionStatus.running => l10n.pomodoroStatusRunning,
+      PomodoroSessionStatus.paused => l10n.pomodoroStatusPaused,
+    };
 
     final timerStyle = theme.textTheme.displayLarge?.copyWith(
       fontFamily: AppTypography.titleFont,
@@ -656,6 +706,31 @@ class _FocusTimer extends StatelessWidget {
                         ? 0.0
                         : (shown.inMilliseconds / total).clamp(0.0, 1.0);
 
+                    Widget digits = _TabularTimeText(
+                      key: const Key('pomodoro_timer_text'),
+                      text: format(shown),
+                      style: timerStyle!,
+                    );
+
+                    digits = Semantics(
+                      container: true,
+                      button: onTap != null,
+                      enabled: onTap != null,
+                      label: l10n.pomodoroDurationHint,
+                      child: digits,
+                    );
+
+                    if (onTap != null) {
+                      digits = Tooltip(
+                        message: l10n.pomodoroDurationHint,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: onTap,
+                          child: digits,
+                        ),
+                      );
+                    }
+
                     return Stack(
                       alignment: Alignment.center,
                       children: [
@@ -671,13 +746,30 @@ class _FocusTimer extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: _TabularTimeText(
-                              key: const Key('pomodoro_timer_text'),
-                              text: format(shown),
-                              style: timerStyle!,
-                            ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              FittedBox(fit: BoxFit.scaleDown, child: digits),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    statusCaption,
+                                    style: theme.textTheme.bodySmall
+                                        ?.copyWith(color: colors.inkMuted),
+                                  ),
+                                  if (isIdle) ...[
+                                    const SizedBox(width: 3),
+                                    Icon(
+                                      Icons.edit_outlined,
+                                      size: 14,
+                                      color: colors.inkMuted,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -804,14 +896,20 @@ class PomodoroRingPainter extends CustomPainter {
 /// `primary`/`onPrimary`, sisanya `surface` + border `border`.
 class _DurationPresets extends StatelessWidget {
   const _DurationPresets({
+    required this.presets,
     required this.selectedMinutes,
     required this.enabled,
     required this.onSelected,
+    required this.onEdit,
   });
 
+  final List<int> presets;
   final int selectedMinutes;
   final bool enabled;
   final ValueChanged<int> onSelected;
+
+  /// Dipanggil dengan indeks chip saat ditekan lama (untuk mengubah nilainya).
+  final ValueChanged<int> onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -823,11 +921,12 @@ class _DurationPresets extends StatelessWidget {
         spacing: _Board.chipGap,
         runSpacing: _Board.chipGap,
         children: [
-          for (final minutes in _Board.presets)
+          for (var i = 0; i < presets.length; i++)
             _DurationChip(
-              minutes: minutes,
-              selected: minutes == selectedMinutes,
-              onTap: enabled ? () => onSelected(minutes) : null,
+              minutes: presets[i],
+              selected: presets[i] == selectedMinutes,
+              onTap: enabled ? () => onSelected(presets[i]) : null,
+              onLongPress: enabled ? () => onEdit(i) : null,
             ),
         ],
       ),
@@ -840,16 +939,19 @@ class _DurationChip extends StatelessWidget {
     required this.minutes,
     required this.selected,
     required this.onTap,
+    this.onLongPress,
   });
 
   final int minutes;
   final bool selected;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final foreground = selected ? colors.onPrimary : colors.ink;
 
     return SizedBox(
@@ -867,15 +969,19 @@ class _DurationChip extends StatelessWidget {
             side: selected ? BorderSide.none : BorderSide(color: colors.border),
           ),
           clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            key: Key('pomodoro_duration_chip_$minutes'),
-            onTap: onTap,
-            child: Center(
-              child: Text(
-                '$minutes',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontSize: _Board.chipNumberFontSize,
-                  color: foreground,
+          child: Tooltip(
+            message: l10n.presetEditHint,
+            child: InkWell(
+              key: Key('pomodoro_duration_chip_$minutes'),
+              onTap: onTap,
+              onLongPress: onLongPress,
+              child: Center(
+                child: Text(
+                  '$minutes',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontSize: _Board.chipNumberFontSize,
+                    color: foreground,
+                  ),
                 ),
               ),
             ),
@@ -915,6 +1021,120 @@ class _StopButton extends StatelessWidget {
             child: Icon(Icons.stop_rounded, size: 20, color: colors.inkMuted),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Sheet editor angka durasi (1..180 menit) untuk "atur durasi bebas" dan
+/// "ubah nilai chip". Menampilkan judul + `AppTextField` numerik + pesan
+/// galat/helper, lalu mengembalikan nilai lewat `Navigator.pop` saat Simpan.
+///
+/// Tombol Simpan nonaktif selama input di luar rentang valid.
+class _DurationEditorSheet extends StatefulWidget {
+  const _DurationEditorSheet({
+    required this.title,
+    required this.helperText,
+    required this.initialValue,
+  });
+
+  final String title;
+  final String helperText;
+  final int initialValue;
+
+  @override
+  State<_DurationEditorSheet> createState() => _DurationEditorSheetState();
+}
+
+class _DurationEditorSheetState extends State<_DurationEditorSheet> {
+  late final TextEditingController _field =
+      TextEditingController(text: '${widget.initialValue}');
+
+  bool get _valid {
+    final value = int.tryParse(_field.text);
+    return value != null && value >= 1 && value <= 180;
+  }
+
+  bool get _showError => _field.text.isNotEmpty && !_valid;
+
+  @override
+  void dispose() {
+    _field.dispose();
+    super.dispose();
+  }
+
+  /// `AppTextField` tidak mendukung `inputFormatters`, jadi digit-only
+  /// diterapkan manual di sini.
+  void _onChanged(String raw) {
+    final digits = raw.replaceAll(RegExp('[^0-9]'), '');
+    if (digits != raw) {
+      _field.value = TextEditingValue(
+        text: digits,
+        selection: TextSelection.collapsed(offset: digits.length),
+      );
+    }
+    setState(() {});
+  }
+
+  void _submit() {
+    if (!_valid) return;
+    Navigator.of(context).pop(int.parse(_field.text));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = context.colors;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.title,
+            style: theme.textTheme.headlineSmall?.copyWith(color: colors.ink),
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            key: const Key('pomodoro_duration_field'),
+            controller: _field,
+            keyboardType: TextInputType.number,
+            labelText: l10n.customDurationFieldLabel,
+            autofocus: true,
+            onChanged: _onChanged,
+            onFieldSubmitted: (_) => _submit(),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _showError ? l10n.customDurationInvalid : widget.helperText,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: _showError ? colors.danger : colors.inkMuted,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.ghost(
+                  key: const Key('pomodoro_duration_cancel'),
+                  label: l10n.cancelButton,
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AppButton.primary(
+                  key: const Key('pomodoro_duration_save'),
+                  label: l10n.saveButton,
+                  onPressed: _valid ? _submit : null,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

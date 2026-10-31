@@ -20,6 +20,9 @@ class AppButton extends StatefulWidget {
     this.icon,
     this.onPressed,
     this.expanded = false,
+    this.height,
+    this.padding,
+    this.labelStyle,
   }) : _variant = _AppButtonVariant.primary;
 
   const AppButton.secondary({
@@ -28,6 +31,9 @@ class AppButton extends StatefulWidget {
     this.icon,
     this.onPressed,
     this.expanded = false,
+    this.height,
+    this.padding,
+    this.labelStyle,
   }) : _variant = _AppButtonVariant.secondary;
 
   const AppButton.ghost({
@@ -36,6 +42,9 @@ class AppButton extends StatefulWidget {
     this.icon,
     this.onPressed,
     this.expanded = false,
+    this.height,
+    this.padding,
+    this.labelStyle,
   }) : _variant = _AppButtonVariant.ghost;
 
   const AppButton.danger({
@@ -44,12 +53,18 @@ class AppButton extends StatefulWidget {
     this.icon,
     this.onPressed,
     this.expanded = false,
+    this.height,
+    this.padding,
+    this.labelStyle,
   }) : _variant = _AppButtonVariant.danger;
 
   final String label;
   final IconData? icon;
   final VoidCallback? onPressed;
   final bool expanded;
+  final double? height;
+  final EdgeInsetsGeometry? padding;
+  final TextStyle? labelStyle;
   final _AppButtonVariant _variant;
 
   @override
@@ -80,7 +95,8 @@ class _AppButtonState extends State<AppButton> {
     const radius = BorderRadius.all(Radius.circular(14)); // rounded.md
 
     final content = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: widget.padding ??
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Center(
         widthFactor: 1,
         heightFactor: 1,
@@ -94,7 +110,8 @@ class _AppButtonState extends State<AppButton> {
             ],
             Text(
               widget.label,
-              style: theme.textTheme.labelLarge?.copyWith(color: foreground),
+              style: (widget.labelStyle ?? theme.textTheme.labelLarge)
+                  ?.copyWith(color: foreground),
             ),
           ],
         ),
@@ -118,7 +135,7 @@ class _AppButtonState extends State<AppButton> {
         onTapCancel: enabled ? () => _setPressed(false) : null,
         borderRadius: radius,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 48), // tap target
+          constraints: BoxConstraints(minHeight: widget.height ?? 48), // tap target
           child: content,
         ),
       ),

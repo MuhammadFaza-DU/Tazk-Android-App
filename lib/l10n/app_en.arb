@@ -304,5 +304,26 @@
   "dayThursday": "Thursday",
   "dayFriday": "Friday",
   "daySaturday": "Saturday",
-  "daySunday": "Sunday"
+  "daySunday": "Sunday",
+
+  "habitsSummaryHeadline": "{done} of {total} habits today",
+  "habitsSummaryStart": "Start one habit to keep your rhythm",
+  "habitsSummaryAllDone": "All habits done today",
+  "habitsSummaryOnTrack": "Keep the rhythm, you are on track",
+
+  "aboutPrivacyTitle": "Privacy policy",
+  "aboutPrivacyBody": "Tazk runs entirely on your phone. There is no account, no server of ours, and no data sent to anyone. The app never asks for camera, microphone, location, or storage permission. Every task, habit, and focus session lives in the device's local database. A backup exists only if you turn on backup to your own Google Drive, and that file stays in your Drive, not with us. Uninstalling the app removes all local data.",
+  "aboutLicensesTitle": "Open source licenses",
+  "aboutFooter": "Built with Flutter. Free, no ads, no account.",
+
+  "pomodoroStatusIdle": "Ready to focus",
+  "pomodoroStatusRunning": "Focus running",
+  "pomodoroStatusPaused": "Paused",
+  "pomodoroDurationHint": "Tap the time to change duration",
+  "customDurationTitle": "Set duration",
+  "customDurationFieldLabel": "Minutes",
+  "customDurationHint": "1 to 180 minutes",
+  "customDurationInvalid": "Enter 1 to 180 minutes",
+  "presetEditTitle": "Edit duration chip",
+  "presetEditHint": "Long-press a chip to change its value"
 }

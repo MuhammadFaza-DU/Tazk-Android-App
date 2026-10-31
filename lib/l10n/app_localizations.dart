@@ -1705,6 +1705,114 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Minggu'**
   String get daySunday;
+
+  /// No description provided for @habitsSummaryHeadline.
+  ///
+  /// In id, this message translates to:
+  /// **'{done} dari {total} habit hari ini'**
+  String habitsSummaryHeadline(int done, int total);
+
+  /// No description provided for @habitsSummaryStart.
+  ///
+  /// In id, this message translates to:
+  /// **'Mulai satu habit untuk menjaga ritme'**
+  String get habitsSummaryStart;
+
+  /// No description provided for @habitsSummaryAllDone.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua habit hari ini selesai'**
+  String get habitsSummaryAllDone;
+
+  /// No description provided for @habitsSummaryOnTrack.
+  ///
+  /// In id, this message translates to:
+  /// **'Jaga ritme, kamu sedang on-track'**
+  String get habitsSummaryOnTrack;
+
+  /// No description provided for @aboutPrivacyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kebijakan privasi'**
+  String get aboutPrivacyTitle;
+
+  /// No description provided for @aboutPrivacyBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Tazk bekerja sepenuhnya di HP-mu. Tidak ada akun, tidak ada server kami, dan tidak ada data yang dikirim ke siapa pun. Aplikasi tidak meminta izin kamera, mikrofon, lokasi, atau penyimpanan. Semua catatan tugas, habit, dan sesi fokus tersimpan di database lokal perangkatmu. Cadangan hanya dibuat bila kamu sendiri mengaktifkan backup ke Google Drive milikmu, dan file itu tetap di Drive-mu, bukan di tempat kami. Menghapus aplikasi menghapus seluruh data lokal.'**
+  String get aboutPrivacyBody;
+
+  /// No description provided for @aboutLicensesTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Lisensi open source'**
+  String get aboutLicensesTitle;
+
+  /// No description provided for @aboutFooter.
+  ///
+  /// In id, this message translates to:
+  /// **'Dibuat dengan Flutter. Gratis, tanpa iklan, tanpa akun.'**
+  String get aboutFooter;
+
+  /// No description provided for @pomodoroStatusIdle.
+  ///
+  /// In id, this message translates to:
+  /// **'Siap fokus'**
+  String get pomodoroStatusIdle;
+
+  /// No description provided for @pomodoroStatusRunning.
+  ///
+  /// In id, this message translates to:
+  /// **'Fokus berjalan'**
+  String get pomodoroStatusRunning;
+
+  /// No description provided for @pomodoroStatusPaused.
+  ///
+  /// In id, this message translates to:
+  /// **'Dijeda'**
+  String get pomodoroStatusPaused;
+
+  /// No description provided for @pomodoroDurationHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Ketuk angka waktu untuk mengubah durasi'**
+  String get pomodoroDurationHint;
+
+  /// No description provided for @customDurationTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur durasi'**
+  String get customDurationTitle;
+
+  /// No description provided for @customDurationFieldLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Menit'**
+  String get customDurationFieldLabel;
+
+  /// No description provided for @customDurationHint.
+  ///
+  /// In id, this message translates to:
+  /// **'1 sampai 180 menit'**
+  String get customDurationHint;
+
+  /// No description provided for @customDurationInvalid.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan 1 sampai 180 menit'**
+  String get customDurationInvalid;
+
+  /// No description provided for @presetEditTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah chip durasi'**
+  String get presetEditTitle;
+
+  /// No description provided for @presetEditHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Tekan lama chip untuk mengubah nilainya'**
+  String get presetEditHint;
 }
 
 class _AppLocalizationsDelegate

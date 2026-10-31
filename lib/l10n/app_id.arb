@@ -430,5 +430,32 @@
   "dayThursday": "Kamis",
   "dayFriday": "Jumat",
   "daySaturday": "Sabtu",
-  "daySunday": "Minggu"
+  "daySunday": "Minggu",
+
+  "habitsSummaryHeadline": "{done} dari {total} habit hari ini",
+  "@habitsSummaryHeadline": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "habitsSummaryStart": "Mulai satu habit untuk menjaga ritme",
+  "habitsSummaryAllDone": "Semua habit hari ini selesai",
+  "habitsSummaryOnTrack": "Jaga ritme, kamu sedang on-track",
+
+  "aboutPrivacyTitle": "Kebijakan privasi",
+  "aboutPrivacyBody": "Tazk bekerja sepenuhnya di HP-mu. Tidak ada akun, tidak ada server kami, dan tidak ada data yang dikirim ke siapa pun. Aplikasi tidak meminta izin kamera, mikrofon, lokasi, atau penyimpanan. Semua catatan tugas, habit, dan sesi fokus tersimpan di database lokal perangkatmu. Cadangan hanya dibuat bila kamu sendiri mengaktifkan backup ke Google Drive milikmu, dan file itu tetap di Drive-mu, bukan di tempat kami. Menghapus aplikasi menghapus seluruh data lokal.",
+  "aboutLicensesTitle": "Lisensi open source",
+  "aboutFooter": "Dibuat dengan Flutter. Gratis, tanpa iklan, tanpa akun.",
+
+  "pomodoroStatusIdle": "Siap fokus",
+  "pomodoroStatusRunning": "Fokus berjalan",
+  "pomodoroStatusPaused": "Dijeda",
+  "pomodoroDurationHint": "Ketuk angka waktu untuk mengubah durasi",
+  "customDurationTitle": "Atur durasi",
+  "customDurationFieldLabel": "Menit",
+  "customDurationHint": "1 sampai 180 menit",
+  "customDurationInvalid": "Masukkan 1 sampai 180 menit",
+  "presetEditTitle": "Ubah chip durasi",
+  "presetEditHint": "Tekan lama chip untuk mengubah nilainya"
 }

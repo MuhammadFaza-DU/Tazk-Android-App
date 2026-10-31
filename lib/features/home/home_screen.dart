@@ -147,6 +147,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: AppButton.primary(
                   label: l10n.homeStartPomodoroButton,
                   onPressed: _openPomodoro,
+                  height: 59,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 23,
+                    vertical: 12,
+                  ),
+                  labelStyle: Theme.of(context)
+                      .textTheme
+                      .labelLarge
+                      ?.copyWith(fontSize: 15),
                 ),
               ),
               top: _sectionGap,

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
@@ -20,6 +23,22 @@ import 'package:tazk/providers/task_providers.dart';
 /// `primary`, item task/habit sebagai kartu per item, dan CTA selebar isinya.
 void main() {
   final today = DateTime.now();
+
+  // Muat font sungguhan (Fredoka + Plus Jakarta Sans) supaya pengukuran lebar
+  // CTA realistis. Font default `flutter test` (Ahem) melebar tiap glif 1em,
+  // sehingga lebar label terukur ~2× ukuran aslinya.
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    Future<ByteData> bytes(String path) =>
+        Future.value(ByteData.sublistView(File(path).readAsBytesSync()));
+    await (FontLoader('Fredoka')
+          ..addFont(bytes('assets/fonts/Fredoka-Variable.ttf')))
+        .load();
+    await (FontLoader('PlusJakartaSans')
+          ..addFont(bytes('assets/fonts/PlusJakartaSans-Regular.ttf'))
+          ..addFont(bytes('assets/fonts/PlusJakartaSans-SemiBold.ttf')))
+        .load();
+  });
 
   final profile = UserProfileData(
     id: 1,
@@ -255,5 +274,22 @@ void main() {
     expect(size.width, greaterThan(80));
 
     expect(tester.getTopLeft(cta).dx, 20); // padding halaman board
+  });
+
+  testWidgets('CTA "Mulai sesi fokus" tinggi 59 dan lebar ~144 di 390dp',
+      (tester) async {
+    await pumpHome(tester);
+
+    final cta = find.widgetWithText(AppButton, 'Mulai sesi fokus');
+    expect(cta, findsOneWidget);
+
+    final size = tester.getSize(cta);
+    // Board `01 Home` mengukur 144×59 dp; lebar auto mengikuti label sehingga
+    // dipakai rentang (bukan angka mati).
+    expect(size.height, closeTo(59, 0.6));
+    expect(size.width, greaterThanOrEqualTo(140));
+    expect(size.width, lessThanOrEqualTo(160));
+
+    expect(tester.takeException(), isNull);
   });
 }

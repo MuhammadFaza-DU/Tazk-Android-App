@@ -54,6 +54,30 @@ void main() {
     });
   });
 
+  group('BarChart.barRects adaptive slot', () {
+    test('slot width by bar count (7/12/30) at width 316', () {
+      final d7 = List.generate(7, (_) => const BarDatum(label: 'x', value: 1));
+      final d12 = List.generate(12, (_) => const BarDatum(label: 'x', value: 1));
+      final d30 = List.generate(30, (_) => const BarDatum(label: 'x', value: 1));
+
+      final r7 = BarChart.barRects(316, d7, barGap: 10);
+      expect(r7.first.width, closeTo(36.57, 0.05));
+
+      final r12 = BarChart.barRects(316, d12, barGap: 10);
+      expect(r12.first.width, closeTo(18.79, 0.05));
+
+      final r30 = BarChart.barRects(316, d30, barGap: 10);
+      expect(r30.first.width, greaterThanOrEqualTo(6.0));
+    });
+
+    test('gap between bars matches resolveBarGap (n=30)', () {
+      final d30 = List.generate(30, (_) => const BarDatum(label: 'x', value: 1));
+      final rects = BarChart.barRects(316, d30, barGap: 10);
+      final gap = BarChart.resolveBarGap(316, 30, 10);
+      expect(rects[1].left - rects[0].right, closeTo(gap, 0.001));
+    });
+  });
+
   group('BarChart render', () {
     testWidgets('renders chart at 88 height with 7 labels', (tester) async {
       final data = ['S', 'S', 'R', 'K', 'J', 'S', 'M']
@@ -87,6 +111,76 @@ void main() {
         matching: find.byType(Text),
       );
       expect(tester.widgetList<Text>(labels).length, lessThan(30));
+    });
+  });
+
+  group('BarChart.resolveBarGap', () {
+    test('preferred for sparse, shrinks for dense, floor at 2', () {
+      expect(BarChart.resolveBarGap(316, 7, 10), 10);
+      expect(BarChart.resolveBarGap(316, 12, 10), closeTo(8.23, 0.05));
+      expect(BarChart.resolveBarGap(316, 30, 10), closeTo(3.29, 0.05));
+      expect(BarChart.resolveBarGap(100, 60, 10), 2.0);
+    });
+  });
+
+  group('BarChart label alignment', () {
+    testWidgets('7 labels centered on their bars', (tester) async {
+      final data = List.generate(
+        7,
+        (i) => BarDatum(
+          label: String.fromCharCode('A'.codeUnitAt(0) + i),
+          value: i + 1,
+        ),
+      );
+      const width = 319.0;
+      await tester.pumpWidget(
+        harness(SizedBox(width: width, child: BarChart(data: data))),
+      );
+      final rects = BarChart.barRects(width, data, barGap: 10, plotHeight: 88);
+      final chartLeft = tester.getTopLeft(find.byType(BarChart)).dx;
+      for (var i = 0; i < 7; i++) {
+        final labelX = tester.getCenter(find.text(data[i].label)).dx - chartLeft;
+        final barX = rects[i].center.dx;
+        expect((labelX - barX).abs(), lessThan(0.6),
+            reason: 'label "${data[i].label}" (i=$i) misaligned');
+      }
+    });
+
+    testWidgets('renders all 12 month labels', (tester) async {
+      final months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+      final data = months.map((l) => BarDatum(label: l, value: 1)).toList();
+      await tester.pumpWidget(
+        harness(SizedBox(width: 316, child: BarChart(data: data))),
+      );
+      final labels = find.descendant(
+        of: find.byType(BarChart),
+        matching: find.byType(Text),
+      );
+      expect(labels, findsNWidgets(12));
+    });
+
+    testWidgets('30 bars show 6 labels at 0,5,10,15,20,25 with no overflow',
+        (tester) async {
+      final data = List.generate(30, (i) => BarDatum(label: '$i', value: 1));
+      await tester.pumpWidget(
+        harness(SizedBox(width: 316, child: BarChart(data: data))),
+      );
+      expect(tester.takeException(), isNull);
+      final labels = find.descendant(
+        of: find.byType(BarChart),
+        matching: find.byType(Text),
+      );
+      final texts = tester.widgetList<Text>(labels).map((t) => t.data).toList();
+      expect(texts, ['0', '5', '10', '15', '20', '25']);
+    });
+
+    testWidgets('no scheduled frame after settle (no ticker)', (tester) async {
+      final data = List.generate(7, (i) => BarDatum(label: '$i', value: 1));
+      await tester.pumpWidget(
+        harness(SizedBox(width: 319, child: BarChart(data: data))),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.binding.hasScheduledFrame, isFalse);
     });
   });
 }
