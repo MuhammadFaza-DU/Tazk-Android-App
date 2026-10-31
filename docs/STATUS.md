@@ -7,6 +7,8 @@ Terakhir diperbarui: **2026-10-31**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-10-31 — **Plan T6–T10 selesai ditulis (14 task, 5 fase, tanpa celah)** → `docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`. Owner **akan mengeksekusi di sesi lain**. Keputusan final terekam di plan: offline JSON dulu (Drive ditunda), 1 kategori per item, reorder drag, auto-selesai = XP konsisten, lokasi `geo:` fallback web, checkpoint per tahap. **Ditemukan & ditutup (D1): bug XP task masih rata 10** (`gamification_repository.taskXp = 10`) padahal keputusan = 15/10/5 → jadi Task T6.0 wajib di plan. *(belum commit)*
+
 - 2026-10-31 — **Kartu Level dark DIKEMBALIKAN ke tampilan awal (G2-revert)**: owner menilai warna **sebelum** penggelapan lebih baik, jadi commit `669d0f4` (tag `v8`, 6 token `level-card-*`) **di-revert**. Kartu Level kembali memakai `primary` `#8FE0A9` + aksen `honey` `#F2C765` di dark; `DESIGN.md`, `home_screen.dart`, dan test kontras ikut kembali. **Konsekuensi yang tetap dicatat:** label+ikon pil "1 day" kembali **1,37:1** (teks `ink` terang di atas `honey` terang) dan isi XP vs track **1,68:1** — owner menerima ini (isu no. 13). Perbaikan termurah bila nanti diminta tanpa ubah warna: label pil memakai `on-primary` dark (`#0F1A14`). **Kanvas `design.pen` tidak perlu diubah** (tidak ada drift). **Verifikasi linter (dijalankan setelah revert, lewat CLI cache langsung karena `npx` menggantung):** `lint DESIGN.md` → **exit 0, errors 0**, warnings 2 (`colors.warning` & `colors.success` "defined but never referenced by any component" — sudah ada sebelum perubahan ini), infos 1 (19 warna, 6 tipografi, 5 radius, 7 spacing, 13 komponen); `export --format dtcg DESIGN.md` → **exit 0**, 13.574 byte JSON DTCG. Bukti HP (perangkat sudah tidak terkunci): `hp-12-home-dark-warna-awal.png` + zoom pil `hp-12-pil-streak-kontras-rendah.png`. 344 test hijau, analyze 0 — *(belum commit)*
 
 - 2026-10-31 — **Percobaan ubah token hijau dark DIBATALKAN (G1-revert)**: perubahan `primary`/`success` dark `#8FE0A9` → `#78C994` (commit `1a9c37c`, tag `v6`) **di-revert**. Alasan: owner menunjuk **kartu Level di layar Home** (latar hijau kartu + kuning XP/pil di dalamnya) yang terasa terlalu terang di tema gelap — bukan token hijau global. Token dark kembali `#8FE0A9`, `DESIGN.md` + `app_theme_test` ikut kembali, dan **kanvas `design.pen` sinkron lagi** (tidak perlu ubah Pen). Masalah aslinya dicatat sebagai **isu terbuka no. 13** + gambar kandidat warna disimpan sebagai `docs/artifacts/warna-kartu-level-dark-kandidat.png` untuk dikerjakan lain waktu — *(commit ini)*
@@ -347,18 +349,23 @@ adb -s RR8RC027VGL pull "/sdcard/s.png" "docs\artifacts\nama.png"
 #    ⚠️ Kalau layar terkunci, screenshot jadi hitam penuh walaupun file ada isinya.
 ```
 
-**Baseline terakhir terverifikasi (2026-10-31, commit `ecf8df2` / tag `v10`):** `dart analyze` bersih,
+**Baseline terakhir terverifikasi (2026-10-31, commit `5d25a0a` / tag `v11`):** `dart analyze` bersih,
 `flutter test` **344/344**, `lint DESIGN.md` **exit 0 / errors 0** (2 warning `orphaned-tokens` lama),
 `export dtcg` **exit 0** (13.574 byte), versi **2.0.0+5**, APK arm64 32.6 MB terpasang di Galaxy A52.
 
 ---
 
-## Langkah berikutnya (pilihan)
+## Langkah berikutnya
 
-| Opsi | Isi | Kenapa |
+**Eksekusi T6–T10** — plan lengkap & tuntas ada di:
+`docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`
+
+| Fase | Isi | Migrasi |
 |---|---|---|
-| **A** | T2: migrasi design system ke kode — unduh font, ganti `app_colors.dart` + `app_typography.dart`, buat widget kit | Fondasi untuk semua layar v2 |
-| **B** | T1: perbaikan performa (8 temuan audit) | App jadi enak dipakai sebelum UI diganti |
-| **C** | Lengkapi aset: generate ikon app persegi | Dibutuhkan launcher & landing page |
+| T6 | Subtask (reorder drag + auto-selesai toggle) + lokasi `geo:` + **XP 15/10/5 (D1)** | v4→v5 |
+| T7 | Kategori (1/item) + pencarian lintas task/habit | v5→v6 |
+| T8 | Widget scroll (`RemoteViewsService` Kotlin) + empty state | — |
+| T9 | Channel focus-session (ke-5) + toggle | v6→v7 |
+| T10 | Backup offline JSON + checksum (Drive ditunda) | — |
 
-Rekomendasi: **B dulu, lalu A** — sesuai alasan di §7 spec (animasi baru di atas fondasi lambat = lebih parah).
+Checkpoint per tahap (5 tag `stable-YYYY-MM-DD-vN`). Sesi baru cukup baca file plan itu + dokumen ini.
