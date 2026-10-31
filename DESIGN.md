@@ -22,6 +22,12 @@ colors:
   warning: "#B4791F"
   warning-strong: "#8A5A12"
   success: "#4A5A44"
+  level-card: "#4A5A44"
+  level-card-on: "#FBF9F4"
+  level-card-on-muted: "#DDE3D6"
+  level-card-track: "#6B7F5E"
+  level-card-accent: "#D69A3C"
+  level-card-on-accent: "#26251F"
 typography:
   display:
     fontFamily: Fredoka
@@ -169,8 +175,16 @@ The specification in use has no theme-aware token syntax, so the values above ar
 | `warning` | `#B4791F` | `#EBCB7E` |
 | `warning-strong` | `#8A5A12` | `#EBCB7E` |
 | `success` | `#4A5A44` | `#8FE0A9` |
+| `level-card` | `#4A5A44` | `#21402F` |
+| `level-card-on` | `#FBF9F4` | `#E8F0E7` |
+| `level-card-on-muted` | `#DDE3D6` | `#A8C2B0` |
+| `level-card-track` | `#6B7F5E` | `#182F23` |
+| `level-card-accent` | `#D69A3C` | `#C99B3F` |
+| `level-card-on-accent` | `#26251F` | `#14110A` |
 
 Both themes are equally finished. Dark depth comes from `surface` and `surface-alt`, never from shadow.
+
+The `level-card-*` group is the app's one "hero" surface (the Level card on Home). It is the only place where a whole card is filled with an action color, so it needs its own theme-aware pair: in light it is the board's dark `primary` panel with light text, and in dark that same bright panel glares, so it inverts into a deep green panel with light text and an amber accent. Keep its four contrast pairs measured (title, secondary line, accent label, accent-vs-track); the streak pill lives inside it and must never use a light `ink` on the light `honey` (that pairing measured 1.37:1 in dark).
 
 ## Typography
 
