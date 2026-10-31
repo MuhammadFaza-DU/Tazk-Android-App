@@ -409,7 +409,7 @@ class _LevelCard extends StatelessWidget {
       key: const Key('home_level_card'),
       padding: const EdgeInsets.all(16), // spacing.lg
       decoration: BoxDecoration(
-        color: colors.levelCard,
+        color: colors.primary,
         borderRadius: BorderRadius.circular(24), // rounded.xl
       ),
       child: Column(
@@ -421,7 +421,7 @@ class _LevelCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   l10n.levelLabel(level),
-                  style: theme.textTheme.headlineLarge?.copyWith(color: colors.levelCardOn),
+                  style: theme.textTheme.headlineLarge?.copyWith(color: colors.onPrimary),
                 ),
               ),
               const SizedBox(width: 12),
@@ -433,13 +433,13 @@ class _LevelCard extends StatelessWidget {
             value: needed == 0 ? 0 : xp / needed,
             level: level,
             height: 8,
-            trackColor: colors.levelCardTrack,
-            fillColor: colors.levelCardAccent,
+            trackColor: colors.primarySoft,
+            fillColor: colors.honey,
           ),
           const SizedBox(height: 8),
           Text(
             l10n.homeXpMeta(xp, needed, rankLabel),
-            style: theme.textTheme.bodySmall?.copyWith(color: colors.levelCardOnMuted),
+            style: theme.textTheme.bodySmall?.copyWith(color: colors.onPrimaryMuted),
           ),
         ],
       ),
@@ -447,7 +447,7 @@ class _LevelCard extends StatelessWidget {
   }
 }
 
-/// Streak pill `01 Home`: latar aksen kartu Level, label `levelCardOnAccent`.
+/// Streak pill `01 Home`: latar `honey`, label `ink`, ikon api 14.
 class _StreakPill extends StatelessWidget {
   const _StreakPill({required this.days});
 
@@ -463,7 +463,7 @@ class _StreakPill extends StatelessWidget {
       key: const Key('home_streak_pill'),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: colors.levelCardAccent,
+        color: colors.honey,
         borderRadius: BorderRadius.circular(999), // rounded.pill
       ),
       child: Row(
@@ -472,13 +472,12 @@ class _StreakPill extends StatelessWidget {
           Icon(
             Icons.local_fire_department_rounded,
             size: 14,
-            color: colors.levelCardOnAccent,
+            color: colors.ink,
           ),
           const SizedBox(width: 4),
           Text(
             l10n.homeStreakDays(days),
-            style: theme.textTheme.labelLarge
-                ?.copyWith(color: colors.levelCardOnAccent),
+            style: theme.textTheme.labelLarge?.copyWith(color: colors.ink),
           ),
         ],
       ),

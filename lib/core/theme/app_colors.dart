@@ -26,12 +26,6 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.warning,
     required this.warningStrong,
     required this.success,
-    required this.levelCard,
-    required this.levelCardOn,
-    required this.levelCardOnMuted,
-    required this.levelCardTrack,
-    required this.levelCardAccent,
-    required this.levelCardOnAccent,
   });
 
   /// Latar halaman.
@@ -91,32 +85,6 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Sukses / positif.
   final Color success;
 
-  // ---------------------------------------------------------------------------
-  // "Hero" card (kartu Level di Home). Token terpisah karena di light theme
-  // kartu ini berlatarkan warna AKSI gelap dengan teks terang, sedangkan di dark
-  // theme latar terang itu justru menyilaukan: nilainya dibalik jadi panel hijau
-  // gelap dengan teks terang. Tanpa token ini, kartu harus bercabang `isDark` dan
-  // menyimpan hex di dalam widget fitur.
-  // ---------------------------------------------------------------------------
-
-  /// Latar kartu Level.
-  final Color levelCard;
-
-  /// Teks utama di atas [levelCard].
-  final Color levelCardOn;
-
-  /// Baris sekunder di bawah teks utama [levelCard].
-  final Color levelCardOnMuted;
-
-  /// Track progress XP di [levelCard] (isi memakai [levelCardAccent]).
-  final Color levelCardTrack;
-
-  /// Aksen di dalam kartu Level: isi XP dan pil streak.
-  final Color levelCardAccent;
-
-  /// Ikon + label di atas [levelCardAccent].
-  final Color levelCardOnAccent;
-
   /// Light — "Sage & Sand" (verbatim `DESIGN.md` `colors:`).
   static const AppColors light = AppColors(
     canvas: Color(0xFFF4F1EA),
@@ -138,14 +106,6 @@ class AppColors extends ThemeExtension<AppColors> {
     warning: Color(0xFFB4791F),
     warningStrong: Color(0xFF8A5A12),
     success: Color(0xFF4A5A44),
-    // Light: kartu Level identik dengan board 01 (latar `primary`, teks
-    // `on-primary`, aksen `honey`) — jadi tampilan light tidak berubah.
-    levelCard: Color(0xFF4A5A44),
-    levelCardOn: Color(0xFFFBF9F4),
-    levelCardOnMuted: Color(0xFFDDE3D6),
-    levelCardTrack: Color(0xFF6B7F5E),
-    levelCardAccent: Color(0xFFD69A3C),
-    levelCardOnAccent: Color(0xFF26251F),
   );
 
   /// Dark — "Dusk Forest" (verbatim tabel "Themes" `DESIGN.md`).
@@ -169,14 +129,6 @@ class AppColors extends ThemeExtension<AppColors> {
     warning: Color(0xFFEBCB7E),
     warningStrong: Color(0xFFEBCB7E),
     success: Color(0xFF8FE0A9),
-    // Dark: panel hijau dalam + teks terang, aksen amber tua (opsi 3 owner).
-    // Kontras terukur: judul 9,81 · meta 5,99 · pil 7,40 · isi-vs-track 5,61.
-    levelCard: Color(0xFF21402F),
-    levelCardOn: Color(0xFFE8F0E7),
-    levelCardOnMuted: Color(0xFFA8C2B0),
-    levelCardTrack: Color(0xFF182F23),
-    levelCardAccent: Color(0xFFC99B3F),
-    levelCardOnAccent: Color(0xFF14110A),
   );
 
   @override
@@ -200,12 +152,6 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? warning,
     Color? warningStrong,
     Color? success,
-    Color? levelCard,
-    Color? levelCardOn,
-    Color? levelCardOnMuted,
-    Color? levelCardTrack,
-    Color? levelCardAccent,
-    Color? levelCardOnAccent,
   }) {
     return AppColors(
       canvas: canvas ?? this.canvas,
@@ -227,12 +173,6 @@ class AppColors extends ThemeExtension<AppColors> {
       warning: warning ?? this.warning,
       warningStrong: warningStrong ?? this.warningStrong,
       success: success ?? this.success,
-      levelCard: levelCard ?? this.levelCard,
-      levelCardOn: levelCardOn ?? this.levelCardOn,
-      levelCardOnMuted: levelCardOnMuted ?? this.levelCardOnMuted,
-      levelCardTrack: levelCardTrack ?? this.levelCardTrack,
-      levelCardAccent: levelCardAccent ?? this.levelCardAccent,
-      levelCardOnAccent: levelCardOnAccent ?? this.levelCardOnAccent,
     );
   }
 
@@ -261,14 +201,6 @@ class AppColors extends ThemeExtension<AppColors> {
       warning: Color.lerp(warning, other.warning, t)!,
       warningStrong: Color.lerp(warningStrong, other.warningStrong, t)!,
       success: Color.lerp(success, other.success, t)!,
-      levelCard: Color.lerp(levelCard, other.levelCard, t)!,
-      levelCardOn: Color.lerp(levelCardOn, other.levelCardOn, t)!,
-      levelCardOnMuted:
-          Color.lerp(levelCardOnMuted, other.levelCardOnMuted, t)!,
-      levelCardTrack: Color.lerp(levelCardTrack, other.levelCardTrack, t)!,
-      levelCardAccent: Color.lerp(levelCardAccent, other.levelCardAccent, t)!,
-      levelCardOnAccent:
-          Color.lerp(levelCardOnAccent, other.levelCardOnAccent, t)!,
     );
   }
 
