@@ -44,7 +44,7 @@ void main() {
     });
 
     test('nilai hex token dark persis DESIGN.md', () {
-      expect(AppColors.dark.primary, const Color(0xFF8FE0A9));
+      expect(AppColors.dark.primary, const Color(0xFF78C994));
       expect(AppColors.dark.canvas, const Color(0xFF0F1A14));
       expect(AppColors.dark.surface, const Color(0xFF152219));
       expect(AppColors.dark.surfaceAlt, const Color(0xFF1C2C21));
@@ -62,7 +62,7 @@ void main() {
       expect(AppColors.dark.danger, const Color(0xFFF0A48C));
       expect(AppColors.dark.warning, const Color(0xFFEBCB7E));
       expect(AppColors.dark.warningStrong, const Color(0xFFEBCB7E));
-      expect(AppColors.dark.success, const Color(0xFF8FE0A9));
+      expect(AppColors.dark.success, const Color(0xFF78C994));
     });
   });
 

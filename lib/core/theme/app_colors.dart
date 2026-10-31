@@ -116,7 +116,7 @@ class AppColors extends ThemeExtension<AppColors> {
     border: Color(0xFF23382A),
     ink: Color(0xFFE8F0E7),
     inkMuted: Color(0xFF9DAF9F),
-    primary: Color(0xFF8FE0A9),
+    primary: Color(0xFF78C994),
     primarySoft: Color(0xFF5FAE7C),
     primaryContainer: Color(0xFF20362A),
     onPrimary: Color(0xFF0F1A14),
@@ -128,7 +128,7 @@ class AppColors extends ThemeExtension<AppColors> {
     danger: Color(0xFFF0A48C),
     warning: Color(0xFFEBCB7E),
     warningStrong: Color(0xFFEBCB7E),
-    success: Color(0xFF8FE0A9),
+    success: Color(0xFF78C994),
   );
 
   @override
@@ -215,7 +215,7 @@ class AppColors extends ThemeExtension<AppColors> {
 
   // @deprecated use context.colors.primary (dark)
   @Deprecated('use context.colors.primary')
-  static const Color primaryDark = Color(0xFF8FE0A9);
+  static const Color primaryDark = Color(0xFF78C994);
 
   // @deprecated use context.colors.honey (light)
   @Deprecated('use context.colors.honey')
