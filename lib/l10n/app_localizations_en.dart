@@ -491,7 +491,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noNamePlaceholder => '(No name yet)';
 
   @override
+  String get profileStreakDaysLabel => 'day streak';
+
+  @override
+  String get profileTasksDoneTodayLabel => 'tasks done today';
+
+  @override
+  String get profileBadgesLabel => 'badges';
+
+  @override
   String get badgeCollectionTitle => 'Badge Collection';
+
+  @override
+  String badgesUnlockedCount(int unlocked, int total) {
+    return '$unlocked of $total';
+  }
 
   @override
   String errorLoadingBadges(String error) {
@@ -499,8 +513,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get avatarCollectionTitle =>
-      'Avatar Collection — unlocks every 10 levels';
+  String get avatarCollectionTitle => 'Cosmetics';
+
+  @override
+  String cosmeticsUnlockedCount(int count) {
+    return '$count unlocked';
+  }
 
   @override
   String errorLoadingAvatars(String error) {

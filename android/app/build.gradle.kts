@@ -63,14 +63,11 @@ android {
         }
     }
 
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("arm64-v8a", "armeabi-v7a", "x86_64")
-            isUniversalApk = false
-        }
-    }
+    // Catatan: TIDAK ada blok `splits { abi { ... } }` di sini dengan sengaja.
+    // Flutter sudah memecah APK per ABI lewat `flutter build apk --split-per-abi`,
+    // dan blok manual bentrok dengan `ndk.abiFilters` yang disuntik Flutter pada
+    // build non-split (mis. `flutter build apk --debug`):
+    //   "Conflicting configuration ... abiFilters cannot be present when splits abi filters are set"
 }
 
 kotlin {

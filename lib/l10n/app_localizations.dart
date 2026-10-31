@@ -950,11 +950,35 @@ abstract class AppLocalizations {
   /// **'(Belum ada nama)'**
   String get noNamePlaceholder;
 
+  /// No description provided for @profileStreakDaysLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'hari streak'**
+  String get profileStreakDaysLabel;
+
+  /// No description provided for @profileTasksDoneTodayLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'tugas selesai hari ini'**
+  String get profileTasksDoneTodayLabel;
+
+  /// No description provided for @profileBadgesLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'badge'**
+  String get profileBadgesLabel;
+
   /// No description provided for @badgeCollectionTitle.
   ///
   /// In id, this message translates to:
-  /// **'Badge Collection'**
+  /// **'Koleksi Badge'**
   String get badgeCollectionTitle;
+
+  /// No description provided for @badgesUnlockedCount.
+  ///
+  /// In id, this message translates to:
+  /// **'{unlocked} dari {total}'**
+  String badgesUnlockedCount(int unlocked, int total);
 
   /// No description provided for @errorLoadingBadges.
   ///
@@ -965,8 +989,14 @@ abstract class AppLocalizations {
   /// No description provided for @avatarCollectionTitle.
   ///
   /// In id, this message translates to:
-  /// **'Avatar Collection — unlock per 10 level'**
+  /// **'Kosmetik'**
   String get avatarCollectionTitle;
+
+  /// No description provided for @cosmeticsUnlockedCount.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} terbuka'**
+  String cosmeticsUnlockedCount(int count);
 
   /// No description provided for @errorLoadingAvatars.
   ///

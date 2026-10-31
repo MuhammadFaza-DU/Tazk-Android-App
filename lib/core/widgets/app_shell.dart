@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/calendar/calendar_screen.dart';
+import '../../features/dev/component_preview_screen.dart';
 import '../../features/habits/habits_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/profile/profile_screen.dart';
@@ -304,6 +306,16 @@ class _MoreSheet extends StatelessWidget {
             trailing: Icon(Icons.chevron_right_rounded, color: colors.inkMuted),
             onTap: () => _push(context, const AboutScreen()),
           ),
+          // dev-only: galeri komponen design system. Tidak pernah tampil di
+          // build release (kDebugMode false), jadi board 01b tetap 3 baris.
+          if (kDebugMode)
+            ListRow(
+              showDivider: false,
+              leading: _SheetIcon(icon: Icons.widgets_outlined),
+              title: 'Komponen (dev)',
+              trailing: Icon(Icons.chevron_right_rounded, color: colors.inkMuted),
+              onTap: () => _push(context, const ComponentPreviewScreen()),
+            ),
           const SizedBox(height: 8),
         ],
       ),

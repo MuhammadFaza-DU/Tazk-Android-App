@@ -244,12 +244,26 @@
   "changeAvatarTooltip": "Ganti Avatar",
   "editNameTooltip": "Edit Nama",
   "noNamePlaceholder": "(Belum ada nama)",
-  "badgeCollectionTitle": "Badge Collection",
+  "profileStreakDaysLabel": "hari streak",
+  "profileTasksDoneTodayLabel": "tugas selesai hari ini",
+  "profileBadgesLabel": "badge",
+  "badgeCollectionTitle": "Koleksi Badge",
+  "badgesUnlockedCount": "{unlocked} dari {total}",
+  "@badgesUnlockedCount": {
+    "placeholders": {
+      "unlocked": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
   "errorLoadingBadges": "Gagal memuat badge: {error}",
   "@errorLoadingBadges": {
     "placeholders": { "error": { "type": "String" } }
   },
-  "avatarCollectionTitle": "Avatar Collection — unlock per 10 level",
+  "avatarCollectionTitle": "Kosmetik",
+  "cosmeticsUnlockedCount": "{count} terbuka",
+  "@cosmeticsUnlockedCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "errorLoadingAvatars": "Gagal memuat avatar: {error}",
   "@errorLoadingAvatars": {
     "placeholders": { "error": { "type": "String" } }
