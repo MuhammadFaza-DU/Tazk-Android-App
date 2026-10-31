@@ -252,7 +252,7 @@ class _StatTiles extends StatelessWidget {
               icon: Icons.check_rounded,
               container: colors.primaryContainer,
               value: '${stats.completedDays}',
-              label: 'Total selesai',
+              label: l10n.habitTotalDoneLabel,
             ),
           ),
           const SizedBox(width: 8), // spacing.sm
@@ -262,7 +262,7 @@ class _StatTiles extends StatelessWidget {
               icon: Icons.trending_up_rounded,
               container: colors.clayContainer,
               value: '${stats.consistencyPercent}%',
-              label: 'Konsistensi',
+              label: l10n.habitConsistencyLabel,
             ),
           ),
         ],
@@ -360,11 +360,14 @@ class _SummaryCard extends StatelessWidget {
             value: habit.frequency.label(context),
           ),
           const SizedBox(height: 2),
-          _SummaryRow(label: 'Pengingat', value: _formatTime(habit.scheduledTime)),
+          _SummaryRow(
+            label: l10n.habitReminderLabel,
+            value: _formatTime(habit.scheduledTime),
+          ),
           const SizedBox(height: 2),
           _SummaryRow(
-            label: 'Target',
-            value: target == null ? '-' : '$target menit / hari',
+            label: l10n.habitTargetLabel,
+            value: target == null ? '-' : l10n.habitMinutesPerDay(target),
           ),
         ],
       ),
@@ -419,7 +422,7 @@ class _HistoryHeader extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            'Histori 4 minggu',
+            l10n.habitHistoryWindowTitle,
             // Board mengukur ~16dp; dipakai token `headline` 18 (Fredoka)
             // supaya sama dengan judul section lain di aplikasi.
             style: theme.textTheme.headlineSmall?.copyWith(color: colors.ink),
@@ -486,6 +489,7 @@ class _HistoryCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final material = MaterialLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     // Warna mengikuti empat langkah board; bentuk/ikon membawa informasi
     // "selesai" (DESIGN: status selesai tidak boleh dibedakan warna saja).
@@ -495,21 +499,31 @@ class _HistoryCell extends StatelessWidget {
           colors.primary,
           null,
           Icons.check_rounded,
-          'selesai',
+          l10n.habitDayDoneSemantics,
         ),
-      HabitDayState.partial => (colors.primarySoft, null, null, 'sebagian'),
+      HabitDayState.partial => (
+          colors.primarySoft,
+          null,
+          null,
+          l10n.habitDayPartialSemantics,
+        ),
       HabitDayState.notYet => (
           colors.primaryContainer,
           null,
           null,
-          'belum selesai',
+          l10n.habitDayNotDoneSemantics,
         ),
-      HabitDayState.missed => (colors.surfaceAlt, null, null, 'terlewat'),
+      HabitDayState.missed => (
+          colors.surfaceAlt,
+          null,
+          null,
+          l10n.habitDayMissedSemantics,
+        ),
       HabitDayState.notDue => (
           null,
           colors.border,
           null,
-          'tidak dijadwalkan',
+          l10n.habitDayNotDueSemantics,
         ),
     };
 
@@ -540,13 +554,14 @@ class _HistoryLegend extends StatelessWidget {
     final colors = context.colors;
     final theme = Theme.of(context);
     final style = theme.textTheme.labelSmall?.copyWith(color: colors.inkMuted);
+    final l10n = AppLocalizations.of(context)!;
 
     // TODO(l10n): belum ada key untuk "lewat" & "selesai" (legenda).
     return Row(
       key: habitDetailLegendKey,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text('lewat', style: style),
+        Text(l10n.habitLegendMissed, style: style),
         const SizedBox(width: 6),
         _LegendSwatch(color: colors.surfaceAlt),
         const SizedBox(width: 5),
@@ -556,7 +571,7 @@ class _HistoryLegend extends StatelessWidget {
         const SizedBox(width: 5),
         _LegendSwatch(color: colors.primary),
         const SizedBox(width: 6),
-        Text('selesai', style: style),
+        Text(l10n.habitLegendDone, style: style),
       ],
     );
   }

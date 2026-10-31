@@ -50,6 +50,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveButton => 'Save';
 
   @override
+  String get habitTotalDoneLabel => 'Total done';
+
+  @override
+  String get habitConsistencyLabel => 'Consistency';
+
+  @override
+  String get habitReminderLabel => 'Reminder';
+
+  @override
+  String get habitTargetLabel => 'Target';
+
+  @override
+  String habitMinutesPerDay(int minutes) {
+    return '$minutes min / day';
+  }
+
+  @override
+  String get habitHistoryWindowTitle => '4-week history';
+
+  @override
+  String get habitLegendMissed => 'missed';
+
+  @override
+  String get habitLegendDone => 'done';
+
+  @override
+  String get habitDayDoneSemantics => 'done';
+
+  @override
+  String get habitDayNotDoneSemantics => 'not done';
+
+  @override
+  String get habitDayMissedSemantics => 'missed';
+
+  @override
+  String get habitDayPartialSemantics => 'partially done';
+
+  @override
+  String get habitDayNotDueSemantics => 'not scheduled';
+
+  @override
   String get okButton => 'OK';
 
   @override

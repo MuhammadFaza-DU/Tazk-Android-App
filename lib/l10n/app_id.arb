@@ -19,6 +19,25 @@
 
   "cancelButton": "Batal",
   "saveButton": "Simpan",
+
+  "habitTotalDoneLabel": "Total selesai",
+  "habitConsistencyLabel": "Konsistensi",
+  "habitReminderLabel": "Pengingat",
+  "habitTargetLabel": "Target",
+  "habitMinutesPerDay": "{minutes} menit / hari",
+  "@habitMinutesPerDay": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "habitHistoryWindowTitle": "Histori 4 minggu",
+  "habitLegendMissed": "lewat",
+  "habitLegendDone": "selesai",
+  "habitDayDoneSemantics": "selesai",
+  "habitDayNotDoneSemantics": "belum selesai",
+  "habitDayMissedSemantics": "terlewat",
+  "habitDayPartialSemantics": "sebagian",
+  "habitDayNotDueSemantics": "tidak dijadwalkan",
   "okButton": "OK",
   "deleteButton": "Hapus",
   "startButton": "Mulai",

@@ -176,6 +176,84 @@ abstract class AppLocalizations {
   /// **'Simpan'**
   String get saveButton;
 
+  /// No description provided for @habitTotalDoneLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Total selesai'**
+  String get habitTotalDoneLabel;
+
+  /// No description provided for @habitConsistencyLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Konsistensi'**
+  String get habitConsistencyLabel;
+
+  /// No description provided for @habitReminderLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengingat'**
+  String get habitReminderLabel;
+
+  /// No description provided for @habitTargetLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Target'**
+  String get habitTargetLabel;
+
+  /// No description provided for @habitMinutesPerDay.
+  ///
+  /// In id, this message translates to:
+  /// **'{minutes} menit / hari'**
+  String habitMinutesPerDay(int minutes);
+
+  /// No description provided for @habitHistoryWindowTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Histori 4 minggu'**
+  String get habitHistoryWindowTitle;
+
+  /// No description provided for @habitLegendMissed.
+  ///
+  /// In id, this message translates to:
+  /// **'lewat'**
+  String get habitLegendMissed;
+
+  /// No description provided for @habitLegendDone.
+  ///
+  /// In id, this message translates to:
+  /// **'selesai'**
+  String get habitLegendDone;
+
+  /// No description provided for @habitDayDoneSemantics.
+  ///
+  /// In id, this message translates to:
+  /// **'selesai'**
+  String get habitDayDoneSemantics;
+
+  /// No description provided for @habitDayNotDoneSemantics.
+  ///
+  /// In id, this message translates to:
+  /// **'belum selesai'**
+  String get habitDayNotDoneSemantics;
+
+  /// No description provided for @habitDayMissedSemantics.
+  ///
+  /// In id, this message translates to:
+  /// **'terlewat'**
+  String get habitDayMissedSemantics;
+
+  /// No description provided for @habitDayPartialSemantics.
+  ///
+  /// In id, this message translates to:
+  /// **'sebagian'**
+  String get habitDayPartialSemantics;
+
+  /// No description provided for @habitDayNotDueSemantics.
+  ///
+  /// In id, this message translates to:
+  /// **'tidak dijadwalkan'**
+  String get habitDayNotDueSemantics;
+
   /// No description provided for @okButton.
   ///
   /// In id, this message translates to:
