@@ -156,7 +156,7 @@ The specification in use has no theme-aware token syntax, so the values above ar
 | `border` | `#E2DACB` | `#23382A` |
 | `ink` | `#26251F` | `#E8F0E7` |
 | `ink-muted` | `#6A6659` | `#9DAF9F` |
-| `primary` | `#4A5A44` | `#78C994` |
+| `primary` | `#4A5A44` | `#8FE0A9` |
 | `primary-soft` | `#6B7F5E` | `#5FAE7C` |
 | `primary-container` | `#DDE3D6` | `#20362A` |
 | `on-primary` | `#FBF9F4` | `#0F1A14` |
@@ -168,7 +168,7 @@ The specification in use has no theme-aware token syntax, so the values above ar
 | `danger` | `#A5432A` | `#F0A48C` |
 | `warning` | `#B4791F` | `#EBCB7E` |
 | `warning-strong` | `#8A5A12` | `#EBCB7E` |
-| `success` | `#4A5A44` | `#78C994` |
+| `success` | `#4A5A44` | `#8FE0A9` |
 
 Both themes are equally finished. Dark depth comes from `surface` and `surface-alt`, never from shadow.
 
