@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_motion.dart';
 
-/// Bottom sheet bertema: bg `surface`, radius atas `xl` (24), grab handle 40×4
+/// Bottom sheet bertema: bg `surface`, radius atas `xl` (24), grab handle 40Ã—4
 /// pill (`border`) ditengahkan pada full width (bukan di dalam padding konten).
 Future<T?> showAppSheet<T>(
   BuildContext context, {
@@ -25,16 +25,23 @@ Future<T?> showAppSheet<T>(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)), // rounded.xl
     ),
     builder: (sheetContext) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 8),
-            child: AppSheetHandle(),
-          ),
-          const SizedBox(height: 12),
-          Flexible(child: child),
-        ],
+      // Keyboard-aware: tanpa ini, sheet dengan field teks (mis. atur durasi
+      // Pomodoro) tertutup keyboard dan tombol aksinya tak bisa dijangkau.
+      // Inset bernilai 0 saat keyboard tertutup, jadi sheet lain tak berubah.
+      final keyboardInset = MediaQuery.viewInsetsOf(sheetContext).bottom;
+      return Padding(
+        padding: EdgeInsets.only(bottom: keyboardInset),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: AppSheetHandle(),
+            ),
+            const SizedBox(height: 12),
+            Flexible(child: child),
+          ],
+        ),
       );
     },
   );
