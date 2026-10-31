@@ -318,22 +318,38 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 # 1. App masih jalan?
 flutter pub get
 dart analyze          # harus: No issues found!
-flutter test          # harus: 306/306 lulus
+flutter test          # harus: 344/344 lulus
 
 # 2. DESIGN.md masih valid?
-npx @google/design.md lint DESIGN.md          # harus: 0 errors
-npx @google/design.md export --format dtcg DESIGN.md
+#    ⚠️ `npx @google/design.md ...` MENGGANTUNG di mesin ini (job tidak pernah selesai,
+#    output 0 byte; terbukti 2026-10-31). Jalankan CLI dari cache npx langsung:
+$cli = "$env:LOCALAPPDATA\npm-cache\_npx\9cb06364208d5c89\node_modules\@google\design.md\dist\index.js"
+node $cli lint DESIGN.md                       # harus: exit 0, errors 0 (2 warning orphaned-token = normal)
+node $cli export --format dtcg DESIGN.md       # harus: exit 0, JSON DTCG tercetak
+#    Catatan: hash folder `9cb06364208d5c89` bisa berubah kalau cache dibersihkan;
+#    cari ulang dengan: Get-ChildItem "$env:LOCALAPPDATA\npm-cache\_npx" -Directory |
+#      Where-Object { Test-Path (Join-Path $_.FullName "node_modules\@google\design.md") }
 
 # 3. Kontras — jangan pernah menebak
 python "C:\Users\LENOVO\.agents\skills\antislop-human\contrast-check.py" "#TEXT" "#BG"
 
 # 4. Kanvas
 # buka design.pen di pen.dev, cek get_app_state
+#    ⚠️ MCP pencil gagal connect kalau app Pen tidak jalan:
+#    "transport not connected to app: desktop"
+
+# 5. Verifikasi HP (Galaxy A52) — HP harus TIDAK terkunci saat screencap
+adb -s RR8RC027VGL shell "dumpsys window" | Select-String "mDreamingLockscreen"
+adb -s RR8RC027VGL shell "screencap -p /sdcard/s.png"
+adb -s RR8RC027VGL pull "/sdcard/s.png" "docs\artifacts\nama.png"
+#    ⚠️ JANGAN pakai `adb exec-out screencap -p > file.png` di PowerShell: file jadi
+#    rusak (redirection PowerShell merusak biner). Selalu screencap ke /sdcard lalu pull.
+#    ⚠️ Kalau layar terkunci, screenshot jadi hitam penuh walaupun file ada isinya.
 ```
 
-**Baseline terakhir terverifikasi (2026-10-30):** `dart analyze` bersih, `flutter test` 60/60,
-`lint DESIGN.md` 0 error, export dtcg exit 0, semua pasangan warna chip lolos AA,
-sheet grab handle center 195 = sheet center 195 (selisih 0).
+**Baseline terakhir terverifikasi (2026-10-31, commit `ecf8df2` / tag `v10`):** `dart analyze` bersih,
+`flutter test` **344/344**, `lint DESIGN.md` **exit 0 / errors 0** (2 warning `orphaned-tokens` lama),
+`export dtcg` **exit 0** (13.574 byte), versi **2.0.0+5**, APK arm64 32.6 MB terpasang di Galaxy A52.
 
 ---
 
