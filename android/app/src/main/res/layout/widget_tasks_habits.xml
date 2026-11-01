@@ -19,12 +19,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:paddingEnd="6dp">
@@ -38,91 +39,27 @@
                 android:textStyle="bold"
                 android:paddingBottom="2dp" />
 
-            <LinearLayout
-                android:id="@+id/task_row_0"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingVertical="2dp">
-                <ImageView
-                    android:id="@+id/task_check_0"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_checkbox_unchecked" />
-                <TextView
-                    android:id="@+id/task_title_0"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:textColor="#1E2E22"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-            </LinearLayout>
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
-            <LinearLayout
-                android:id="@+id/task_row_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingVertical="2dp">
-                <ImageView
-                    android:id="@+id/task_check_1"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_checkbox_unchecked" />
-                <TextView
-                    android:id="@+id/task_title_1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:textColor="#1E2E22"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-            </LinearLayout>
+                <ListView
+                    android:id="@+id/widget_tasks_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@null"
+                    android:paddingVertical="2dp" />
 
-            <LinearLayout
-                android:id="@+id/task_row_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingVertical="2dp">
-                <ImageView
-                    android:id="@+id/task_check_2"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_checkbox_unchecked" />
-                <TextView
-                    android:id="@+id/task_title_2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:textColor="#1E2E22"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tasks_empty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tidak ada task"
-                android:textColor="#889"
-                android:textSize="10sp"
-                android:visibility="gone" />
+                <include
+                    android:id="@+id/widget_tasks_empty_view"
+                    layout="@layout/widget_empty_state" />
+            </FrameLayout>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:paddingStart="6dp">
@@ -136,86 +73,22 @@
                 android:textStyle="bold"
                 android:paddingBottom="2dp" />
 
-            <LinearLayout
-                android:id="@+id/habit_row_0"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingVertical="2dp">
-                <ImageView
-                    android:id="@+id/habit_check_0"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_checkbox_unchecked" />
-                <TextView
-                    android:id="@+id/habit_title_0"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:textColor="#1E2E22"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-            </LinearLayout>
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
-            <LinearLayout
-                android:id="@+id/habit_row_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingVertical="2dp">
-                <ImageView
-                    android:id="@+id/habit_check_1"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_checkbox_unchecked" />
-                <TextView
-                    android:id="@+id/habit_title_1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:textColor="#1E2E22"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-            </LinearLayout>
+                <ListView
+                    android:id="@+id/widget_habits_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@null"
+                    android:paddingVertical="2dp" />
 
-            <LinearLayout
-                android:id="@+id/habit_row_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingVertical="2dp">
-                <ImageView
-                    android:id="@+id/habit_check_2"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_checkbox_unchecked" />
-                <TextView
-                    android:id="@+id/habit_title_2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:textColor="#1E2E22"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/habits_empty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tidak ada habit"
-                android:textColor="#889"
-                android:textSize="10sp"
-                android:visibility="gone" />
+                <include
+                    android:id="@+id/widget_habits_empty_view"
+                    layout="@layout/widget_empty_state" />
+            </FrameLayout>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

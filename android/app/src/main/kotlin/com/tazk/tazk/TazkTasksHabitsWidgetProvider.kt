@@ -1,12 +1,12 @@
 package com.tazk.tazk
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
-import android.view.View
 import android.widget.RemoteViews
-import es.antonborri.home_widget.HomeWidgetBackgroundIntent
+import es.antonborri.home_widget.HomeWidgetBackgroundReceiver
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 
@@ -26,111 +26,135 @@ class TazkTasksHabitsWidgetProvider : HomeWidgetProvider() {
                 R.id.widget_container,
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java))
 
-            val taskCount = widgetData.getInt("tazk_task_count", 0)
-            setViewVisibility(R.id.tasks_empty, if (taskCount == 0) View.VISIBLE else View.GONE)
-            bindTaskRow(
-                context, this, widgetData, 0, R.id.task_row_0, R.id.task_check_0, R.id.task_title_0)
-            bindTaskRow(
-                context, this, widgetData, 1, R.id.task_row_1, R.id.task_check_1, R.id.task_title_1)
-            bindTaskRow(
-                context, this, widgetData, 2, R.id.task_row_2, R.id.task_check_2, R.id.task_title_2)
-
-            val habitCount = widgetData.getInt("tazk_habit_count", 0)
-            setViewVisibility(R.id.habits_empty, if (habitCount == 0) View.VISIBLE else View.GONE)
-            bindHabitRow(
-                context,
-                this,
-                widgetData,
-                0,
-                R.id.habit_row_0,
-                R.id.habit_check_0,
-                R.id.habit_title_0)
-            bindHabitRow(
-                context,
-                this,
-                widgetData,
-                1,
-                R.id.habit_row_1,
-                R.id.habit_check_1,
-                R.id.habit_title_1)
-            bindHabitRow(
-                context,
-                this,
-                widgetData,
-                2,
-                R.id.habit_row_2,
-                R.id.habit_check_2,
-                R.id.habit_title_2)
+            bindTasksToday(context, this, widgetData, widgetId)
+            bindHabitsToday(context, this, widgetData, widgetId)
           }
       appWidgetManager.updateAppWidget(widgetId, views)
+      appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.widget_tasks_list)
+      appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.widget_habits_list)
     }
   }
 }
 
-/**
- * Binds a single task row: hides it entirely if there's no task at [index],
- * otherwise sets the title and wires the checkbox to complete that task via a
- * background isolate (see homeWidgetBackgroundCallback in Dart).
- */
-internal fun bindTaskRow(
+/** Scrollable task list for today, shared by the combined and tasks-only widgets. */
+internal fun bindTasksToday(
     context: Context,
     views: RemoteViews,
     widgetData: SharedPreferences,
-    index: Int,
-    rowId: Int,
-    checkId: Int,
-    titleId: Int
+    widgetId: Int
 ) {
-  val id = widgetData.getInt("tazk_task_${index}_id", -1)
-  if (id < 0) {
-    views.setViewVisibility(rowId, View.GONE)
-    return
-  }
-  views.setViewVisibility(rowId, View.VISIBLE)
-  views.setTextViewText(titleId, widgetData.getString("tazk_task_${index}_title", ""))
-  views.setImageViewResource(checkId, R.drawable.ic_checkbox_unchecked)
-  // Unique requestCode per task so Android does not collapse the 3 row
-  // PendingIntents into one (see HomeWidgetBackgroundIntent always using 0).
-  val taskIntent = android.content.Intent(context, es.antonborri.home_widget.HomeWidgetBackgroundReceiver::class.java).apply {
-    data = Uri.parse("homeWidget://completeTask?id=$id")
-    action = "es.antonborri.home_widget.action.BACKGROUND"
-  }
-  var taskFlags = android.app.PendingIntent.FLAG_UPDATE_CURRENT
-  if (android.os.Build.VERSION.SDK_INT >= 23) {
-    taskFlags = taskFlags or android.app.PendingIntent.FLAG_IMMUTABLE
-  }
-  val taskPending = android.app.PendingIntent.getBroadcast(context, 100000 + id, taskIntent, taskFlags)
-  views.setOnClickPendingIntent(checkId, taskPending)
+  bindItemList(
+      context = context,
+      views = views,
+      widgetData = widgetData,
+      widgetId = widgetId,
+      listId = R.id.widget_tasks_list,
+      emptyViewId = R.id.widget_tasks_empty_view,
+      kind = TazkRemoteViewsService.KIND_TASK,
+      source = TazkRemoteViewsService.SOURCE_TODAY,
+      emptyTextKey = "tazk_tasks_empty_text",
+      templateRequestCode = 700000 + widgetId)
 }
 
-/** Same as [bindTaskRow], but habits can already be checked for today. */
-internal fun bindHabitRow(
+/** Scrollable habit list for today, shared by the combined and habits-only widgets. */
+internal fun bindHabitsToday(
     context: Context,
     views: RemoteViews,
     widgetData: SharedPreferences,
-    index: Int,
-    rowId: Int,
-    checkId: Int,
-    titleId: Int
+    widgetId: Int
 ) {
-  val id = widgetData.getInt("tazk_habit_${index}_id", -1)
-  if (id < 0) {
-    views.setViewVisibility(rowId, View.GONE)
-    return
-  }
-  views.setViewVisibility(rowId, View.VISIBLE)
-  views.setTextViewText(titleId, widgetData.getString("tazk_habit_${index}_title", ""))
-  val done = widgetData.getBoolean("tazk_habit_${index}_done", false)
-  views.setImageViewResource(
-      checkId, if (done) R.drawable.ic_checkbox_checked else R.drawable.ic_checkbox_unchecked)
-  val habitIntent = android.content.Intent(context, es.antonborri.home_widget.HomeWidgetBackgroundReceiver::class.java).apply {
-    data = Uri.parse("homeWidget://completeHabit?id=$id")
-    action = "es.antonborri.home_widget.action.BACKGROUND"
-  }
-  var habitFlags = android.app.PendingIntent.FLAG_UPDATE_CURRENT
-  if (android.os.Build.VERSION.SDK_INT >= 23) {
-    habitFlags = habitFlags or android.app.PendingIntent.FLAG_IMMUTABLE
-  }
-  val habitPending = android.app.PendingIntent.getBroadcast(context, 200000 + id, habitIntent, habitFlags)
-  views.setOnClickPendingIntent(checkId, habitPending)
+  bindItemList(
+      context = context,
+      views = views,
+      widgetData = widgetData,
+      widgetId = widgetId,
+      listId = R.id.widget_habits_list,
+      emptyViewId = R.id.widget_habits_empty_view,
+      kind = TazkRemoteViewsService.KIND_HABIT,
+      source = TazkRemoteViewsService.SOURCE_TODAY,
+      emptyTextKey = "tazk_habits_empty_text",
+      templateRequestCode = 710000 + widgetId)
+}
+
+/** Task list for the day selected in the calendar widget. */
+internal fun bindTasksCalendar(
+    context: Context,
+    views: RemoteViews,
+    widgetData: SharedPreferences,
+    widgetId: Int
+) {
+  bindItemList(
+      context = context,
+      views = views,
+      widgetData = widgetData,
+      widgetId = widgetId,
+      listId = R.id.widget_tasks_list,
+      emptyViewId = R.id.widget_tasks_empty_view,
+      kind = TazkRemoteViewsService.KIND_TASK,
+      source = TazkRemoteViewsService.SOURCE_CALENDAR,
+      emptyTextKey = "tazk_calendar_tasks_empty",
+      templateRequestCode = 720000 + widgetId)
+}
+
+/** Habit list for the day selected in the calendar widget. */
+internal fun bindHabitsCalendar(
+    context: Context,
+    views: RemoteViews,
+    widgetData: SharedPreferences,
+    widgetId: Int
+) {
+  bindItemList(
+      context = context,
+      views = views,
+      widgetData = widgetData,
+      widgetId = widgetId,
+      listId = R.id.widget_habits_list,
+      emptyViewId = R.id.widget_habits_empty_view,
+      kind = TazkRemoteViewsService.KIND_HABIT,
+      source = TazkRemoteViewsService.SOURCE_CALENDAR,
+      emptyTextKey = "tazk_calendar_habits_empty",
+      templateRequestCode = 730000 + widgetId)
+}
+
+/**
+ * Makes [listId] a scrollable collection: the adapter comes from
+ * [TazkRemoteViewsService], the empty view is toggled by the adapter itself, and
+ * [rowClickTemplate] gives every row a broadcast to complete its item.
+ *
+ * The empty *text* is pushed by the app (`*_empty_text` / `*_calendar_*_empty`).
+ * The `tazk_tasks_empty` / `tazk_habits_empty` booleans are a separate type for
+ * a different reader: the list count decides emptiness here, so never feed a
+ * String key to [SharedPreferences.getBoolean] or the reverse.
+ */
+internal fun bindItemList(
+    context: Context,
+    views: RemoteViews,
+    widgetData: SharedPreferences,
+    widgetId: Int,
+    listId: Int,
+    emptyViewId: Int,
+    kind: String,
+    source: String,
+    emptyTextKey: String,
+    templateRequestCode: Int
+) {
+  views.setRemoteAdapter(listId, TazkRemoteViewsService.intent(context, widgetId, kind, source))
+  views.setPendingIntentTemplate(listId, rowClickTemplate(context, templateRequestCode))
+  views.setEmptyView(listId, emptyViewId)
+  views.setTextViewText(emptyViewId, widgetData.getString(emptyTextKey, "") ?: "")
+}
+
+/**
+ * Broadcast template every row's fill-in Intent is merged into. Collection items
+ * cannot own a PendingIntent (the host drops it), so the row only supplies the
+ * `homeWidget://...` data URI and this template supplies component + action.
+ * Mutable because `setOnClickFillInIntent` merges each row into it.
+ */
+private fun rowClickTemplate(context: Context, requestCode: Int): PendingIntent {
+  val intent =
+      Intent(context, HomeWidgetBackgroundReceiver::class.java).apply {
+        action = "es.antonborri.home_widget.action.BACKGROUND"
+      }
+  return PendingIntent.getBroadcast(
+      context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
 }

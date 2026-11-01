@@ -732,6 +732,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get widgetStreakDaysSuffix => 'hari';
 
   @override
+  String get widgetTasksEmpty => 'Belum ada tugas';
+
+  @override
+  String get widgetHabitsEmpty => 'Belum ada habit';
+
+  @override
   String get streakDaySingular => 'hari';
 
   @override

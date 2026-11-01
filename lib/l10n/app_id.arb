@@ -358,6 +358,8 @@
   "dbResetMessage": "Data lokal sempat rusak, jadi Tazk amankan dengan mulai dari awal.",
   "widgetStreakActiveLabel": "Streak aktif",
   "widgetStreakDaysSuffix": "hari",
+  "widgetTasksEmpty": "Belum ada tugas",
+  "widgetHabitsEmpty": "Belum ada habit",
   "streakDaySingular": "hari",
   "exactAlarmBannerMessage": "Izin alarm presisi dimatikan. Pengingat bisa telat hingga 15 menit.",
   "exactAlarmBannerAction": "Aktifkan",

@@ -1412,6 +1412,18 @@ abstract class AppLocalizations {
   /// **'hari'**
   String get widgetStreakDaysSuffix;
 
+  /// No description provided for @widgetTasksEmpty.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada tugas'**
+  String get widgetTasksEmpty;
+
+  /// No description provided for @widgetHabitsEmpty.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada habit'**
+  String get widgetHabitsEmpty;
+
   /// No description provided for @streakDaySingular.
   ///
   /// In id, this message translates to:

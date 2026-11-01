@@ -744,6 +744,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetStreakDaysSuffix => 'days';
 
   @override
+  String get widgetTasksEmpty => 'No tasks yet';
+
+  @override
+  String get widgetHabitsEmpty => 'No habits yet';
+
+  @override
   String get streakDaySingular => 'day';
 
   @override

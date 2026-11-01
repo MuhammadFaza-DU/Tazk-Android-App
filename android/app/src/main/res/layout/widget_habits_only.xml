@@ -17,102 +17,20 @@
         android:textStyle="bold"
         android:paddingBottom="6dp" />
 
-    <LinearLayout
-        android:id="@+id/habit_row_0"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingVertical="3dp">
-        <ImageView
-            android:id="@+id/habit_check_0"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:src="@drawable/ic_checkbox_unchecked" />
-        <TextView
-            android:id="@+id/habit_title_0"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="6dp"
-            android:textColor="#1E2E22"
-            android:textSize="13sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
-        <TextView
-            android:id="@+id/habit_subtitle_0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#889"
-            android:textSize="11sp" />
-    </LinearLayout>
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <LinearLayout
-        android:id="@+id/habit_row_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingVertical="3dp">
-        <ImageView
-            android:id="@+id/habit_check_1"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:src="@drawable/ic_checkbox_unchecked" />
-        <TextView
-            android:id="@+id/habit_title_1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="6dp"
-            android:textColor="#1E2E22"
-            android:textSize="13sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
-        <TextView
-            android:id="@+id/habit_subtitle_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#889"
-            android:textSize="11sp" />
-    </LinearLayout>
+        <ListView
+            android:id="@+id/widget_habits_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:paddingVertical="2dp" />
 
-    <LinearLayout
-        android:id="@+id/habit_row_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingVertical="3dp">
-        <ImageView
-            android:id="@+id/habit_check_2"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:src="@drawable/ic_checkbox_unchecked" />
-        <TextView
-            android:id="@+id/habit_title_2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="6dp"
-            android:textColor="#1E2E22"
-            android:textSize="13sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
-        <TextView
-            android:id="@+id/habit_subtitle_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#889"
-            android:textSize="11sp" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/habits_empty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Tidak ada habit aktif"
-        android:textColor="#889"
-        android:textSize="12sp"
-        android:visibility="gone" />
+        <include
+            android:id="@+id/widget_habits_empty_view"
+            layout="@layout/widget_empty_state" />
+    </FrameLayout>
 </LinearLayout>

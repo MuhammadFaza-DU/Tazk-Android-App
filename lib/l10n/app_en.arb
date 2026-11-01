@@ -250,6 +250,8 @@
   "dbResetMessage": "Local data got corrupted, so Tazk safely started fresh.",
   "widgetStreakActiveLabel": "Active streak",
   "widgetStreakDaysSuffix": "days",
+  "widgetTasksEmpty": "No tasks yet",
+  "widgetHabitsEmpty": "No habits yet",
   "streakDaySingular": "day",
   "exactAlarmBannerMessage": "Exact alarm permission is off. Reminders may be up to 15 minutes late.",
   "exactAlarmBannerAction": "Turn On",

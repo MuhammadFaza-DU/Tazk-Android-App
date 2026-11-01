@@ -105,6 +105,14 @@
                 android:resource="@xml/tazk_calendar_tasks_habits_widget_info" />
         </receiver>
 
+        <!-- Backs the scrollable ListViews above with RemoteViews. The launcher
+             binds to it, so it needs the BIND_REMOTEVIEWS permission, and it is
+             not exported because only this app's widgets request data. -->
+        <service
+            android:name=".TazkRemoteViewsService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+
         <!-- Midnight day-rollover job (android_alarm_manager_plus). The plugin does
              NOT auto-merge these — they must be declared, or arming an alarm with
              rescheduleOnReboot throws "Component class ... does not exist". -->

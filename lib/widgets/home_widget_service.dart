@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:home_widget/home_widget.dart';
 
 import '../core/utils/habit_due.dart' as habit_due;
@@ -9,6 +9,7 @@ import '../data/repositories/settings_repository.dart';
 import '../l10n/app_localizations.dart';
 import 'calendar_widget_models.dart';
 import 'widget_push_gate.dart';
+import 'widget_row_models.dart';
 
 /// Pushes today's tasks/habits and current streak into Android homescreen widgets.
 class HomeWidgetService {
@@ -24,8 +25,16 @@ class HomeWidgetService {
   @visibleForTesting
   int debugPushCount = 0;
 
-  static const maxRows = 3;
-  static const calendarMaxRows = 5;
+  static const maxRows = 100;
+  static const calendarMaxRows = 100;
+
+  /// Slots the pre-ListView layouts still render as fixed rows (three task and
+  /// habit rows, five calendar rows). Slots past the last real row are cleared
+  /// so a day that shrinks from three items to one does not leave yesterday's
+  /// title behind. The list adapter that T8.2 wires reads `*_count` instead, so
+  /// this tail clear is a handful of writes and nothing more.
+  static const _staticTaskSlots = 3;
+  static const _staticCalendarSlots = 5;
 
   static const tasksHabitsProviderName = 'TazkTasksHabitsWidgetProvider';
   static const tasksOnlyProviderName = 'TazkTasksOnlyWidgetProvider';
@@ -114,54 +123,88 @@ class HomeWidgetService {
   Future<void> _refreshTasksAndHabits() async {
     final today = _dateOnly(DateTime.now());
 
-    final tasks = await _tasksForDate(today);
+    final taskRows = taskWidgetRows(await _tasksForDate(today));
     final habits = await _habitsForDate(today);
+    final habitRows = habitWidgetRows(
+      habits,
+      await _logsForHabits(habits.map((habit) => habit.id).toList(), today),
+    );
 
-    for (var i = 0; i < maxRows; i++) {
-      if (i < tasks.length) {
-        final task = tasks[i];
-        await HomeWidget.saveWidgetData('tazk_task_${i}_id', task.id);
-        await HomeWidget.saveWidgetData('tazk_task_${i}_title', task.title);
-        await HomeWidget.saveWidgetData(
-          'tazk_task_${i}_time',
-          task.time != null ? TimeOfDay.fromDateTime(task.time!).format24Hour() : '',
-        );
-      } else {
-        await HomeWidget.saveWidgetData('tazk_task_${i}_id', -1);
-        await HomeWidget.saveWidgetData('tazk_task_${i}_title', '');
-        await HomeWidget.saveWidgetData('tazk_task_${i}_time', '');
-      }
-    }
-    await HomeWidget.saveWidgetData('tazk_task_count', tasks.length);
+    final taskCount = await _writeTaskRows(taskRows);
+    final habitCount = await _writeHabitRows(habitRows);
 
-    for (var i = 0; i < maxRows; i++) {
-      if (i < habits.length) {
-        final habit = habits[i];
-        final log = await (_db.select(_db.habitLogs)
-              ..where((l) => l.habitId.equals(habit.id) & l.date.equals(today)))
-            .getSingleOrNull();
-        await HomeWidget.saveWidgetData('tazk_habit_${i}_id', habit.id);
-        await HomeWidget.saveWidgetData('tazk_habit_${i}_title', habit.name);
-        await HomeWidget.saveWidgetData(
-          'tazk_habit_${i}_subtitle',
-          habit.hasProgress ? '${log?.progressMinutes ?? 0}/${habit.targetMinutes ?? 0}' : '',
-        );
-        await HomeWidget.saveWidgetData(
-          'tazk_habit_${i}_done',
-          log?.isCompleted ?? false,
-        );
-      } else {
-        await HomeWidget.saveWidgetData('tazk_habit_${i}_id', -1);
-        await HomeWidget.saveWidgetData('tazk_habit_${i}_title', '');
-        await HomeWidget.saveWidgetData('tazk_habit_${i}_subtitle', '');
-        await HomeWidget.saveWidgetData('tazk_habit_${i}_done', false);
-      }
-    }
-    await HomeWidget.saveWidgetData('tazk_habit_count', habits.length);
+    final settings = await _settings.ensureSettings();
+    final l10n = lookupAppLocalizations(
+      Locale(settings.language == AppLanguage.english ? 'en' : 'id'),
+    );
+    await HomeWidget.saveWidgetData('tazk_tasks_empty', taskCount == 0);
+    await HomeWidget.saveWidgetData(
+      'tazk_tasks_empty_text',
+      l10n.widgetTasksEmpty,
+    );
+    await HomeWidget.saveWidgetData('tazk_habits_empty', habitCount == 0);
+    await HomeWidget.saveWidgetData(
+      'tazk_habits_empty_text',
+      l10n.widgetHabitsEmpty,
+    );
 
     await HomeWidget.updateWidget(androidName: tasksHabitsProviderName);
     await HomeWidget.updateWidget(androidName: tasksOnlyProviderName);
     await HomeWidget.updateWidget(androidName: habitsOnlyProviderName);
+  }
+
+  /// Writes every task row and returns how many were written, so
+  /// `tazk_task_count` can never claim more rows than the keys that exist.
+  Future<int> _writeTaskRows(List<WidgetRow> rows) async {
+    final written = _rowsToWrite(rows.length, maxRows);
+    for (var i = 0; i < written; i++) {
+      final row = rows[i];
+      await HomeWidget.saveWidgetData('tazk_task_${i}_id', row.id);
+      await HomeWidget.saveWidgetData('tazk_task_${i}_title', row.title);
+      await HomeWidget.saveWidgetData('tazk_task_${i}_time', row.subtitle);
+    }
+    for (var i = written; i < _staticTaskSlots; i++) {
+      await HomeWidget.saveWidgetData('tazk_task_${i}_id', -1);
+      await HomeWidget.saveWidgetData('tazk_task_${i}_title', '');
+      await HomeWidget.saveWidgetData('tazk_task_${i}_time', '');
+    }
+    await HomeWidget.saveWidgetData('tazk_task_count', written);
+    return written;
+  }
+
+  /// Habit twin of [_writeTaskRows].
+  Future<int> _writeHabitRows(List<WidgetRow> rows) async {
+    final written = _rowsToWrite(rows.length, maxRows);
+    for (var i = 0; i < written; i++) {
+      final row = rows[i];
+      await HomeWidget.saveWidgetData('tazk_habit_${i}_id', row.id);
+      await HomeWidget.saveWidgetData('tazk_habit_${i}_title', row.title);
+      await HomeWidget.saveWidgetData('tazk_habit_${i}_subtitle', row.subtitle);
+      await HomeWidget.saveWidgetData('tazk_habit_${i}_done', row.done);
+    }
+    for (var i = written; i < _staticTaskSlots; i++) {
+      await HomeWidget.saveWidgetData('tazk_habit_${i}_id', -1);
+      await HomeWidget.saveWidgetData('tazk_habit_${i}_title', '');
+      await HomeWidget.saveWidgetData('tazk_habit_${i}_subtitle', '');
+      await HomeWidget.saveWidgetData('tazk_habit_${i}_done', false);
+    }
+    await HomeWidget.saveWidgetData('tazk_habit_count', written);
+    return written;
+  }
+
+  static int _rowsToWrite(int rowCount, int ceiling) =>
+      rowCount > ceiling ? ceiling : rowCount;
+
+  /// One query for every habit's log on [date]; the row builder wants a map.
+  Future<Map<int, HabitLog>> _logsForHabits(
+    List<int> habitIds,
+    DateTime date,
+  ) async {
+    if (habitIds.isEmpty) return const {};
+    final logs = await (_db.select(_db.habitLogs)
+          ..where((l) => l.habitId.isIn(habitIds) & l.date.equals(date)))
+        .get();
+    return {for (final log in logs) log.habitId: log};
   }
 
   Future<void> _refreshCalendar({
@@ -224,35 +267,41 @@ class HomeWidgetService {
       );
     }
 
-    for (var i = 0; i < calendarMaxRows; i++) {
-      if (i < tasks.length) {
-        final task = tasks[i];
-        await HomeWidget.saveWidgetData('tazk_calendar_task_${i}_id', task.id);
-        await HomeWidget.saveWidgetData(
-          'tazk_calendar_task_${i}_title',
-          task.title,
-        );
-      } else {
-        await HomeWidget.saveWidgetData('tazk_calendar_task_${i}_id', -1);
-        await HomeWidget.saveWidgetData('tazk_calendar_task_${i}_title', '');
-      }
+    final calendarTaskCount = _rowsToWrite(tasks.length, calendarMaxRows);
+    for (var i = 0; i < calendarTaskCount; i++) {
+      final task = tasks[i];
+      await HomeWidget.saveWidgetData('tazk_calendar_task_${i}_id', task.id);
+      await HomeWidget.saveWidgetData(
+        'tazk_calendar_task_${i}_title',
+        task.title,
+      );
     }
-    await HomeWidget.saveWidgetData('tazk_calendar_task_count', tasks.length);
+    for (var i = calendarTaskCount; i < _staticCalendarSlots; i++) {
+      await HomeWidget.saveWidgetData('tazk_calendar_task_${i}_id', -1);
+      await HomeWidget.saveWidgetData('tazk_calendar_task_${i}_title', '');
+    }
+    await HomeWidget.saveWidgetData(
+      'tazk_calendar_task_count',
+      calendarTaskCount,
+    );
 
-    for (var i = 0; i < calendarMaxRows; i++) {
-      if (i < habits.length) {
-        final habit = habits[i];
-        await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_id', habit.id);
-        await HomeWidget.saveWidgetData(
-          'tazk_calendar_habit_${i}_title',
-          habit.name,
-        );
-      } else {
-        await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_id', -1);
-        await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_title', '');
-      }
+    final calendarHabitCount = _rowsToWrite(habits.length, calendarMaxRows);
+    for (var i = 0; i < calendarHabitCount; i++) {
+      final habit = habits[i];
+      await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_id', habit.id);
+      await HomeWidget.saveWidgetData(
+        'tazk_calendar_habit_${i}_title',
+        habit.name,
+      );
     }
-    await HomeWidget.saveWidgetData('tazk_calendar_habit_count', habits.length);
+    for (var i = calendarHabitCount; i < _staticCalendarSlots; i++) {
+      await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_id', -1);
+      await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_title', '');
+    }
+    await HomeWidget.saveWidgetData(
+      'tazk_calendar_habit_count',
+      calendarHabitCount,
+    );
     await HomeWidget.saveWidgetData('tazk_calendar_tasks_label', 'TASKS');
     await HomeWidget.saveWidgetData('tazk_calendar_habits_label', 'HABITS');
     await HomeWidget.saveWidgetData(
@@ -436,12 +485,4 @@ class HomeWidgetService {
   bool _isDueOnDate(Habit habit, DateTime date) => habit_due.isHabitDueOnDate(habit, date);
 
   static DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
-}
-
-extension on TimeOfDay {
-  String format24Hour() {
-    final hh = hour.toString().padLeft(2, '0');
-    final mm = minute.toString().padLeft(2, '0');
-    return '$hh:$mm';
-  }
 }

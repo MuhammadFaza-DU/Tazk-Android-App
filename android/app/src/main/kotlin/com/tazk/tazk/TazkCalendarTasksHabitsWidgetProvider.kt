@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.net.Uri
-import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
@@ -33,10 +32,12 @@ class TazkCalendarTasksHabitsWidgetProvider : HomeWidgetProvider() {
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java))
 
             bindCalendarDays(context, this, widgetData)
-            bindCalendarTaskRows(context, this, widgetData)
-            bindCalendarHabitRows(context, this, widgetData)
+            bindTasksCalendar(context, this, widgetData, widgetId)
+            bindHabitsCalendar(context, this, widgetData, widgetId)
           }
       appWidgetManager.updateAppWidget(widgetId, views)
+      appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.widget_tasks_list)
+      appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.widget_habits_list)
     }
   }
 }
@@ -114,69 +115,6 @@ private fun bindCalendarDays(
     views.setTextColor(viewId, colorForDay(inMonth, isToday, isSelected))
     views.setInt(viewId, "setBackgroundResource", backgroundForDay(isToday, isSelected))
     views.setOnClickPendingIntent(viewId, backgroundPending(context, "homeWidget://calendarSelectDate?millis=$millis", 500000 + index))
-  }
-}
-
-private fun bindCalendarTaskRows(
-    context: Context,
-    views: RemoteViews,
-    widgetData: SharedPreferences
-) {
-  val rows =
-      arrayOf(
-          Triple(R.id.calendar_task_row_0, R.id.calendar_task_check_0, R.id.calendar_task_title_0),
-          Triple(R.id.calendar_task_row_1, R.id.calendar_task_check_1, R.id.calendar_task_title_1),
-          Triple(R.id.calendar_task_row_2, R.id.calendar_task_check_2, R.id.calendar_task_title_2),
-          Triple(R.id.calendar_task_row_3, R.id.calendar_task_check_3, R.id.calendar_task_title_3),
-          Triple(R.id.calendar_task_row_4, R.id.calendar_task_check_4, R.id.calendar_task_title_4))
-  val count = widgetData.getInt("tazk_calendar_task_count", 0)
-  views.setViewVisibility(R.id.calendar_tasks_empty, if (count == 0) View.VISIBLE else View.GONE)
-  views.setTextViewText(
-      R.id.calendar_tasks_empty, widgetData.getString("tazk_calendar_tasks_empty", "Tidak ada task"))
-
-  rows.forEachIndexed { index, ids ->
-    val id = widgetData.getInt("tazk_calendar_task_${index}_id", -1)
-    if (id < 0) {
-      views.setViewVisibility(ids.first, View.GONE)
-      return@forEachIndexed
-    }
-    views.setViewVisibility(ids.first, View.VISIBLE)
-    views.setTextViewText(ids.third, widgetData.getString("tazk_calendar_task_${index}_title", ""))
-    views.setImageViewResource(ids.second, R.drawable.ic_checkbox_unchecked)
-    views.setOnClickPendingIntent(ids.second, backgroundPending(context, "homeWidget://calendarCompleteTask?id=$id", 300000 + id))
-  }
-}
-
-private fun bindCalendarHabitRows(
-    context: Context,
-    views: RemoteViews,
-    widgetData: SharedPreferences
-) {
-  val rows =
-      arrayOf(
-          Triple(R.id.calendar_habit_row_0, R.id.calendar_habit_check_0, R.id.calendar_habit_title_0),
-          Triple(R.id.calendar_habit_row_1, R.id.calendar_habit_check_1, R.id.calendar_habit_title_1),
-          Triple(R.id.calendar_habit_row_2, R.id.calendar_habit_check_2, R.id.calendar_habit_title_2),
-          Triple(R.id.calendar_habit_row_3, R.id.calendar_habit_check_3, R.id.calendar_habit_title_3),
-          Triple(R.id.calendar_habit_row_4, R.id.calendar_habit_check_4, R.id.calendar_habit_title_4))
-  val count = widgetData.getInt("tazk_calendar_habit_count", 0)
-  val selectedMillis = widgetData.getLong("tazk_calendar_selected_millis", 0L)
-  views.setViewVisibility(R.id.calendar_habits_empty, if (count == 0) View.VISIBLE else View.GONE)
-  views.setTextViewText(
-      R.id.calendar_habits_empty,
-      widgetData.getString("tazk_calendar_habits_empty", "Tidak ada habit"))
-
-  rows.forEachIndexed { index, ids ->
-    val id = widgetData.getInt("tazk_calendar_habit_${index}_id", -1)
-    if (id < 0) {
-      views.setViewVisibility(ids.first, View.GONE)
-      return@forEachIndexed
-    }
-    views.setViewVisibility(ids.first, View.VISIBLE)
-    views.setTextViewText(ids.third, widgetData.getString("tazk_calendar_habit_${index}_title", ""))
-    views.setImageViewResource(ids.second, R.drawable.ic_checkbox_unchecked)
-    views.setOnClickPendingIntent(
-        ids.second, backgroundPending(context, "homeWidget://calendarCompleteHabit?id=$id&selectedMillis=$selectedMillis", 400000 + id))
   }
 }
 
