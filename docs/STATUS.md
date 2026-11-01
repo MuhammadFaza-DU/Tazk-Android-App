@@ -366,8 +366,24 @@ verifikasi HP akhir (permintaan owner).
 
 ## Langkah berikutnya
 
-**T6 & T7 selesai.** Lanjut **T8–T10** — plan lengkap ada di:
-`docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`
+**T6 & T7 selesai.** Sisa **T8–T10**, dieksekusi dalam **4 putaran paralel** (keputusan owner
+2026-11-01, menggantikan urutan sekuensial plan):
+
+| Putaran | Task | Paralel |
+|---|---|---|
+| 0 | T9.1 (schema v7) | 1 |
+| 1 | T8.1 ∥ T9.2 ∥ T10.1 | 3 |
+| 2 | T8.2 ∥ T10.2 | 2 |
+| 3 | T8.3 | 1 |
+
+Alasan: file yang bertabrakan sudah dipetakan — T8.2/T8.3 sama-sama menyentuh `home_widget_service.dart`,
+T9.2/T10.2 sama-sama menyentuh `settings_screen.dart` + ARB, jadi keduanya dipisah ke putaran berbeda.
+Verifikasi berat (suite penuh + build APK) dipegang PM di batas tiap putaran; subagent hanya
+`dart analyze` + test tertarget.
+
+**Rujukan lanjut:** `.superpowers/sdd/t6-t10/RESUME.md` (status, keputusan owner, matriks tabrakan file,
+kontrak key widget, jebakan terverifikasi) + plan asli
+`docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`.
 
 | Fase | Isi | Migrasi |
 |---|---|---|
@@ -377,4 +393,4 @@ verifikasi HP akhir (permintaan owner).
 | T9 | Channel focus-session (ke-5) + toggle | v6→v7 |
 | T10 | Backup offline JSON + checksum (Drive ditunda) | — |
 
-Checkpoint per tahap (`stable-YYYY-MM-DD-vN`). Sesi baru cukup baca file plan itu + dokumen ini.
+Checkpoint per tahap (`stable-YYYY-MM-DD-vN`). Verifikasi HP ditunda ke akhir semua tahap.
