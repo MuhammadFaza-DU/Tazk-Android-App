@@ -688,6 +688,24 @@ class AppLocalizationsId extends AppLocalizations {
   String get notifFreezeLabel => 'Freeze';
 
   @override
+  String get notifFocusSessionLabel => 'Sesi fokus';
+
+  @override
+  String get notifTaskSubtitle => 'Saat jam task tiba';
+
+  @override
+  String get notifHabitSubtitle => 'Saat waktu habit tiba';
+
+  @override
+  String get notifStreakWarningSubtitle => 'Kalau belum ada yang selesai';
+
+  @override
+  String get notifFreezeSubtitle => 'Saat freeze otomatis dipakai';
+
+  @override
+  String get notifFocusSessionSubtitle => 'Saat timer Pomodoro habis';
+
+  @override
   String get permissionBannerMessage =>
       'Notifikasi dimatikan. Aktifkan supaya pengingat task & habit berfungsi.';
 

@@ -1328,6 +1328,42 @@ abstract class AppLocalizations {
   /// **'Freeze'**
   String get notifFreezeLabel;
 
+  /// No description provided for @notifFocusSessionLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi fokus'**
+  String get notifFocusSessionLabel;
+
+  /// No description provided for @notifTaskSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Saat jam task tiba'**
+  String get notifTaskSubtitle;
+
+  /// No description provided for @notifHabitSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Saat waktu habit tiba'**
+  String get notifHabitSubtitle;
+
+  /// No description provided for @notifStreakWarningSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kalau belum ada yang selesai'**
+  String get notifStreakWarningSubtitle;
+
+  /// No description provided for @notifFreezeSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Saat freeze otomatis dipakai'**
+  String get notifFreezeSubtitle;
+
+  /// No description provided for @notifFocusSessionSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Saat timer Pomodoro habis'**
+  String get notifFocusSessionSubtitle;
+
   /// No description provided for @permissionBannerMessage.
   ///
   /// In id, this message translates to:

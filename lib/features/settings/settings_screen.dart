@@ -102,6 +102,13 @@ class SettingsScreen extends ConsumerWidget {
                   title: l10n.notifStreakWarningLabel,
                   enabled: settings?.notifyStreakWarning ?? true,
                 ),
+                // Baris ke-4 = perluasan produk (board 08 hanya punya 3);
+                // deviasinya dicatat di laporan T9.2.
+                reminderRow(
+                  icon: Icons.timer_rounded,
+                  title: l10n.notifFocusSessionLabel,
+                  enabled: settings?.notifyFocusSession ?? true,
+                ),
                 ListRow(
                   leading: _IconTile(
                     permissionEnabled

@@ -700,6 +700,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifFreezeLabel => 'Freeze';
 
   @override
+  String get notifFocusSessionLabel => 'Focus session';
+
+  @override
+  String get notifTaskSubtitle => 'When the task time arrives';
+
+  @override
+  String get notifHabitSubtitle => 'When the habit time arrives';
+
+  @override
+  String get notifStreakWarningSubtitle => 'If nothing is done yet';
+
+  @override
+  String get notifFreezeSubtitle => 'When a freeze is used automatically';
+
+  @override
+  String get notifFocusSessionSubtitle => 'When the Pomodoro timer ends';
+
+  @override
   String get permissionBannerMessage =>
       'Notifications are off. Turn them on so task & habit reminders work.';
 

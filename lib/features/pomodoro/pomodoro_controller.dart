@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/database.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/repository_providers.dart';
+import '../../providers/settings_providers.dart';
 import '../../providers/stats_repository_provider.dart';
 
 enum PomodoroSessionStatus { idle, running, paused }
@@ -47,6 +48,8 @@ final pomodoroControllerProvider = ChangeNotifierProvider<PomodoroController>((
     logHabitProgress: habitRepository.logProgress,
     completeHabitToday: habitRepository.completeHabitToday,
     logFocusSession: ref.watch(statsRepositoryProvider).logFocusSession,
+    isFocusSessionNotificationEnabled: () =>
+        ref.read(appSettingsProvider).valueOrNull?.notifyFocusSession ?? true,
   );
 });
 
@@ -58,6 +61,7 @@ class PomodoroController extends ChangeNotifier {
     required this.completeHabitToday,
     required this.logFocusSession,
     DateTime Function()? now,
+    this.isFocusSessionNotificationEnabled,
   }) : _now = now ?? DateTime.now;
 
   final SchedulePomodoroCompletion scheduleCompletionNotification;
@@ -65,7 +69,14 @@ class PomodoroController extends ChangeNotifier {
   final Future<void> Function(int habitId, int minutes) logHabitProgress;
   final Future<void> Function(int habitId) completeHabitToday;
   final Future<void> Function(int minutes, int? habitId) logFocusSession;
+
+  /// Gate channel notifikasi ke-5 (`AppSetting.notifyFocusSession`). `null`
+  /// berarti channel aktif — perilaku sebelum T9.2.
+  final bool Function()? isFocusSessionNotificationEnabled;
   final DateTime Function() _now;
+
+  bool _shouldNotifyFocusSession() =>
+      isFocusSessionNotificationEnabled?.call() ?? true;
 
   bool _isHabitMode = false;
   Habit? _selectedHabit;
@@ -149,11 +160,13 @@ class PomodoroController extends ChangeNotifier {
     _status = PomodoroSessionStatus.running;
     notifyListeners();
     _startTicker();
-    await scheduleCompletionNotification(
-      endTime,
-      completionTitle,
-      completionBody,
-    );
+    if (_shouldNotifyFocusSession()) {
+      await scheduleCompletionNotification(
+        endTime,
+        completionTitle,
+        completionBody,
+      );
+    }
   }
 
   Future<void> pause() async {
@@ -173,11 +186,13 @@ class PomodoroController extends ChangeNotifier {
     _status = PomodoroSessionStatus.running;
     notifyListeners();
     _startTicker();
-    await scheduleCompletionNotification(
-      endTime,
-      completionTitle,
-      completionBody,
-    );
+    if (_shouldNotifyFocusSession()) {
+      await scheduleCompletionNotification(
+        endTime,
+        completionTitle,
+        completionBody,
+      );
+    }
   }
 
   Future<void> cancel() async {

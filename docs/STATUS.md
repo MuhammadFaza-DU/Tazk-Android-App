@@ -3,9 +3,11 @@
 Dokumen penanda posisi kerja. Baca ini dulu sebelum melanjutkan, supaya tidak
 mengulang keputusan yang sudah diambil atau mengerjakan hal yang sudah selesai.
 
-Terakhir diperbarui: **2026-10-31**
+Terakhir diperbarui: **2026-11-01**
 
 ## Log Perubahan (terbaru duluan)
+
+- 2026-11-01 — **T9 Notifikasi channel ke-5 tuntas (T9.1–T9.2)**: schema **v7** (`AppSettings.notifyFocusSession` BoolColumn default true; migrasi v6→v7 teruji di file SQLite nyata — baris lama selamat, default ter-backfill, `PRAGMA user_version == 7`); `updateNotificationPref` dapat `notifyFocusSession` tanpa menimpa 4 channel lain; layar Notifikasi kini **5 baris judul+subjudul** (board 21) termasuk `Sesi fokus / Saat timer Pomodoro habis`; baris shortcut **Focus** ke-4 di Pengaturan; **Pomodoro** hanya menjadwalkan notifikasi selesai sesi bila `notifyFocusSession` true (gate di `start` & `resume`; `logFocusSession` + cancel tetap jalan). **492 test hijau (+15), analyze 0, APK debug terbangun.** Deviasi tercatat: baris Focus ke-4 **tidak ada di board 08** (perluasan produk, preseden T6.4); subjudul streak tanpa `20:00`; judul pendek `Sesi fokus` (board `Sesi fokus selesai`); toggle ke-5 ON (schema true) walau board menggambarnya redup. **Limitasi diterima:** mematikan channel saat sesi berjalan TIDAK membatalkan notifikasi yang sudah terjadwal (revisit T12/T13). **Verifikasi HP ditunda.** — *(belum commit)*
 
 - 2026-11-01 — **T7 Kategori & Pencarian tuntas (T7.1–T7.4)**: schema **v6** (`Categories` + `categoryId` nullable di tasks/habits, `REFERENCES … ON DELETE SET NULL` teruji di jalur migrasi *dan* fresh DB, kontrak int `CategoryColor` dipaku 0–5); `CategoryRepository` (nama unik case-insensitive, `deleteCategory` men-null-kan referensi eksplisit karena `PRAGMA foreign_keys` = **OFF**, `updateCategoryColor`) + palette 6 warna **12/12 lolos kontras** (min 4,61:1); `CategoryPicker` di Task Form & Habit Form (set/ubah), layar **Kelola kategori** (tambah/ubah/warna/hapus) + grup `KATEGORI` di Pengaturan; **pencarian lintas item** (`SearchRepository`: `LIKE … ESCAPE '\'` literal, escape `%`/`_`/`\` berurutan, query kosong → `[]` tanpa menyentuh DB, cocok judul/lokasi/nama kategori, item selesai ikut) + `SearchScreen` board 26 D (chip `Semua`→kategori→`Habit`→`Selesai`, debounce 250 ms tanpa kehilangan huruf pertama, hasil di-invalidate setelah edit) + ikon cari di header Tasks. `AppTextField` dapat `prefixIcon`/`hintStyle` opsional (satu sumber styling input). **475 test hijau, analyze 0.** Deviasi tercatat: streak habit di subjudul diganti frekuensi, kotak cari + kartu hasil dipisah (hindari card-in-card dengan `EmptyState`), warna kategori di light lebih gelap dari token mentah (token `honey`/`clay` gagal 4,5:1). **Verifikasi HP ditunda.** — *(belum commit)*
 
@@ -54,7 +56,9 @@ reduced-motion dihormati di semua animasi), dan **T5 statistik selesai** (schema
 `focus_sessions` + `xp_events`, query agregat, layar Statistik dengan chart + heatmap,
 tanpa angka palsu), dan **T6 subtask & lokasi selesai** (schema v5, XP 15/10/5 + rekonsiliasi,
 reorder + toggle atomik, "Buka di Maps", progress `x/y` di kartu), dan **T7 kategori & pencarian selesai**
-(schema v6, kategori 1/item + kelola, pencarian lintas task/habit literal). Fase berikutnya: **T8 — widget scroll**.
+(schema v6, kategori 1/item + kelola, pencarian lintas task/habit literal), dan **T9 notifikasi channel
+ke-5 selesai** (schema v7, toggle Focus + gate notifikasi Pomodoro). Fase berikutnya: **T10 backup** lalu
+**T8 widget scroll**.
 
 ---
 
@@ -232,7 +236,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 | T6 Subtask & Lokasi | ✅ selesai | **T6.0** XP 15/10/5 + rekonsiliasi prioritas; **T6.1** schema v5 (`position` + `autoCompleteSubtasks`); **T6.2** reorder; **T6.3** `toggleSubtask` atomik; **T6.4** UI reorder/maps/progress. 392 test |
 | T7 Kategori/tag & pencarian | ✅ selesai | **T7.1** schema v6 `Categories`+`categoryId`; **T7.2** repo+palette (12/12 kontras); **T7.3** picker+Kelola kategori; **T7.4** pencarian lintas item (board 26 D). 475 test |
 | T8 Widget | 🟡 desain selesai | 5 varian + state kosong digambar; scroll butuh `RemoteViewsService` (belum ada) |
-| T9 Notifikasi | 🟡 desain selesai | 5 channel + banner + layar pengaturan digambar |
+| T9 Notifikasi | ✅ selesai | **T9.1** schema v7 `notifyFocusSession`; **T9.2** 5 toggle judul+subjudul (board 21) + baris Focus di Pengaturan + gate notifikasi selesai sesi di `start`/`resume`. 492 test |
 | T10 Backup/restore | 🟡 desain selesai | Alur Google Drive digambar, belum dikode |
 | T11 Cek update | ⬜ belum | |
 | T12 Gamifikasi polish | ⬜ belum | |
@@ -265,7 +269,9 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
    | 27 Celebration | ✅ sesuai | maskot 100dp, pill rank, CTA; one-shot 750ms + reduced-motion (T4 dipertahankan) |
    | 23 Tentang | ✅ sesuai | petak maskot 84dp rounded, nama, versi dari `package_info_plus` (tidak hardcode), deskripsi. Deviasi: 4 baris aksi (privasi/lisensi/rating/masukan) belum dibangun — butuh tujuan nyata |
    | 07 Statistik | ✅ sesuai | board 07 dibangun + **diverifikasi di HP (Galaxy A52, Android 14)**. Tabel selisih lengkap di section "T5 — fidelity board 07 Statistik". Screenshot HP: `docs/artifacts/hp-07-statistik-*.png` (light Mingu/Tahun, dark), render pembanding `07-statistik-render.png` |
-   | 20/21/26 | 🔒 | menunggu T8/T9/T10 |
+   | 21 Notifikasi | ✅ sesuai (T9.2) | 5 baris judul+subjudul (board 21) + baris shortcut Focus di Pengaturan. Deviasi: subjudul streak tanpa `20:00`; judul pendek `Sesi fokus` (board `Sesi fokus selesai`); toggle ke-5 ON walau board redup (schema default true) |
+   | 20 Widgets | 🔒 | menunggu T8 |
+   | 26 Backup & Pencarian | 🟡 sebagian | bagian **D — Pencarian** sudah (T7.4); bagian backup menunggu T10 |
 
    **Gutter:** diseragamkan **20dp** (nilai board 19.5–20) di `AppScaffold.gutter` + Kalender/Habits/Tasks/HabitDetail/Pengaturan/NotifSettings/Home/HabitForm/Profil. Onboarding tetap 24 sesuai board 09.
 
@@ -355,30 +361,29 @@ adb -s RR8RC027VGL pull "/sdcard/s.png" "docs\artifacts\nama.png"
 #    ⚠️ Kalau layar terkunci, screenshot jadi hitam penuh walaupun file ada isinya.
 ```
 
-**Baseline terakhir terverifikasi (2026-11-01, T7 selesai):** `dart analyze` bersih,
-`flutter test` **475/475**, `flutter build apk --debug` sukses, versi tetap **2.0.0+5**.
+**Baseline terakhir terverifikasi (2026-11-01, T9 selesai):** `dart analyze` bersih,
+`flutter test` **492/492**, `flutter build apk --debug` sukses (212 MB), versi tetap **2.0.0+5**.
 `DESIGN.md` tidak disentuh sejak T5 (lint `exit 0` terakhir 2026-10-31).
 **Belum terverifikasi:** perilaku di HP (drag subtask, maps, sakelar auto-selesai, progress `x/y`,
-picker kategori, layar Kelola kategori, pencarian) — device tidak tersambung; ditunda ke
-verifikasi HP akhir (permintaan owner).
+picker kategori, Kelola kategori, pencarian, toggle + notifikasi focus-session) — device tidak tersambung;
+ditunda ke verifikasi HP akhir (permintaan owner).
 
 ---
 
 ## Langkah berikutnya
 
-**T6 & T7 selesai.** Sisa **T8–T10**, dieksekusi dalam **4 putaran paralel** (keputusan owner
-2026-11-01, menggantikan urutan sekuensial plan):
+**T6, T7, T9 selesai.** Sisa **T10** lalu **T8**. Eksekusi **diserialkan** (ruling 2026-11-01):
+`flutter test`/`dart analyze` di satu checkout saling berebut `.dart_tool` + lock startup, jadi
+menjalankan beberapa subagent serentak berisiko gagal-palsu. Urutan tetap memenuhi dependensi dan
+checkpoint per tahap:
 
-| Putaran | Task | Paralel |
+| Urutan | Task | Catatan |
 |---|---|---|
-| 0 | T9.1 (schema v7) | 1 |
-| 1 | T8.1 ∥ T9.2 ∥ T10.1 | 3 |
-| 2 | T8.2 ∥ T10.2 | 2 |
-| 3 | T8.3 | 1 |
+| ✅ | T9.1 → T9.2 | tag `stable-2026-11-01-v3` |
+| berikut | T10.1 → T10.2 | butuh kolom `notifyFocusSession` (selesai); tag `-v4` |
+| lalu | T8.1 → T8.2 → T8.3 | T8.3 butuh row model + layout; tag `-v5` |
 
-Alasan: file yang bertabrakan sudah dipetakan — T8.2/T8.3 sama-sama menyentuh `home_widget_service.dart`,
-T9.2/T10.2 sama-sama menyentuh `settings_screen.dart` + ARB, jadi keduanya dipisah ke putaran berbeda.
-Verifikasi berat (suite penuh + build APK) dipegang PM di batas tiap putaran; subagent hanya
+Verifikasi berat (suite penuh + build APK) dipegang PM di batas tiap tahap; subagent hanya
 `dart analyze` + test tertarget.
 
 **Rujukan lanjut:** `.superpowers/sdd/t6-t10/RESUME.md` (status, keputusan owner, matriks tabrakan file,
@@ -389,8 +394,8 @@ kontrak key widget, jebakan terverifikasi) + plan asli
 |---|---|---|
 | ~~T6~~ | ~~Subtask + lokasi + XP 15/10/5~~ | **v5 ✅** |
 | ~~T7~~ | ~~Kategori (1/item) + pencarian lintas task/habit~~ | **v6 ✅** |
-| T8 | Widget scroll (`RemoteViewsService` Kotlin) + empty state | — |
-| T9 | Channel focus-session (ke-5) + toggle | v6→v7 |
+| ~~T9~~ | ~~Channel focus-session (ke-5) + toggle~~ | **v7 ✅** |
 | T10 | Backup offline JSON + checksum (Drive ditunda) | — |
+| T8 | Widget scroll (`RemoteViewsService` Kotlin) + empty state | — |
 
 Checkpoint per tahap (`stable-YYYY-MM-DD-vN`). Verifikasi HP ditunda ke akhir semua tahap.

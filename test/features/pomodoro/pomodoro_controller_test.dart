@@ -191,6 +191,75 @@ void main() {
     });
   });
 
+  test('start tidak menjadwalkan notifikasi saat sesi fokus dimatikan', () async {
+    var scheduled = 0;
+    final controller = _controller(
+      isFocusSessionNotificationEnabled: () => false,
+      scheduleCompletionNotification: (_, _, _) async => scheduled++,
+    );
+
+    await controller.start(completionTitle: 'Selesai', completionBody: 'Done');
+
+    expect(controller.status, PomodoroSessionStatus.running);
+    expect(scheduled, 0);
+  });
+
+  test('start menjadwalkan notifikasi saat sesi fokus dinyalakan', () async {
+    var scheduled = 0;
+    final controller = _controller(
+      isFocusSessionNotificationEnabled: () => true,
+      scheduleCompletionNotification: (_, _, _) async => scheduled++,
+    );
+
+    await controller.start(completionTitle: 'Selesai', completionBody: 'Done');
+
+    expect(scheduled, 1);
+  });
+
+  test('resume tidak menjadwalkan notifikasi saat sesi fokus dimatikan', () {
+    fakeAsync((async) {
+      var now = DateTime(2026, 7, 12, 10);
+      var scheduled = 0;
+      final controller = _controller(
+        now: () => now,
+        isFocusSessionNotificationEnabled: () => false,
+        scheduleCompletionNotification: (_, _, _) async => scheduled++,
+      );
+
+      controller.setDurationMinutes(10);
+      unawaited(
+        controller.start(completionTitle: 'Selesai', completionBody: 'Done'),
+      );
+      async.flushMicrotasks();
+      unawaited(controller.pause());
+      async.flushMicrotasks();
+      expect(controller.status, PomodoroSessionStatus.paused);
+      expect(scheduled, 0);
+
+      unawaited(
+        controller.resume(completionTitle: 'Selesai', completionBody: 'Done'),
+      );
+      async.flushMicrotasks();
+
+      // Timer tetap berjalan; hanya notifikasinya yang tidak dijadwalkan.
+      expect(controller.status, PomodoroSessionStatus.running);
+      expect(scheduled, 0);
+    });
+  });
+
+  test('mematikan notifikasi tidak menghalangi pencatatan sesi fokus', () async {
+    var logged = 0;
+    final controller = _controller(
+      isFocusSessionNotificationEnabled: () => false,
+      logFocusSession: (_, _) async => logged++,
+    );
+
+    await controller.start(completionTitle: 'Selesai', completionBody: 'Done');
+    await controller.completeCurrentSession();
+
+    expect(logged, 1);
+  });
+
   test('ticker is stopped when idle (after cancel/complete)', () {
     fakeAsync((async) {
       var now = DateTime(2026, 7, 12, 10);
@@ -219,14 +288,19 @@ PomodoroController _controller({
   Future<void> Function(int habitId)? completeHabitToday,
   Future<void> Function(int habitId, int minutes)? logHabitProgress,
   Future<void> Function(int minutes, int? habitId)? logFocusSession,
+  Future<void> Function(DateTime endTime, String title, String body)?
+      scheduleCompletionNotification,
+  bool Function()? isFocusSessionNotificationEnabled,
 }) {
   return PomodoroController(
     now: now,
-    scheduleCompletionNotification: (_, _, _) async {},
+    scheduleCompletionNotification: scheduleCompletionNotification ??
+        (_, _, _) async {},
     cancelCompletionNotification: () async {},
     completeHabitToday: completeHabitToday ?? (_) async {},
     logHabitProgress: logHabitProgress ?? (_, _) async {},
     logFocusSession: logFocusSession ?? (_, _) async {},
+    isFocusSessionNotificationEnabled: isFocusSessionNotificationEnabled,
   );
 }
 

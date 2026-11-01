@@ -29,6 +29,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
               children: [
                 _ToggleRow(
                   title: l10n.notifTaskLabel,
+                  subtitle: l10n.notifTaskSubtitle,
                   value: settings?.notifyTasks ?? true,
                   onChanged: (value) {
                     repo.updateNotificationPref(notifyTasks: value);
@@ -39,6 +40,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 ),
                 _ToggleRow(
                   title: l10n.notifHabitLabel,
+                  subtitle: l10n.notifHabitSubtitle,
                   value: settings?.notifyHabits ?? true,
                   onChanged: (value) {
                     repo.updateNotificationPref(notifyHabits: value);
@@ -49,6 +51,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 ),
                 _ToggleRow(
                   title: l10n.notifStreakWarningLabel,
+                  subtitle: l10n.notifStreakWarningSubtitle,
                   value: settings?.notifyStreakWarning ?? true,
                   onChanged: (value) {
                     repo.updateNotificationPref(notifyStreakWarning: value);
@@ -62,9 +65,18 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 ),
                 _ToggleRow(
                   title: l10n.notifFreezeLabel,
+                  subtitle: l10n.notifFreezeSubtitle,
                   value: settings?.notifyFreezeUsed ?? true,
                   onChanged: (value) =>
                       repo.updateNotificationPref(notifyFreezeUsed: value),
+                ),
+                // Channel ke-5 (board 21 "Sesi fokus selesai").
+                _ToggleRow(
+                  title: l10n.notifFocusSessionLabel,
+                  subtitle: l10n.notifFocusSessionSubtitle,
+                  value: settings?.notifyFocusSession ?? true,
+                  onChanged: (value) =>
+                      repo.updateNotificationPref(notifyFocusSession: value),
                   showDivider: false,
                 ),
               ],
@@ -84,10 +96,12 @@ class _ToggleRow extends StatelessWidget {
     required this.title,
     required this.value,
     required this.onChanged,
+    this.subtitle,
     this.showDivider = true,
   });
 
   final String title;
+  final String? subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
   final bool showDivider;
@@ -97,6 +111,7 @@ class _ToggleRow extends StatelessWidget {
     final colors = context.colors;
     return ListRow(
       title: title,
+      subtitle: subtitle,
       showDivider: showDivider,
       trailing: Switch(
         value: value,

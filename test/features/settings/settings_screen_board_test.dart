@@ -161,9 +161,10 @@ void main() {
     ) async {
       await _pumpScreen(tester);
 
-      // 5 baris grup Pemberitahuan + 1 baris Kelola kategori + 1 baris Tentang App.
-      expect(_iconTiles, findsNWidgets(7));
-      expect(find.byIcon(Icons.chevron_right_rounded), findsNWidgets(7));
+      // 6 baris grup Pemberitahuan (Task/Habit/Streak/Focus/Status/Alarm presisi)
+      // + 1 baris Kelola kategori + 1 baris Tentang App.
+      expect(_iconTiles, findsNWidgets(8));
+      expect(find.byIcon(Icons.chevron_right_rounded), findsNWidgets(8));
 
       final tile = tester.widget<Container>(_iconTiles.first);
       final decoration = tile.decoration! as BoxDecoration;
@@ -175,10 +176,11 @@ void main() {
         const Size(18, 18),
       );
 
-      // Ikon board: bell, panah siklus, api, info. Label = grup kategori T7.3.
+      // Ikon board: bell, panah siklus, api, timer, info. Label = grup kategori T7.3.
       expect(find.byIcon(Icons.notifications_rounded), findsOneWidget);
       expect(find.byIcon(Icons.repeat_rounded), findsOneWidget);
       expect(find.byIcon(Icons.local_fire_department_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.timer_rounded), findsOneWidget);
       expect(find.byIcon(Icons.label_outline_rounded), findsOneWidget);
       expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
 
@@ -221,9 +223,9 @@ void main() {
 
       expect(find.byIcon(Icons.notifications_off_rounded), findsOneWidget);
       expect(find.byIcon(Icons.alarm_off_rounded), findsOneWidget);
-      // Baris pengingat (Task/Habit/Streak Warning) tetap "Aktif"; status
-      // notifikasi "Mati" dan alarm presisi memakai kalimat penjelasnya.
-      expect(find.text('Aktif'), findsNWidgets(3));
+      // Baris pengingat (Task/Habit/Streak Warning/Sesi fokus) tetap "Aktif";
+      // status notifikasi "Mati" dan alarm presisi memakai kalimat penjelasnya.
+      expect(find.text('Aktif'), findsNWidgets(4));
       expect(find.text('Mati'), findsOneWidget);
       expect(find.text('Mati — pengingat bisa telat'), findsOneWidget);
 
@@ -316,7 +318,7 @@ void main() {
         await _pumpScreen(tester);
 
         final rows = tester.widgetList<ListRow>(find.byType(ListRow)).toList();
-        expect(rows, hasLength(7));
+        expect(rows, hasLength(8));
         for (final row in rows) {
           expect(
             row.onTap,

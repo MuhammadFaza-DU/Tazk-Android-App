@@ -51,6 +51,7 @@ class SettingsRepository {
     bool? notifyHabits,
     bool? notifyStreakWarning,
     bool? notifyFreezeUsed,
+    bool? notifyFocusSession,
   }) async {
     final settings = await ensureSettings();
     await (_db.update(_db.appSettings)..where((s) => s.id.equals(settings.id)))
@@ -64,6 +65,9 @@ class SettingsRepository {
             : const Value.absent(),
         notifyFreezeUsed: notifyFreezeUsed != null
             ? Value(notifyFreezeUsed)
+            : const Value.absent(),
+        notifyFocusSession: notifyFocusSession != null
+            ? Value(notifyFocusSession)
             : const Value.absent(),
       ),
     );
