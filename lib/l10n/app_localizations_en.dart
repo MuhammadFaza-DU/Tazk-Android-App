@@ -1093,6 +1093,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryColorSand => 'Sand';
 
   @override
+  String get settingsData => 'Data';
+
+  @override
+  String get settingsBackupLabel => 'Back up & restore';
+
+  @override
+  String get settingsBackupSubtitle => 'Export or import a JSON file';
+
+  @override
+  String get backupScreenTitle => 'Back up & restore';
+
+  @override
+  String get backupLocalNote =>
+      'Files stay on your device. No account, no server.';
+
+  @override
+  String get backupExportAction => 'Export data';
+
+  @override
+  String get backupImportAction => 'Restore data';
+
+  @override
+  String get backupDriveDeferred => 'Google Drive backup isn\'t available yet.';
+
+  @override
+  String get backupExportDone => 'Backup file shared.';
+
+  @override
+  String get backupImportDone => 'Data restored.';
+
+  @override
+  String get backupImportInvalid => 'Invalid or corrupted backup file.';
+
+  @override
+  String get backupConfirmTitle => 'Overwrite local data?';
+
+  @override
+  String get backupConfirmBody =>
+      'Your current local data will be replaced by this backup. This can\'t be undone.';
+
+  @override
+  String get backupConfirmAction => 'Yes, overwrite';
+
+  @override
   String get searchScreenTitle => 'Search';
 
   @override

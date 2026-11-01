@@ -14,6 +14,7 @@ import '../../providers/notification_provider.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/settings_providers.dart';
 import 'about_screen.dart';
+import 'backup_screen.dart';
 import 'categories_screen.dart';
 import 'notification_settings_screen.dart';
 
@@ -28,7 +29,8 @@ import 'notification_settings_screen.dart';
 /// - tiap baris: petak ikon 30×30 `primary-container` radius 8 + ikon 18
 ///   `primary`, judul `body` 15, sub-judul `caption` 12 `ink-muted`, chevron
 ///   18 `ink-muted` di kanan;
-/// - urutan grup: Pemberitahuan → Tampilan → Bahasa → Kategori → Lainnya.
+/// - urutan grup: Pemberitahuan → Tampilan → Bahasa → Kategori → Data →
+///   Lainnya (Data ditambahkan T10.2 bersama baris cadangkan/pulihkan).
 ///
 /// Deviasi yang disengaja (dicatat di laporan): gutter memakai 16 (aturan
 /// DESIGN "satu wrapper, padding diterapkan sekali" + konsisten dengan 12 layar
@@ -214,6 +216,26 @@ class SettingsScreen extends ConsumerWidget {
                 Navigator.of(
                   context,
                 ).push(AppPageRoute(builder: (_) => const CategoriesScreen()));
+              },
+            ),
+          ),
+
+          const SizedBox(height: 24),
+          // Grup DATA (T10.2). Board `08` menampilkan baris Drive + baris ekspor;
+          // Drive ditunda, jadi hanya satu baris `Cadangkan & pulihkan`.
+          _SectionLabel(l10n.settingsData),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: ListRow(
+              leading: const _IconTile(Icons.save_alt_rounded),
+              title: l10n.settingsBackupLabel,
+              subtitle: l10n.settingsBackupSubtitle,
+              trailing: const _Chevron(),
+              showDivider: false,
+              onTap: () {
+                Navigator.of(
+                  context,
+                ).push(AppPageRoute(builder: (_) => const BackupScreen()));
               },
             ),
           ),

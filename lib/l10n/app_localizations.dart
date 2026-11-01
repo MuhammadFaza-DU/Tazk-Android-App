@@ -2048,6 +2048,90 @@ abstract class AppLocalizations {
   /// **'Pasir'**
   String get categoryColorSand;
 
+  /// No description provided for @settingsData.
+  ///
+  /// In id, this message translates to:
+  /// **'Data'**
+  String get settingsData;
+
+  /// No description provided for @settingsBackupLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Cadangkan & pulihkan'**
+  String get settingsBackupLabel;
+
+  /// No description provided for @settingsBackupSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekspor atau impor file JSON'**
+  String get settingsBackupSubtitle;
+
+  /// No description provided for @backupScreenTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Cadangkan & pulihkan'**
+  String get backupScreenTitle;
+
+  /// No description provided for @backupLocalNote.
+  ///
+  /// In id, this message translates to:
+  /// **'File tetap di perangkatmu. Tanpa akun, tanpa server.'**
+  String get backupLocalNote;
+
+  /// No description provided for @backupExportAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekspor data'**
+  String get backupExportAction;
+
+  /// No description provided for @backupImportAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Pulihkan data'**
+  String get backupImportAction;
+
+  /// No description provided for @backupDriveDeferred.
+  ///
+  /// In id, this message translates to:
+  /// **'Backup Google Drive belum tersedia.'**
+  String get backupDriveDeferred;
+
+  /// No description provided for @backupExportDone.
+  ///
+  /// In id, this message translates to:
+  /// **'File backup dibagikan.'**
+  String get backupExportDone;
+
+  /// No description provided for @backupImportDone.
+  ///
+  /// In id, this message translates to:
+  /// **'Data berhasil dipulihkan.'**
+  String get backupImportDone;
+
+  /// No description provided for @backupImportInvalid.
+  ///
+  /// In id, this message translates to:
+  /// **'File backup tidak valid atau rusak.'**
+  String get backupImportInvalid;
+
+  /// No description provided for @backupConfirmTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Timpa data lokal?'**
+  String get backupConfirmTitle;
+
+  /// No description provided for @backupConfirmBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Data lokal saat ini akan diganti dengan isi backup. Tindakan ini tidak bisa dibatalkan.'**
+  String get backupConfirmBody;
+
+  /// No description provided for @backupConfirmAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Ya, timpa'**
+  String get backupConfirmAction;
+
   /// No description provided for @searchScreenTitle.
   ///
   /// In id, this message translates to:

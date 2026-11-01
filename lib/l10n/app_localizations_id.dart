@@ -1083,6 +1083,50 @@ class AppLocalizationsId extends AppLocalizations {
   String get categoryColorSand => 'Pasir';
 
   @override
+  String get settingsData => 'Data';
+
+  @override
+  String get settingsBackupLabel => 'Cadangkan & pulihkan';
+
+  @override
+  String get settingsBackupSubtitle => 'Ekspor atau impor file JSON';
+
+  @override
+  String get backupScreenTitle => 'Cadangkan & pulihkan';
+
+  @override
+  String get backupLocalNote =>
+      'File tetap di perangkatmu. Tanpa akun, tanpa server.';
+
+  @override
+  String get backupExportAction => 'Ekspor data';
+
+  @override
+  String get backupImportAction => 'Pulihkan data';
+
+  @override
+  String get backupDriveDeferred => 'Backup Google Drive belum tersedia.';
+
+  @override
+  String get backupExportDone => 'File backup dibagikan.';
+
+  @override
+  String get backupImportDone => 'Data berhasil dipulihkan.';
+
+  @override
+  String get backupImportInvalid => 'File backup tidak valid atau rusak.';
+
+  @override
+  String get backupConfirmTitle => 'Timpa data lokal?';
+
+  @override
+  String get backupConfirmBody =>
+      'Data lokal saat ini akan diganti dengan isi backup. Tindakan ini tidak bisa dibatalkan.';
+
+  @override
+  String get backupConfirmAction => 'Ya, timpa';
+
+  @override
   String get searchScreenTitle => 'Pencarian';
 
   @override
