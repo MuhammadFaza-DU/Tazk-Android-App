@@ -7,6 +7,8 @@ Terakhir diperbarui: **2026-11-01**
 
 ## Log Perubahan (terbaru duluan)
 
+> **Commit/tag per tahap T6–T10 (lokal, belum di-push):** T6 `48bed1c`/`stable-2026-11-01-v1` · T7 `47cf831`/`-v2` · T9.1 `6b0cd3a` + T9.2 `1e8a14d`/`-v3` · T10.1 `ae1441d` + T10.2 `a312dfb`/`stable-2026-11-02-v1` · T8 `d115ae5`/`stable-2026-11-02-v2`. Entri log di bawah yang masih menulis *(belum commit)* **sudah ter-commit** dengan hash di atas.
+
 - 2026-11-02 — **T8 Widget scroll tuntas (T8.1–T8.3)**: widget homescreen kini **scrollable** — `RemoteViewsService`/`RemoteViewsFactory` (Kotlin) membaca SharedPreferences `"HomeWidgetPreferences"`; item row `widget_task_item`/`widget_habit_item` (hit ≥48dp via root baris; muted `#6A6659` = 5,36:1 AA); container 4 varian memakai `<ListView>` + empty view; provider memanggil `setRemoteAdapter` + `setPendingIntentTemplate`/`setOnClickFillInIntent` (pola klik item koleksi yang **benar** — `setOnClickPendingIntent` di item diabaikan framework) + `notifyAppWidgetViewDataChanged`; service didaftarkan dengan `BIND_REMOTEVIEWS`. Dart: `taskWidgetRows`/`habitWidgetRows`; push **full list** (`maxRows` 3→100) dengan invarian **`count == jumlah key yang ditulis`** (diuji jalur today *dan* calendar) + teks kosong terlokalisasi (`widgetTasksEmpty`/`widgetHabitsEmpty`). **527 test hijau (+12 dari 515), analyze 0, APK debug terbangun (213 MB)**; merged manifest memuat service. **Limitasi:** runtime widget (scroll, tap→selesai, refresh, empty) **belum diuji di HP**; widget **Calendar** dipaku board 4x2 (`minHeight=110dp`, dijaga `android_calendar_widget_config_test`) sehingga chrome grid ≈160dp bisa memotong list — board E sebenarnya **week-strip**, bukan grid 6×7 → perlu redesign (isu #15). — *(belum commit)*
 
 - 2026-11-02 — **T10 Backup offline tuntas (T10.1–T10.2)**: `BackupRepository` mengekspor seluruh DB (12 tabel) ke satu JSON `{version:1, exportedAt, checksum, data}` dengan **checksum SHA-256 kanonik** (kunci diurut rekursif), menolak versi/checksum salah **sebelum menyentuh DB**, dan memulihkan dalam **satu transaksi** (hapus-semua → insert-semua dengan id eksplisit; default key lama `autoCompleteSubtasks ?? true`, `position ?? 0`, `notifyFocusSession ?? true`; guard tabel singleton); layar **Cadangkan & pulihkan** (ekspor → share sheet; impor → file picker + dialog konfirmasi "Timpa data lokal?" + snackbar sukses/gagal) + grup `DATA` di Pengaturan. **515 test hijau, analyze 0, APK debug terbangun (187 MB).** **Ruling:** `file_picker` **diganti `file_selector`** — `file_picker 11.0.3` (KGP 1.8.22) gagal compile di **AGP 9.0.1** (`FilePickerPlugin` tidak ditemukan); `file_selector_android` (Kotlin 2.3.0) terbukti build + terpasang di APK. **Google Drive `drive.appdata` DITUNDA** (butuh proyek GCP + OAuth client + SHA-1 owner). Deviasi: layar backup offline **tidak ada di board** (dibangun dari token DESIGN); satu baris DATA (board 08 punya baris Drive + ekspor). **Verifikasi HP ditunda.** — *(belum commit)*
@@ -75,8 +77,8 @@ akhir** (owner) lalu review whole-branch.
 | Branch | `main` |
 | Commit terakhir | jalankan `git log -1` — dokumen ini di-commit sesudahnya, jadi hash di teks akan selalu tertinggal satu |
 | Commit terakhir yang tercatat saat dokumen ditulis | `8627cf7` — fix(canvas): tengahkan sheet grab handle + jadikan komponen |
-| Tag stabil terakhir | `stable-2026-10-30-v2` (lihat `git tag \| Select-String stable` untuk yang terbaru) |
-| Status push | **7 commit belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
+| Tag stabil terakhir | `stable-2026-11-02-v2` (lihat `git tag \| Select-String stable` untuk yang terbaru) |
+| Status push | **8 commit T6–T10 belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
 | Working tree | bersih |
 
 > Catatan: hash commit dan jumlah commit di dokumen ini **selalu tertinggal satu** dari
