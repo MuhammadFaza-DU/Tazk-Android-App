@@ -24,22 +24,23 @@ void main() {
   });
 
   test('onTaskCompleted inserts one xp event for tasks', () async {
-    await gamification.onTaskCompleted();
+    await gamification.onTaskCompleted(TaskPriority.high);
 
     final events = await db.select(db.xpEvents).get();
 
     expect(events, hasLength(1));
-    expect(events.single.amount, 10);
+    expect(events.single.amount, GamificationRepository.taskXpFor(TaskPriority.high));
     expect(events.single.source, XpSource.task);
   });
 
   test('onTaskUncompleted inserts a negative event after completion', () async {
-    await gamification.onTaskCompleted();
-    await gamification.onTaskUncompleted();
+    final highXp = GamificationRepository.taskXpFor(TaskPriority.high);
+    await gamification.onTaskCompleted(TaskPriority.high);
+    await gamification.onTaskUncompleted(TaskPriority.high);
 
     final events = await db.select(db.xpEvents).get();
 
-    expect(events.map((e) => e.amount).toList(), [10, -10]);
+    expect(events.map((e) => e.amount).toList(), [highXp, -highXp]);
     expect(
       events.map((e) => e.source).toList(),
       [XpSource.task, XpSource.task],

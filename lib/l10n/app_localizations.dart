@@ -572,6 +572,48 @@ abstract class AppLocalizations {
   /// **'Tambah item'**
   String get addItemHint;
 
+  /// No description provided for @autoCompleteSubtasksLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Tandai tugas selesai saat semua subtask beres'**
+  String get autoCompleteSubtasksLabel;
+
+  /// No description provided for @openInMapsTooltip.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka di Maps'**
+  String get openInMapsTooltip;
+
+  /// No description provided for @openInMapsFailedMessage.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada aplikasi maps di HP ini yang bisa membuka lokasi itu.'**
+  String get openInMapsFailedMessage;
+
+  /// No description provided for @noTimeLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanpa jam'**
+  String get noTimeLabel;
+
+  /// No description provided for @tasksPendingHeader.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum selesai'**
+  String get tasksPendingHeader;
+
+  /// No description provided for @tasksDoneHeader.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesai'**
+  String get tasksDoneHeader;
+
+  /// No description provided for @subtaskProgress.
+  ///
+  /// In id, this message translates to:
+  /// **'{done}/{total} subtask'**
+  String subtaskProgress(int done, int total);
+
   /// No description provided for @habitsScreenTitle.
   ///
   /// In id, this message translates to:

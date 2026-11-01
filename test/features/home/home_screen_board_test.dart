@@ -64,6 +64,7 @@ void main() {
       time: DateTime(2026, 1, 1, 8),
       priority: TaskPriority.high,
       isCompleted: true,
+      autoCompleteSubtasks: true,
       createdAt: today,
     ),
     Task(
@@ -73,6 +74,7 @@ void main() {
       time: DateTime(2026, 1, 1, 13),
       priority: TaskPriority.medium,
       isCompleted: false,
+      autoCompleteSubtasks: true,
       createdAt: today,
     ),
     Task(
@@ -81,6 +83,7 @@ void main() {
       date: today,
       priority: TaskPriority.low,
       isCompleted: false,
+      autoCompleteSubtasks: true,
       createdAt: today,
     ),
   ];

@@ -68,6 +68,9 @@ dependencies:
   intl: ^0.20.2
   uuid: ^4.5.1
 
+  # Opens the free-text location label in an installed maps app (geo: URI).
+  url_launcher: ^6.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

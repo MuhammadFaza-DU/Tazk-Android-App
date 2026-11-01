@@ -144,5 +144,18 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Android 11+ package visibility: without these, "Buka di Maps" on a
+             task location cannot resolve an installed maps app even though
+             url_launcher asks for `geo:` (with an `https://maps` fallback).
+             Visibility only, not permission: the app still requests no
+             location permission. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="geo"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
     </queries>
 </manifest>

@@ -93,6 +93,19 @@
   "fieldLocationOptionalLabel": "Location (optional)",
   "checklistOptionalLabel": "Checklist/Subtasks (optional)",
   "addItemHint": "Add item",
+  "autoCompleteSubtasksLabel": "Complete the task when every subtask is done",
+  "openInMapsTooltip": "Open in Maps",
+  "openInMapsFailedMessage": "No maps app on this phone can open that location.",
+  "noTimeLabel": "No time",
+  "tasksPendingHeader": "Not done",
+  "tasksDoneHeader": "Done",
+  "subtaskProgress": "{done}/{total} subtask",
+  "@subtaskProgress": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
 
   "habitsScreenTitle": "Habits",
   "habitProgressLabel": "{current}/{target} min",

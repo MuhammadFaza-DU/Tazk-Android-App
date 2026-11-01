@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -67,8 +67,32 @@ class AppDatabase extends _$AppDatabase {
             await customStatement(
                 'CREATE INDEX IF NOT EXISTS idx_focus_sessions_started_at ON focus_sessions(started_at);');
           }
+          if (from < 5) {
+            await _addColumnIfMissing(m, subtasks, subtasks.position);
+            await _addColumnIfMissing(m, tasks, tasks.autoCompleteSubtasks);
+            // v4 had no position column, so every row defaults to 0. Seed it from
+            // id to preserve insertion order for existing tasks.
+            await customStatement(
+                'UPDATE subtasks SET position = id WHERE position = 0;');
+          }
         },
       );
+
+  Future<void> _addColumnIfMissing(
+    Migrator migrator,
+    TableInfo<Table, dynamic> table,
+    GeneratedColumn<Object> column,
+  ) async {
+    final existingColumns = await customSelect(
+      'PRAGMA table_info(${table.actualTableName})',
+    ).get();
+    final columnExists = existingColumns.any(
+      (row) => row.read<String>('name') == column.name,
+    );
+    if (!columnExists) {
+      await migrator.addColumn(table, column);
+    }
+  }
 
   Future<void> _addHabitColumnIfMissing(
     Migrator migrator,

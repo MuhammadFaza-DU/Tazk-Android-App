@@ -26,8 +26,13 @@ class GamificationRepository {
     );
   }
 
-  static const taskXp = 10;
   static const habitXp = 15;
+
+  static int taskXpFor(TaskPriority priority) => switch (priority) {
+        TaskPriority.high => 15,
+        TaskPriority.medium => 10,
+        TaskPriority.low => 5,
+      };
 
   Future<UserProfileData> ensureProfile() async {
     final existing = await _db.select(_db.userProfile).getSingleOrNull();
@@ -92,13 +97,24 @@ class GamificationRepository {
   Stream<List<CosmeticUnlock>> watchCosmetics() =>
       _db.select(_db.cosmeticUnlocks).watch();
 
-  Future<void> onTaskCompleted() async {
-    await _awardXp(taskXp, XpSource.task);
+  Future<void> onTaskCompleted(TaskPriority priority) async {
+    await _awardXp(taskXpFor(priority), XpSource.task);
     await _registerActiveDay();
   }
 
-  Future<void> onTaskUncompleted() async {
-    await _deductXp(taskXp, XpSource.task);
+  Future<void> onTaskUncompleted(TaskPriority priority) async {
+    await _deductXp(taskXpFor(priority), XpSource.task);
+  }
+
+  /// Re-settles XP when a completed task's priority is edited, so a later
+  /// uncheck refunds exactly what the task is already holding.
+  Future<void> onTaskPriorityChanged(TaskPriority from, TaskPriority to) async {
+    final delta = taskXpFor(to) - taskXpFor(from);
+    if (delta > 0) {
+      await _awardXp(delta, XpSource.task);
+    } else if (delta < 0) {
+      await _deductXp(-delta, XpSource.task);
+    }
   }
 
   Future<void> onHabitCompleted() async {

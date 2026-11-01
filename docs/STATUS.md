@@ -7,6 +7,8 @@ Terakhir diperbarui: **2026-10-31**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-11-01 — **T6 Subtask & Lokasi tuntas (T6.0–T6.4)**: XP task berbobot prioritas **15/10/5** + rekonsiliasi bila prioritas task yang sudah selesai diubah (menutup celah farming XP); schema **v5** (`Subtasks.position` 1-based + `Tasks.autoCompleteSubtasks`, backfill `position=id`, migrasi v4→v5 teruji di file SQLite nyata); subtask reorder (drag + aksi reorder semantik bawaan Flutter) + `toggleSubtask` auto-selesai/refund **atomik** (tick + task + XP satu transaksi); Task Form dapat sakelar auto-selesai, ikon "Buka di Maps" (`geo:` + manifest `<queries>` geo/https), dan kartu Tasks menampilkan `{done}/{total} subtask` (bodyMedium, sama dengan label jam) serta memindahkan `Tanpa jam`/header grup ke l10n. **392 test hijau, analyze 0, APK debug terbangun (179 MB) dan manifest hasil-merge memuat `scheme="geo"`/`https`.** Deviasi tercatat: drag handle, sakelar auto-selesai, dan field lokasi **tidak ada di board 10** (kebutuhan produk), dan baris checklist memakai **hit-area 48dp** di atas visual 40dp (a11y §7). **Verifikasi HP ditunda** (device tidak tersambung). — *(belum commit)*
+
 - 2026-10-31 — **Plan T6–T10 selesai ditulis (14 task, 5 fase, tanpa celah)** → `docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`. Owner **akan mengeksekusi di sesi lain**. Keputusan final terekam di plan: offline JSON dulu (Drive ditunda), 1 kategori per item, reorder drag, auto-selesai = XP konsisten, lokasi `geo:` fallback web, checkpoint per tahap. **Ditemukan & ditutup (D1): bug XP task masih rata 10** (`gamification_repository.taskXp = 10`) padahal keputusan = 15/10/5 → jadi Task T6.0 wajib di plan. *(belum commit)*
 
 - 2026-10-31 — **Kartu Level dark DIKEMBALIKAN ke tampilan awal (G2-revert)**: owner menilai warna **sebelum** penggelapan lebih baik, jadi commit `669d0f4` (tag `v8`, 6 token `level-card-*`) **di-revert**. Kartu Level kembali memakai `primary` `#8FE0A9` + aksen `honey` `#F2C765` di dark; `DESIGN.md`, `home_screen.dart`, dan test kontras ikut kembali. **Konsekuensi yang tetap dicatat:** label+ikon pil "1 day" kembali **1,37:1** (teks `ink` terang di atas `honey` terang) dan isi XP vs track **1,68:1** — owner menerima ini (isu no. 13). Perbaikan termurah bila nanti diminta tanpa ubah warna: label pil memakai `on-primary` dark (`#0F1A14`). **Kanvas `design.pen` tidak perlu diubah** (tidak ada drift). **Verifikasi linter (dijalankan setelah revert, lewat CLI cache langsung karena `npx` menggantung):** `lint DESIGN.md` → **exit 0, errors 0**, warnings 2 (`colors.warning` & `colors.success` "defined but never referenced by any component" — sudah ada sebelum perubahan ini), infos 1 (19 warna, 6 tipografi, 5 radius, 7 spacing, 13 komponen); `export --format dtcg DESIGN.md` → **exit 0**, 13.574 byte JSON DTCG. Bukti HP (perangkat sudah tidak terkunci): `hp-12-home-dark-warna-awal.png` + zoom pil `hp-12-pil-streak-kontras-rendah.png`. 344 test hijau, analyze 0 — *(belum commit)*
@@ -48,7 +50,8 @@ layar selesai** (tab bar 5 + sheet "Lainnya" tanpa drawer, 12 layar pakai widget
 **T4 motion selesai** (token motion di kode, tanpa `easeIn`/`scale(0)`/ticker idle,
 reduced-motion dihormati di semua animasi), dan **T5 statistik selesai** (schema v4
 `focus_sessions` + `xp_events`, query agregat, layar Statistik dengan chart + heatmap,
-tanpa angka palsu). Fase berikutnya: **T6 — subtask & lokasi**.
+tanpa angka palsu), dan **T6 subtask & lokasi selesai** (schema v5, XP 15/10/5 + rekonsiliasi,
+reorder + toggle atomik, "Buka di Maps", progress `x/y` di kartu). Fase berikutnya: **T7 — kategori/tag & pencarian**.
 
 ---
 
@@ -223,7 +226,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 | T3 Redesign layar | ✅ selesai | app shell tab bar 5 + sheet "Lainnya" (tanpa drawer); 12 layar pakai widget kit + token; shared-widget & 0 `AppColors.*` deprecated |
 | T4 Animasi | ✅ selesai | motion token di kode (`app_motion.dart`), `AppPageRoute` 220ms fade+slide, press scale, celebration one-shot (ticker idle hilang), XP glow composite-only, shine sweep, reduced-motion (`MediaQuery.disableAnimations`) di semua animasi |
 | T5 Statistik | ✅ selesai | schema v4 `focus_sessions` + `xp_events` (index), titik tulis XP (net, termasuk refund) + sesi fokus, `StatsRepository` + 5 provider, layar board 07 (segmented 3 periode, 2 kartu stat + delta, bar chart 7/30/12 bucket, heatmap 13×7, kartu insight), entri sheet "Lainnya" 4 item. Empty state per periode, `–` bila metrik belum ada data. 304 test |
-| T6 Subtask & Lokasi | ⬜ belum | |
+| T6 Subtask & Lokasi | ✅ selesai | **T6.0** XP 15/10/5 + rekonsiliasi prioritas; **T6.1** schema v5 (`position` + `autoCompleteSubtasks`); **T6.2** reorder; **T6.3** `toggleSubtask` atomik; **T6.4** UI reorder/maps/progress. 392 test |
 | T7 Kategori/tag & pencarian | 🟡 desain selesai | Board 26, fitur belum |
 | T8 Widget | 🟡 desain selesai | 5 varian + state kosong digambar; scroll butuh `RemoteViewsService` (belum ada) |
 | T9 Notifikasi | 🟡 desain selesai | 5 channel + banner + layar pengaturan digambar |
@@ -349,23 +352,26 @@ adb -s RR8RC027VGL pull "/sdcard/s.png" "docs\artifacts\nama.png"
 #    ⚠️ Kalau layar terkunci, screenshot jadi hitam penuh walaupun file ada isinya.
 ```
 
-**Baseline terakhir terverifikasi (2026-10-31, commit `5d25a0a` / tag `v11`):** `dart analyze` bersih,
-`flutter test` **344/344**, `lint DESIGN.md` **exit 0 / errors 0** (2 warning `orphaned-tokens` lama),
-`export dtcg` **exit 0** (13.574 byte), versi **2.0.0+5**, APK arm64 32.6 MB terpasang di Galaxy A52.
+**Baseline terakhir terverifikasi (2026-11-01, T6 selesai):** `dart analyze` bersih,
+`flutter test` **392/392**, `flutter build apk --debug` sukses (APK debug 179 MB) dan manifest
+hasil-merge memuat `<queries>` `scheme="geo"` + `scheme="https"`, versi tetap **2.0.0+5**.
+`DESIGN.md` tidak disentuh sejak T5 (lint `exit 0` terakhir 2026-10-31).
+**Belum terverifikasi:** perilaku di HP (drag, maps, sakelar auto-selesai, progress) — device
+tidak tersambung; ditunda ke verifikasi HP akhir (permintaan owner).
 
 ---
 
 ## Langkah berikutnya
 
-**Eksekusi T6–T10** — plan lengkap & tuntas ada di:
+**T6 selesai.** Lanjut **T7–T10** — plan lengkap ada di:
 `docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`
 
 | Fase | Isi | Migrasi |
 |---|---|---|
-| T6 | Subtask (reorder drag + auto-selesai toggle) + lokasi `geo:` + **XP 15/10/5 (D1)** | v4→v5 |
+| ~~T6~~ | ~~Subtask + lokasi + XP 15/10/5~~ | **v5 ✅** |
 | T7 | Kategori (1/item) + pencarian lintas task/habit | v5→v6 |
 | T8 | Widget scroll (`RemoteViewsService` Kotlin) + empty state | — |
 | T9 | Channel focus-session (ke-5) + toggle | v6→v7 |
 | T10 | Backup offline JSON + checksum (Drive ditunda) | — |
 
-Checkpoint per tahap (5 tag `stable-YYYY-MM-DD-vN`). Sesi baru cukup baca file plan itu + dokumen ini.
+Checkpoint per tahap (`stable-YYYY-MM-DD-vN`). Sesi baru cukup baca file plan itu + dokumen ini.

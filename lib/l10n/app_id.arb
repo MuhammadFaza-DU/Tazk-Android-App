@@ -150,6 +150,19 @@
   "fieldLocationOptionalLabel": "Lokasi (opsional)",
   "checklistOptionalLabel": "Checklist/Subtask (opsional)",
   "addItemHint": "Tambah item",
+  "autoCompleteSubtasksLabel": "Tandai tugas selesai saat semua subtask beres",
+  "openInMapsTooltip": "Buka di Maps",
+  "openInMapsFailedMessage": "Belum ada aplikasi maps di HP ini yang bisa membuka lokasi itu.",
+  "noTimeLabel": "Tanpa jam",
+  "tasksPendingHeader": "Belum selesai",
+  "tasksDoneHeader": "Selesai",
+  "subtaskProgress": "{done}/{total} subtask",
+  "@subtaskProgress": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
 
   "habitsScreenTitle": "Habits",
   "habitProgressLabel": "{current}/{target} menit",

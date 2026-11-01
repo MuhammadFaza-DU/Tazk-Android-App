@@ -289,6 +289,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addItemHint => 'Add item';
 
   @override
+  String get autoCompleteSubtasksLabel =>
+      'Complete the task when every subtask is done';
+
+  @override
+  String get openInMapsTooltip => 'Open in Maps';
+
+  @override
+  String get openInMapsFailedMessage =>
+      'No maps app on this phone can open that location.';
+
+  @override
+  String get noTimeLabel => 'No time';
+
+  @override
+  String get tasksPendingHeader => 'Not done';
+
+  @override
+  String get tasksDoneHeader => 'Done';
+
+  @override
+  String subtaskProgress(int done, int total) {
+    return '$done/$total subtask';
+  }
+
+  @override
   String get habitsScreenTitle => 'Habits';
 
   @override

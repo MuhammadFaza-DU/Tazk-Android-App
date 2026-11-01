@@ -34,17 +34,50 @@ void main() {
   });
 
   test('onTaskCompleted grants XP and starts streak', () async {
-    await gamification.onTaskCompleted();
+    await gamification.onTaskCompleted(TaskPriority.medium);
 
     final profile = await db.select(db.userProfile).getSingle();
     final streak = await db.select(db.streakState).getSingle();
 
-    expect(profile.xp, GamificationRepository.taskXp);
+    expect(profile.xp, GamificationRepository.taskXpFor(TaskPriority.medium));
     expect(profile.level, 1);
     expect(streak.currentStreak, 1);
     expect(streak.longestStreak, 1);
     expect(streak.lastActiveDate, isNotNull);
   });
+
+  test('taskXpFor weights XP by task priority', () {
+    expect(GamificationRepository.taskXpFor(TaskPriority.high), 15);
+    expect(GamificationRepository.taskXpFor(TaskPriority.medium), 10);
+    expect(GamificationRepository.taskXpFor(TaskPriority.low), 5);
+  });
+
+  test('sequential completions accumulate priority-weighted XP', () async {
+    await gamification.onTaskCompleted(TaskPriority.high);
+    final afterHigh = await db.select(db.userProfile).getSingle();
+    await gamification.onTaskCompleted(TaskPriority.medium);
+    final afterMedium = await db.select(db.userProfile).getSingle();
+    await gamification.onTaskCompleted(TaskPriority.low);
+    final afterLow = await db.select(db.userProfile).getSingle();
+
+    expect(afterHigh.xp, 15);
+    expect(afterMedium.xp, 25);
+    expect(afterLow.xp, 30);
+  });
+
+  for (final priority in TaskPriority.values) {
+    test('uncompleting a ${priority.name} task refunds its exact XP', () async {
+      await gamification.onTaskCompleted(priority);
+      final completed = await db.select(db.userProfile).getSingle();
+
+      await gamification.onTaskUncompleted(priority);
+      final refunded = await db.select(db.userProfile).getSingle();
+
+      expect(completed.xp, GamificationRepository.taskXpFor(priority));
+      expect(refunded.xp, 0);
+      expect(refunded.level, completed.level);
+    });
+  }
 
   test('streak rank milestone unlocks permanent badge', () async {
     final yesterday = _dateOnly(DateTime.now()).subtract(const Duration(days: 1));
@@ -81,7 +114,7 @@ void main() {
       ),
     );
 
-    await gamification.onTaskCompleted();
+    await gamification.onTaskCompleted(TaskPriority.low);
 
     final streak = await db.select(db.streakState).getSingle();
 
@@ -125,7 +158,7 @@ void main() {
       ),
     );
 
-    await gamification.onTaskCompleted();
+    await gamification.onTaskCompleted(TaskPriority.medium);
 
     final updatedProfile = await db.select(db.userProfile).getSingle();
     final cosmetics = await db.select(db.cosmeticUnlocks).get();

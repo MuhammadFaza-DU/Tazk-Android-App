@@ -267,4 +267,93 @@ void main() {
       await tempDir.delete(recursive: true);
     }
   });
+
+  test('opens a version 4 database and adds subtask position + auto-complete flag',
+      () async {
+    final tempDir = await Directory.systemTemp.createTemp('tazk_db_migration_');
+    final dbFile =
+        File('${tempDir.path}${Platform.pathSeparator}tazk.sqlite');
+    final db = AppDatabase.forTesting(
+      NativeDatabase(
+        dbFile,
+        setup: (rawDb) {
+          rawDb.execute('''
+            CREATE TABLE tasks (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              title TEXT NOT NULL,
+              date INTEGER NOT NULL,
+              time INTEGER,
+              priority INTEGER NOT NULL,
+              is_completed INTEGER NOT NULL DEFAULT 0 CHECK (is_completed IN (0, 1)),
+              location TEXT,
+              created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000)
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE subtasks (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              task_id INTEGER NOT NULL REFERENCES tasks (id) ON DELETE CASCADE,
+              title TEXT NOT NULL,
+              is_completed INTEGER NOT NULL DEFAULT 0 CHECK (is_completed IN (0, 1))
+            );
+          ''');
+          rawDb.execute(
+            "INSERT INTO tasks (id, title, date, priority) "
+            "VALUES (1, 'Belanja bulanan', strftime('%s', 'now'), 1);",
+          );
+          rawDb.execute("INSERT INTO subtasks (id, task_id, title) "
+              "VALUES (1, 1, 'Beli susu');");
+          rawDb.execute("INSERT INTO subtasks (id, task_id, title) "
+              "VALUES (2, 1, 'Beli telur');");
+          rawDb.execute("INSERT INTO subtasks (id, task_id, title) "
+              "VALUES (3, 1, 'Beli roti');");
+          rawDb.execute('PRAGMA user_version = 4;');
+        },
+      ),
+    );
+    try {
+      final task = await (db.select(db.tasks)..where((row) => row.id.equals(1)))
+          .getSingle();
+      expect(task.title, 'Belanja bulanan');
+      expect(task.autoCompleteSubtasks, isTrue);
+
+      final subtasks = await db.select(db.subtasks).get();
+      expect(subtasks, hasLength(3));
+      subtasks.sort((a, b) => a.id.compareTo(b.id));
+      expect(subtasks.map((row) => row.id), [1, 2, 3]);
+      expect(subtasks.map((row) => row.position), [1, 2, 3]);
+      expect(subtasks.every((row) => row.taskId == 1), isTrue);
+    } finally {
+      await db.close();
+      await tempDir.delete(recursive: true);
+    }
+  });
+
+  test('fresh database defaults subtask position to 0 and auto-complete to true',
+      () async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    try {
+      final taskId = await db.into(db.tasks).insert(
+            TasksCompanion.insert(
+              title: 'Tugas baru',
+              date: DateTime(2026, 11, 1),
+              priority: TaskPriority.high,
+            ),
+          );
+      final task = await (db.select(db.tasks)
+            ..where((row) => row.id.equals(taskId)))
+          .getSingle();
+      expect(task.autoCompleteSubtasks, isTrue);
+
+      final subtaskId = await db.into(db.subtasks).insert(
+            SubtasksCompanion.insert(taskId: taskId, title: 'Langkah 1'),
+          );
+      final subtask = await (db.select(db.subtasks)
+            ..where((row) => row.id.equals(subtaskId)))
+          .getSingle();
+      expect(subtask.position, 0);
+    } finally {
+      await db.close();
+    }
+  });
 }

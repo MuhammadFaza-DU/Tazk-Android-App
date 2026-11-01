@@ -12,6 +12,8 @@ class Tasks extends Table {
   IntColumn get priority => intEnum<TaskPriority>()();
   BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
   TextColumn get location => text().nullable()();
+  BoolColumn get autoCompleteSubtasks =>
+      boolean().withDefault(const Constant(true))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
@@ -22,6 +24,7 @@ class Subtasks extends Table {
       integer().references(Tasks, #id, onDelete: KeyAction.cascade)();
   TextColumn get title => text()();
   BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
+  IntColumn get position => integer().withDefault(const Constant(0))();
 }
 
 @TableIndex(name: 'idx_habits_is_active', columns: {#isActive})

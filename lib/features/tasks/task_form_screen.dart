@@ -2,8 +2,10 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/geo_uri.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/app_text_field.dart';
@@ -30,6 +32,16 @@ const Key taskFormSaveButtonKey = ValueKey('task-form-save');
 
 /// Key input "Tambah item" di bawah baris checklist.
 const Key taskFormAddItemFieldKey = ValueKey('task-form-add-item-field');
+
+/// Key field lokasi (free text; dibuka ke aplikasi maps lewat ikon di kanan).
+const Key taskFormLocationFieldKey = ValueKey('task-form-location-field');
+
+/// Key tombol "buka di Maps" pada field lokasi.
+const Key taskFormOpenMapsKey = ValueKey('task-form-open-maps');
+
+/// Key baris sakelar "tandai tugas selesai saat semua subtask beres".
+const Key taskFormAutoCompleteSwitchKey =
+    ValueKey('task-form-auto-complete-switch');
 
 /// Gutter kiri/kanan. Board `10` mengukur 20dp; instruksi task menetapkan 16
 /// dan `AppScaffold.gutter` (header) sudah 16, jadi dipakai 16 agar tepi field
@@ -75,6 +87,10 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   TimeOfDay? _time;
   late TaskPriority _priority;
 
+  /// Task selesai otomatis saat semua subtask dicentang (AGENTS §5). Task
+  /// lama tanpa nilai eksplisit memakai `true`, sama dengan default skema.
+  late bool _autoCompleteSubtasks;
+
   final List<String> _newSubtaskTitles = [];
   final _subtaskInputController = TextEditingController();
 
@@ -89,6 +105,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     _date = task?.date ?? DateTime.now();
     _time = task?.time != null ? TimeOfDay.fromDateTime(task!.time!) : null;
     _priority = task?.priority ?? TaskPriority.medium;
+    _autoCompleteSubtasks = task?.autoCompleteSubtasks ?? true;
   }
 
   @override
@@ -131,6 +148,29 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     return DateTime(_date.year, _date.month, _date.day, _time!.hour, _time!.minute);
   }
 
+  /// Serah-terima ke aplikasi maps yang terpasang. Lokasi hanya teks, jadi URI
+  /// dibangun dari isi field saat ini — tidak pernah dari koordinat tersimpan.
+  Future<void> _openLocationInMaps() async {
+    final uri = buildGeoUri(_locationController.text);
+    if (uri == null) return;
+    // `launchUrl` bisa melempar `PlatformException` (mis. aktivitas tidak
+    // resolvable); itu jalur gagal yang sama dengan `false`, jadi pengguna
+    // mendapat pesan yang sama, bukan error tak tertangkap.
+    var launched = false;
+    try {
+      launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (error) {
+      debugPrint('launchUrl failed: $error');
+    }
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.openInMapsFailedMessage),
+        ),
+      );
+    }
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -145,6 +185,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
         time: Value(_combinedTime),
         priority: _priority,
         location: Value(location.isEmpty ? null : location),
+        autoCompleteSubtasks: _autoCompleteSubtasks,
       );
       await repo.updateTask(updated);
     } else {
@@ -154,6 +195,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
         time: _combinedTime,
         priority: _priority,
         location: location.isEmpty ? null : location,
+        autoCompleteSubtasks: _autoCompleteSubtasks,
       );
       for (final subtaskTitle in _newSubtaskTitles) {
         await repo.addSubtask(newId, subtaskTitle);
@@ -260,12 +302,34 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             const SizedBox(height: _groupGap),
 
             // 4. Lokasi (tidak ada di board; dipertahankan agar field DB tetap
-            // bisa diisi — lihat laporan deviasi).
+            // bisa diisi — lihat laporan deviasi). Ikon kanan membuka label ini
+            // di aplikasi maps lewat URI `geo:`.
             _FieldLabel(l10n.fieldLocationOptionalLabel),
             const SizedBox(height: _labelGap),
             Semantics(
               label: l10n.fieldLocationOptionalLabel,
-              child: AppTextField(controller: _locationController),
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _locationController,
+                builder: (context, value, _) {
+                  // Hidup saat diketik, bukan saat disimpan: tombolnya langsung
+                  // aktif begitu ada isi yang bisa dicari.
+                  final canOpenMaps = value.text.trim().isNotEmpty;
+                  return AppTextField(
+                    key: taskFormLocationFieldKey,
+                    controller: _locationController,
+                    suffixIcon: IconButton(
+                      key: taskFormOpenMapsKey,
+                      icon: const Icon(Icons.map_outlined),
+                      tooltip: l10n.openInMapsTooltip,
+                      color: colors.primary,
+                      // `inkMuted`, bukan `border`: saat mati ikonnya harus
+                      // masih terbaca sebagai affordance, hanya tidak aktif.
+                      disabledColor: colors.inkMuted,
+                      onPressed: canOpenMaps ? _openLocationInMaps : null,
+                    ),
+                  );
+                },
+              ),
             ),
             const SizedBox(height: _groupGap),
 
@@ -286,6 +350,18 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
               ],
             ),
             const SizedBox(height: _rowGap),
+            _AutoCompleteSubtasksRow(
+              key: taskFormAutoCompleteSwitchKey,
+              value: _autoCompleteSubtasks,
+              onChanged: (value) =>
+                  setState(() => _autoCompleteSubtasks = value),
+            ),
+            // Baris tersimpan sudah membawa 4dp atas di dalam pita sentuhnya
+            // sendiri, jadi gap depan dikurangi supaya tetap 8dp — sama dengan
+            // daftar draft di bawah.
+            SizedBox(
+              height: _isEditing ? _rowGap - _subtaskHitPadding : _rowGap,
+            ),
             if (_isEditing)
               _ExistingSubtasksList(taskId: widget.task!.id)
             else
@@ -754,6 +830,62 @@ class _AddItemRow extends StatelessWidget {
   }
 }
 
+/// Baris sakelar "task selesai otomatis" tepat di bawah header checklist.
+///
+/// Board `10` tidak punya baris ini (keputusan produk, AGENTS §5), jadi bentuknya
+/// memakai bahasa kartu yang sudah ada: baris setinggi ≥48dp, label `ink-muted`,
+/// dan `Switch` M3 yang mewarisi `primary`/`surface-alt` dari tema. Seluruh baris
+/// bisa diketuk supaya target sentuh tidak bergantung pada ukuran thumb.
+class _AutoCompleteSubtasksRow extends StatelessWidget {
+  const _AutoCompleteSubtasksRow({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final theme = Theme.of(context);
+
+    // Satu node pembaca layar: label + nilai sakelar, bukan dua target fokus
+    // terpisah untuk baris dan thumb.
+    return MergeSemantics(
+      child: InkWell(
+        onTap: () => onChanged(!value),
+        borderRadius: _boxRadius,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  AppLocalizations.of(context)!.autoCompleteSubtasksLabel,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.inkMuted,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Switch(value: value, onChanged: onChanged),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tinggi minimum pita sentuh baris checklist. Baris digambar 40dp (board `10`),
+/// tapi target sentuh wajib ≥48dp (AGENTS §7).
+const double _subtaskTapTarget = 48;
+
+/// Sisa pita sentuh di atas dan di bawah baris: (48 - 40) / 2 = 4dp.
+const double _subtaskHitPadding = (_subtaskTapTarget - _rowHeight) / 2;
+
 class _ExistingSubtasksList extends ConsumerWidget {
   const _ExistingSubtasksList({required this.taskId});
 
@@ -764,29 +896,115 @@ class _ExistingSubtasksList extends ConsumerWidget {
     final subtasksAsync = ref.watch(taskSubtasksProvider(taskId));
     final repo = ref.read(taskRepositoryProvider);
 
+    /// Satu-satunya jalur tulis urutan: bangun permutasi lengkap dari daftar
+    /// sekarang, lalu geser satu elemen dari indeks [from] ke [to].
+    ///
+    /// Indeks di luar rentang atau `from == to` = no-op, yaitu keadaan "naik"
+    /// pada baris pertama dan "turun" pada baris terakhir.
+    Future<void> moveSubtask(List<Subtask> subtasks, int from, int to) async {
+      if (from == to || to < 0 || to >= subtasks.length) return;
+      final ids = [for (final subtask in subtasks) subtask.id];
+      ids.insert(to, ids.removeAt(from));
+      try {
+        await repo.reorderSubtasks(taskId, ids);
+      } catch (error) {
+        // Ditolak = tidak ada yang tertulis, jadi daftar dari stream sudah
+        // menampilkan urutan yang benar; tidak ada yang di-rollback.
+        debugPrint('reorderSubtasks rejected: $error');
+      }
+    }
+
     return subtasksAsync.when(
-      data: (subtasks) => Column(
-        children: [
-          for (var i = 0; i < subtasks.length; i++)
-            Padding(
+      data: (subtasks) {
+        // Daftar kosong tidak menggambar baris apa pun, tapi 4dp atas tadi
+        // sudah dipotong dari gap sebelum blok ini; dikembalikan supaya jarak
+        // ke `+ Tambah item` tetap 8dp seperti daftar draft.
+        if (subtasks.isEmpty) return const SizedBox(height: _subtaskHitPadding);
+        return ReorderableListView.builder(
+          // Bertumpuk di dalam ListView form: tidak punya scroll sendiri.
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          // Seluruh baris adalah permukaan tekan-lama, jadi handle bawaan
+          // (yang muncul di kanan pada desktop) dimatikan.
+          buildDefaultDragHandles: false,
+          // Kartu board datar; baris yang terangkat pun tetap datar, bukan
+          // memakai bayangan elevasi bawaan Material. `Material` transparan
+          // tetap diperlukan: proxy drag hidup di Overlay, di luar `Scaffold`,
+          // dan widget Material (Checkbox) butuh leluhur Material.
+          proxyDecorator: (child, index, animation) => Material(
+            type: MaterialType.transparency,
+            child: child,
+          ),
+          itemCount: subtasks.length,
+          itemBuilder: (context, index) {
+            final subtask = subtasks[index];
+            return Padding(
+              // Kunci per id: identitas baris, bukan posisi.
+              key: ValueKey<int>(subtask.id),
               padding: EdgeInsets.only(
-                bottom: i == subtasks.length - 1 ? 0 : _rowGap,
+                // Pita sentuh sudah menyumbang 4dp di bawah; sisa
+                // `_rowGap - 4` membuat jarak ke `+ Tambah item` tetap 8dp.
+                // Antar baris: 4 bawah + 4 atas = 8dp seperti board.
+                bottom: index == subtasks.length - 1
+                    ? _rowGap - _subtaskHitPadding
+                    : 0,
               ),
-              child: _SubtaskRow(
-                title: subtasks[i].title,
-                completed: subtasks[i].isCompleted,
-                checkbox: _SubtaskCheckbox(
-                  value: subtasks[i].isCompleted,
-                  onComplete: () => repo.setSubtaskCompleted(subtasks[i].id, true),
-                  onUncomplete: () =>
-                      repo.setSubtaskCompleted(subtasks[i].id, false),
+              child: ReorderableDelayedDragStartListener(
+                index: index,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: _subtaskTapTarget),
+                  // `Listener` bawaan ReorderableDelayedDragStartListener
+                  // memakai `HitTestBehavior.deferToChild`, jadi pita 48dp baru
+                  // ikut hit-test kalau ada RenderObject buram di dalamnya.
+                  // Inilah yang membuat 4dp atas/bawah benar-benar bisa disentuh.
+                  child: Listener(
+                    behavior: HitTestBehavior.opaque,
+                    child: Align(
+                      // `heightFactor: 1` = tinggi mengikuti baris (40dp), lalu
+                      // dinaikkan ke 48dp oleh ConstrainedBox di atas.
+                      heightFactor: 1,
+                      child: _SubtaskRow(
+                        title: subtask.title,
+                        completed: subtask.isCompleted,
+                        checkbox: _SubtaskCheckbox(
+                          value: subtask.isCompleted,
+                          onComplete: () =>
+                              repo.toggleSubtask(subtask.id, true),
+                          onUncomplete: () =>
+                              repo.toggleSubtask(subtask.id, false),
+                        ),
+                        trailing: const _DragHandle(),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-        ],
-      ),
+            );
+          },
+          onReorderItem: (oldIndex, newIndex) =>
+              moveSubtask(subtasks, oldIndex, newIndex),
+        );
+      },
       loading: () => const SizedBox.shrink(),
       error: (_, _) => const SizedBox.shrink(),
+    );
+  }
+}
+
+/// Penanda geser di ujung baris checklist.
+///
+/// Hanya penanda visual: yang menangkap tekan-lama adalah seluruh pita 48dp
+/// (`ReorderableDelayedDragStartListener` + `Listener` opaque di dalamnya), jadi
+/// target sentuhnya selebar kartu × 48dp, bukan 20dp ikonnya.
+class _DragHandle extends StatelessWidget {
+  const _DragHandle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(
+      Icons.drag_indicator_rounded,
+      size: 20,
+      color: context.colors.inkMuted,
     );
   }
 }

@@ -16,7 +16,9 @@ import 'package:tazk/providers/task_providers.dart';
 /// Board `02 Tasks` fidelity tests.
 ///
 /// [todayTasksProvider] is overridden with a fixed list so the assertions do
-/// not depend on the wall clock or the Drift database.
+/// not depend on the wall clock or the Drift database. [taskSubtasksProvider] is
+/// overridden per task id for the same reason: the card reads it for the
+/// `done/total subtask` counter.
 Task _task({
   required int id,
   required String title,
@@ -32,14 +34,31 @@ Task _task({
     time: time,
     priority: priority,
     isCompleted: isCompleted,
+    autoCompleteSubtasks: true,
     createdAt: date,
   );
 }
 
-Widget _app(List<Task> tasks) {
+Subtask _subtask(int id, int taskId, String title, {required bool done}) {
+  return Subtask(
+    id: id,
+    taskId: taskId,
+    title: title,
+    isCompleted: done,
+    position: id,
+  );
+}
+
+Widget _app(
+  List<Task> tasks, {
+  Map<int, List<Subtask>> subtasks = const {},
+}) {
   return ProviderScope(
     overrides: [
       todayTasksProvider.overrideWith((ref) => Stream.value(tasks)),
+      taskSubtasksProvider.overrideWith(
+        (ref, taskId) => Stream.value(subtasks[taskId] ?? const <Subtask>[]),
+      ),
     ],
     child: MaterialApp(
       locale: const Locale('id'),
@@ -51,8 +70,12 @@ Widget _app(List<Task> tasks) {
   );
 }
 
-Future<void> _pumpLoaded(WidgetTester tester, List<Task> tasks) async {
-  await tester.pumpWidget(_app(tasks));
+Future<void> _pumpLoaded(
+  WidgetTester tester,
+  List<Task> tasks, {
+  Map<int, List<Subtask>> subtasks = const {},
+}) async {
+  await tester.pumpWidget(_app(tasks, subtasks: subtasks));
   // Provider stream emits on a microtask, then the tree rebuilds.
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 100));
@@ -113,6 +136,50 @@ void main() {
     expect(find.text('1'), findsOneWidget);
     // A task without a time says so instead of leaving the row empty.
     expect(find.text('Tanpa jam'), findsOneWidget);
+  });
+
+  testWidgets('progress `x/y subtask` tampil sesudah jam, sembunyi tanpa subtask',
+      (tester) async {
+    await _pumpLoaded(
+      tester,
+      [
+        _task(id: 1, title: 'Belanja bulanan', priority: TaskPriority.low),
+        _task(
+          id: 2,
+          title: 'Rapat Organisasi',
+          time: DateTime(2026, 10, 31, 13),
+        ),
+      ],
+      subtasks: {
+        1: [
+          _subtask(1, 1, 'Beras', done: true),
+          _subtask(2, 1, 'Sabun', done: true),
+          _subtask(3, 1, 'Gula', done: false),
+          _subtask(4, 1, 'Kopi', done: false),
+          _subtask(5, 1, 'Teh', done: false),
+        ],
+      },
+    );
+
+    // Board `02 Tasks`: `2/5 subtask` tepat sesudah jam di baris meta.
+    final progress = find.text('2/5 subtask');
+    expect(progress, findsOneWidget);
+
+    final timeOrigin = tester.getCenter(find.text('Tanpa jam'));
+    final progressOrigin = tester.getCenter(progress);
+    expect(progressOrigin.dx, greaterThan(timeOrigin.dx), reason: 'sesudah jam');
+    expect(progressOrigin.dy, moreOrLessEquals(timeOrigin.dy, epsilon: 1),
+        reason: 'satu baris meta bersama chip + jam');
+
+    // Ukuran & warna progress = label jam (board tidak mengecilkannya).
+    final progressStyle = tester.widget<Text>(progress).style!;
+    final timeStyle = tester.widget<Text>(find.text('Tanpa jam')).style!;
+    expect(progressStyle.fontSize, timeStyle.fontSize);
+    expect(progressStyle.color, timeStyle.color);
+
+    // Task tanpa subtask tidak menampilkan penghitung sama sekali.
+    expect(find.textContaining(' subtask'), findsOneWidget);
+    expect(find.text('0/0 subtask'), findsNothing);
   });
 
   testWidgets('empty state punya judul dan aksi Tambah tugas', (tester) async {

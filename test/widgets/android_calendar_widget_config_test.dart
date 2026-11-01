@@ -157,6 +157,7 @@ Task _task({
     time: time,
     priority: priority,
     isCompleted: completed,
+    autoCompleteSubtasks: true,
     createdAt: DateTime(2026),
   );
 }

@@ -104,6 +104,7 @@ class _TaskList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final pending = tasks.where((task) => !task.isCompleted).toList();
     final completed = tasks.where((task) => task.isCompleted).toList();
     final hasBoth = pending.isNotEmpty && completed.isNotEmpty;
@@ -112,13 +113,13 @@ class _TaskList extends StatelessWidget {
       padding: const EdgeInsets.all(TasksScreen._gutter),
       children: [
         if (pending.isNotEmpty) ...[
-          _GroupHeader(label: 'Belum selesai', count: pending.length),
+          _GroupHeader(label: l10n.tasksPendingHeader, count: pending.length),
           const SizedBox(height: TasksScreen._cardGap),
           ..._buildGroup(pending),
         ],
         if (hasBoth) const SizedBox(height: TasksScreen._sectionGap),
         if (completed.isNotEmpty) ...[
-          _GroupHeader(label: 'Selesai', count: completed.length),
+          _GroupHeader(label: l10n.tasksDoneHeader, count: completed.length),
           const SizedBox(height: TasksScreen._cardGap),
           ..._buildGroup(completed),
         ],
@@ -158,9 +159,10 @@ class _GroupHeader extends StatelessWidget {
   }
 }
 
-/// One task card: checkbox on the left, title plus a `priority` chip + time row
-/// on the right, duplicate action trailing. Tapping the card opens the edit
-/// form, exactly like the previous list row behaviour.
+/// One task card: checkbox on the left, title plus a `priority` chip, time, and
+/// (when it has subtasks) a `done/total subtask` counter on the right, duplicate
+/// action trailing. Tapping the card opens the edit form, exactly like the
+/// previous list row behaviour.
 class _TaskCard extends ConsumerWidget {
   const _TaskCard({required this.task});
 
@@ -179,11 +181,15 @@ class _TaskCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     final time = task.time;
-    // No `Tanpa jam` l10n key exists yet (arb files are outside this task's
-    // scope), so the untimed label stays literal for now.
     final timeLabel = time == null
-        ? 'Tanpa jam'
+        ? l10n.noTimeLabel
         : TimeOfDay.fromDateTime(time).format(context);
+
+    // Same stream the form checklist writes through, so a tick made in the form
+    // is already reflected here without a manual refresh.
+    final subtasks = ref.watch(taskSubtasksProvider(task.id)).valueOrNull;
+    final total = subtasks?.length ?? 0;
+    final done = subtasks?.where((subtask) => subtask.isCompleted).length ?? 0;
 
     return AppCard(
       padding: EdgeInsets.zero,
@@ -221,23 +227,37 @@ class _TaskCard extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4), // spacing.xs
-                      Row(
+                      // `Wrap`, bukan `Row`: judul panjang, font besar, atau
+                      // layar sempit memindahkan meta ke baris kedua alih-alih
+                      // memotongnya.
+                      Wrap(
+                        spacing: 8, // spacing.sm
+                        runSpacing: 4, // spacing.xs
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           AppChip.priority(
                             task.priority,
                             label: _priorityLabel(l10n),
                           ),
-                          const SizedBox(width: 8), // spacing.sm
-                          Flexible(
-                            child: Text(
-                              timeLabel,
+                          Text(
+                            timeLabel,
+                            maxLines: 1,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colors.inkMuted,
+                            ),
+                          ),
+                          // Board `02 Tasks`: `2/5 subtask` sesudah jam, dengan
+                          // ukuran dan warna yang sama seperti label jam, dan
+                          // tidak ditampilkan sama sekali untuk task tanpa
+                          // subtask.
+                          if (total > 0)
+                            Text(
+                              l10n.subtaskProgress(done, total),
                               maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: colors.inkMuted,
                               ),
                             ),
-                          ),
                         ],
                       ),
                     ],

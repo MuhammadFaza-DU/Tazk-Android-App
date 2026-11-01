@@ -83,6 +83,20 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _autoCompleteSubtasksMeta =
+      const VerificationMeta('autoCompleteSubtasks');
+  @override
+  late final GeneratedColumn<bool> autoCompleteSubtasks = GeneratedColumn<bool>(
+    'auto_complete_subtasks',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("auto_complete_subtasks" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -104,6 +118,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     priority,
     isCompleted,
     location,
+    autoCompleteSubtasks,
     createdAt,
   ];
   @override
@@ -158,6 +173,15 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         location.isAcceptableOrUnknown(data['location']!, _locationMeta),
       );
     }
+    if (data.containsKey('auto_complete_subtasks')) {
+      context.handle(
+        _autoCompleteSubtasksMeta,
+        autoCompleteSubtasks.isAcceptableOrUnknown(
+          data['auto_complete_subtasks']!,
+          _autoCompleteSubtasksMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -203,6 +227,10 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         DriftSqlType.string,
         data['${effectivePrefix}location'],
       ),
+      autoCompleteSubtasks: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}auto_complete_subtasks'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -227,6 +255,7 @@ class Task extends DataClass implements Insertable<Task> {
   final TaskPriority priority;
   final bool isCompleted;
   final String? location;
+  final bool autoCompleteSubtasks;
   final DateTime createdAt;
   const Task({
     required this.id,
@@ -236,6 +265,7 @@ class Task extends DataClass implements Insertable<Task> {
     required this.priority,
     required this.isCompleted,
     this.location,
+    required this.autoCompleteSubtasks,
     required this.createdAt,
   });
   @override
@@ -256,6 +286,7 @@ class Task extends DataClass implements Insertable<Task> {
     if (!nullToAbsent || location != null) {
       map['location'] = Variable<String>(location);
     }
+    map['auto_complete_subtasks'] = Variable<bool>(autoCompleteSubtasks);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -271,6 +302,7 @@ class Task extends DataClass implements Insertable<Task> {
       location: location == null && nullToAbsent
           ? const Value.absent()
           : Value(location),
+      autoCompleteSubtasks: Value(autoCompleteSubtasks),
       createdAt: Value(createdAt),
     );
   }
@@ -290,6 +322,9 @@ class Task extends DataClass implements Insertable<Task> {
       ),
       isCompleted: serializer.fromJson<bool>(json['isCompleted']),
       location: serializer.fromJson<String?>(json['location']),
+      autoCompleteSubtasks: serializer.fromJson<bool>(
+        json['autoCompleteSubtasks'],
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -306,6 +341,7 @@ class Task extends DataClass implements Insertable<Task> {
       ),
       'isCompleted': serializer.toJson<bool>(isCompleted),
       'location': serializer.toJson<String?>(location),
+      'autoCompleteSubtasks': serializer.toJson<bool>(autoCompleteSubtasks),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -318,6 +354,7 @@ class Task extends DataClass implements Insertable<Task> {
     TaskPriority? priority,
     bool? isCompleted,
     Value<String?> location = const Value.absent(),
+    bool? autoCompleteSubtasks,
     DateTime? createdAt,
   }) => Task(
     id: id ?? this.id,
@@ -327,6 +364,7 @@ class Task extends DataClass implements Insertable<Task> {
     priority: priority ?? this.priority,
     isCompleted: isCompleted ?? this.isCompleted,
     location: location.present ? location.value : this.location,
+    autoCompleteSubtasks: autoCompleteSubtasks ?? this.autoCompleteSubtasks,
     createdAt: createdAt ?? this.createdAt,
   );
   Task copyWithCompanion(TasksCompanion data) {
@@ -340,6 +378,9 @@ class Task extends DataClass implements Insertable<Task> {
           ? data.isCompleted.value
           : this.isCompleted,
       location: data.location.present ? data.location.value : this.location,
+      autoCompleteSubtasks: data.autoCompleteSubtasks.present
+          ? data.autoCompleteSubtasks.value
+          : this.autoCompleteSubtasks,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -354,6 +395,7 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('priority: $priority, ')
           ..write('isCompleted: $isCompleted, ')
           ..write('location: $location, ')
+          ..write('autoCompleteSubtasks: $autoCompleteSubtasks, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -368,6 +410,7 @@ class Task extends DataClass implements Insertable<Task> {
     priority,
     isCompleted,
     location,
+    autoCompleteSubtasks,
     createdAt,
   );
   @override
@@ -381,6 +424,7 @@ class Task extends DataClass implements Insertable<Task> {
           other.priority == this.priority &&
           other.isCompleted == this.isCompleted &&
           other.location == this.location &&
+          other.autoCompleteSubtasks == this.autoCompleteSubtasks &&
           other.createdAt == this.createdAt);
 }
 
@@ -392,6 +436,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<TaskPriority> priority;
   final Value<bool> isCompleted;
   final Value<String?> location;
+  final Value<bool> autoCompleteSubtasks;
   final Value<DateTime> createdAt;
   const TasksCompanion({
     this.id = const Value.absent(),
@@ -401,6 +446,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.priority = const Value.absent(),
     this.isCompleted = const Value.absent(),
     this.location = const Value.absent(),
+    this.autoCompleteSubtasks = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   TasksCompanion.insert({
@@ -411,6 +457,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     required TaskPriority priority,
     this.isCompleted = const Value.absent(),
     this.location = const Value.absent(),
+    this.autoCompleteSubtasks = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : title = Value(title),
        date = Value(date),
@@ -423,6 +470,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<int>? priority,
     Expression<bool>? isCompleted,
     Expression<String>? location,
+    Expression<bool>? autoCompleteSubtasks,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -433,6 +481,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (priority != null) 'priority': priority,
       if (isCompleted != null) 'is_completed': isCompleted,
       if (location != null) 'location': location,
+      if (autoCompleteSubtasks != null)
+        'auto_complete_subtasks': autoCompleteSubtasks,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -445,6 +495,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Value<TaskPriority>? priority,
     Value<bool>? isCompleted,
     Value<String?>? location,
+    Value<bool>? autoCompleteSubtasks,
     Value<DateTime>? createdAt,
   }) {
     return TasksCompanion(
@@ -455,6 +506,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       priority: priority ?? this.priority,
       isCompleted: isCompleted ?? this.isCompleted,
       location: location ?? this.location,
+      autoCompleteSubtasks: autoCompleteSubtasks ?? this.autoCompleteSubtasks,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -485,6 +537,11 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (location.present) {
       map['location'] = Variable<String>(location.value);
     }
+    if (autoCompleteSubtasks.present) {
+      map['auto_complete_subtasks'] = Variable<bool>(
+        autoCompleteSubtasks.value,
+      );
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -501,6 +558,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('priority: $priority, ')
           ..write('isCompleted: $isCompleted, ')
           ..write('location: $location, ')
+          ..write('autoCompleteSubtasks: $autoCompleteSubtasks, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -561,8 +619,26 @@ class $SubtasksTable extends Subtasks with TableInfo<$SubtasksTable, Subtask> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, taskId, title, isCompleted];
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    taskId,
+    title,
+    isCompleted,
+    position,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -603,6 +679,12 @@ class $SubtasksTable extends Subtasks with TableInfo<$SubtasksTable, Subtask> {
         ),
       );
     }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    }
     return context;
   }
 
@@ -628,6 +710,10 @@ class $SubtasksTable extends Subtasks with TableInfo<$SubtasksTable, Subtask> {
         DriftSqlType.bool,
         data['${effectivePrefix}is_completed'],
       )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
     );
   }
 
@@ -642,11 +728,13 @@ class Subtask extends DataClass implements Insertable<Subtask> {
   final int taskId;
   final String title;
   final bool isCompleted;
+  final int position;
   const Subtask({
     required this.id,
     required this.taskId,
     required this.title,
     required this.isCompleted,
+    required this.position,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -655,6 +743,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
     map['task_id'] = Variable<int>(taskId);
     map['title'] = Variable<String>(title);
     map['is_completed'] = Variable<bool>(isCompleted);
+    map['position'] = Variable<int>(position);
     return map;
   }
 
@@ -664,6 +753,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
       taskId: Value(taskId),
       title: Value(title),
       isCompleted: Value(isCompleted),
+      position: Value(position),
     );
   }
 
@@ -677,6 +767,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
       taskId: serializer.fromJson<int>(json['taskId']),
       title: serializer.fromJson<String>(json['title']),
       isCompleted: serializer.fromJson<bool>(json['isCompleted']),
+      position: serializer.fromJson<int>(json['position']),
     );
   }
   @override
@@ -687,16 +778,23 @@ class Subtask extends DataClass implements Insertable<Subtask> {
       'taskId': serializer.toJson<int>(taskId),
       'title': serializer.toJson<String>(title),
       'isCompleted': serializer.toJson<bool>(isCompleted),
+      'position': serializer.toJson<int>(position),
     };
   }
 
-  Subtask copyWith({int? id, int? taskId, String? title, bool? isCompleted}) =>
-      Subtask(
-        id: id ?? this.id,
-        taskId: taskId ?? this.taskId,
-        title: title ?? this.title,
-        isCompleted: isCompleted ?? this.isCompleted,
-      );
+  Subtask copyWith({
+    int? id,
+    int? taskId,
+    String? title,
+    bool? isCompleted,
+    int? position,
+  }) => Subtask(
+    id: id ?? this.id,
+    taskId: taskId ?? this.taskId,
+    title: title ?? this.title,
+    isCompleted: isCompleted ?? this.isCompleted,
+    position: position ?? this.position,
+  );
   Subtask copyWithCompanion(SubtasksCompanion data) {
     return Subtask(
       id: data.id.present ? data.id.value : this.id,
@@ -705,6 +803,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
       isCompleted: data.isCompleted.present
           ? data.isCompleted.value
           : this.isCompleted,
+      position: data.position.present ? data.position.value : this.position,
     );
   }
 
@@ -714,13 +813,14 @@ class Subtask extends DataClass implements Insertable<Subtask> {
           ..write('id: $id, ')
           ..write('taskId: $taskId, ')
           ..write('title: $title, ')
-          ..write('isCompleted: $isCompleted')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('position: $position')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, taskId, title, isCompleted);
+  int get hashCode => Object.hash(id, taskId, title, isCompleted, position);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -728,7 +828,8 @@ class Subtask extends DataClass implements Insertable<Subtask> {
           other.id == this.id &&
           other.taskId == this.taskId &&
           other.title == this.title &&
-          other.isCompleted == this.isCompleted);
+          other.isCompleted == this.isCompleted &&
+          other.position == this.position);
 }
 
 class SubtasksCompanion extends UpdateCompanion<Subtask> {
@@ -736,17 +837,20 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
   final Value<int> taskId;
   final Value<String> title;
   final Value<bool> isCompleted;
+  final Value<int> position;
   const SubtasksCompanion({
     this.id = const Value.absent(),
     this.taskId = const Value.absent(),
     this.title = const Value.absent(),
     this.isCompleted = const Value.absent(),
+    this.position = const Value.absent(),
   });
   SubtasksCompanion.insert({
     this.id = const Value.absent(),
     required int taskId,
     required String title,
     this.isCompleted = const Value.absent(),
+    this.position = const Value.absent(),
   }) : taskId = Value(taskId),
        title = Value(title);
   static Insertable<Subtask> custom({
@@ -754,12 +858,14 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
     Expression<int>? taskId,
     Expression<String>? title,
     Expression<bool>? isCompleted,
+    Expression<int>? position,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (taskId != null) 'task_id': taskId,
       if (title != null) 'title': title,
       if (isCompleted != null) 'is_completed': isCompleted,
+      if (position != null) 'position': position,
     });
   }
 
@@ -768,12 +874,14 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
     Value<int>? taskId,
     Value<String>? title,
     Value<bool>? isCompleted,
+    Value<int>? position,
   }) {
     return SubtasksCompanion(
       id: id ?? this.id,
       taskId: taskId ?? this.taskId,
       title: title ?? this.title,
       isCompleted: isCompleted ?? this.isCompleted,
+      position: position ?? this.position,
     );
   }
 
@@ -792,6 +900,9 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
     if (isCompleted.present) {
       map['is_completed'] = Variable<bool>(isCompleted.value);
     }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
     return map;
   }
 
@@ -801,7 +912,8 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
           ..write('id: $id, ')
           ..write('taskId: $taskId, ')
           ..write('title: $title, ')
-          ..write('isCompleted: $isCompleted')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('position: $position')
           ..write(')'))
         .toString();
   }
@@ -4452,6 +4564,7 @@ typedef $$TasksTableCreateCompanionBuilder =
       required TaskPriority priority,
       Value<bool> isCompleted,
       Value<String?> location,
+      Value<bool> autoCompleteSubtasks,
       Value<DateTime> createdAt,
     });
 typedef $$TasksTableUpdateCompanionBuilder =
@@ -4463,6 +4576,7 @@ typedef $$TasksTableUpdateCompanionBuilder =
       Value<TaskPriority> priority,
       Value<bool> isCompleted,
       Value<String?> location,
+      Value<bool> autoCompleteSubtasks,
       Value<DateTime> createdAt,
     });
 
@@ -4531,6 +4645,11 @@ class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
 
   ColumnFilters<String> get location => $composableBuilder(
     column: $table.location,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get autoCompleteSubtasks => $composableBuilder(
+    column: $table.autoCompleteSubtasks,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4609,6 +4728,11 @@ class $$TasksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get autoCompleteSubtasks => $composableBuilder(
+    column: $table.autoCompleteSubtasks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -4646,6 +4770,11 @@ class $$TasksTableAnnotationComposer
 
   GeneratedColumn<String> get location =>
       $composableBuilder(column: $table.location, builder: (column) => column);
+
+  GeneratedColumn<bool> get autoCompleteSubtasks => $composableBuilder(
+    column: $table.autoCompleteSubtasks,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -4711,6 +4840,7 @@ class $$TasksTableTableManager
                 Value<TaskPriority> priority = const Value.absent(),
                 Value<bool> isCompleted = const Value.absent(),
                 Value<String?> location = const Value.absent(),
+                Value<bool> autoCompleteSubtasks = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => TasksCompanion(
                 id: id,
@@ -4720,6 +4850,7 @@ class $$TasksTableTableManager
                 priority: priority,
                 isCompleted: isCompleted,
                 location: location,
+                autoCompleteSubtasks: autoCompleteSubtasks,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -4731,6 +4862,7 @@ class $$TasksTableTableManager
                 required TaskPriority priority,
                 Value<bool> isCompleted = const Value.absent(),
                 Value<String?> location = const Value.absent(),
+                Value<bool> autoCompleteSubtasks = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => TasksCompanion.insert(
                 id: id,
@@ -4740,6 +4872,7 @@ class $$TasksTableTableManager
                 priority: priority,
                 isCompleted: isCompleted,
                 location: location,
+                autoCompleteSubtasks: autoCompleteSubtasks,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0
@@ -4794,6 +4927,7 @@ typedef $$SubtasksTableCreateCompanionBuilder =
       required int taskId,
       required String title,
       Value<bool> isCompleted,
+      Value<int> position,
     });
 typedef $$SubtasksTableUpdateCompanionBuilder =
     SubtasksCompanion Function({
@@ -4801,6 +4935,7 @@ typedef $$SubtasksTableUpdateCompanionBuilder =
       Value<int> taskId,
       Value<String> title,
       Value<bool> isCompleted,
+      Value<int> position,
     });
 
 final class $$SubtasksTableReferences
@@ -4846,6 +4981,11 @@ class $$SubtasksTableFilterComposer
 
   ColumnFilters<bool> get isCompleted => $composableBuilder(
     column: $table.isCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4897,6 +5037,11 @@ class $$SubtasksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$TasksTableOrderingComposer get taskId {
     final $$TasksTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4940,6 +5085,9 @@ class $$SubtasksTableAnnotationComposer
     column: $table.isCompleted,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
 
   $$TasksTableAnnotationComposer get taskId {
     final $$TasksTableAnnotationComposer composer = $composerBuilder(
@@ -4997,11 +5145,13 @@ class $$SubtasksTableTableManager
                 Value<int> taskId = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<bool> isCompleted = const Value.absent(),
+                Value<int> position = const Value.absent(),
               }) => SubtasksCompanion(
                 id: id,
                 taskId: taskId,
                 title: title,
                 isCompleted: isCompleted,
+                position: position,
               ),
           createCompanionCallback:
               ({
@@ -5009,11 +5159,13 @@ class $$SubtasksTableTableManager
                 required int taskId,
                 required String title,
                 Value<bool> isCompleted = const Value.absent(),
+                Value<int> position = const Value.absent(),
               }) => SubtasksCompanion.insert(
                 id: id,
                 taskId: taskId,
                 title: title,
                 isCompleted: isCompleted,
+                position: position,
               ),
           withReferenceMapper: (p0) => p0
               .map(

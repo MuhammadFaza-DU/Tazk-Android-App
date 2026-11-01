@@ -277,6 +277,31 @@ class AppLocalizationsId extends AppLocalizations {
   String get addItemHint => 'Tambah item';
 
   @override
+  String get autoCompleteSubtasksLabel =>
+      'Tandai tugas selesai saat semua subtask beres';
+
+  @override
+  String get openInMapsTooltip => 'Buka di Maps';
+
+  @override
+  String get openInMapsFailedMessage =>
+      'Belum ada aplikasi maps di HP ini yang bisa membuka lokasi itu.';
+
+  @override
+  String get noTimeLabel => 'Tanpa jam';
+
+  @override
+  String get tasksPendingHeader => 'Belum selesai';
+
+  @override
+  String get tasksDoneHeader => 'Selesai';
+
+  @override
+  String subtaskProgress(int done, int total) {
+    return '$done/$total subtask';
+  }
+
+  @override
   String get habitsScreenTitle => 'Habits';
 
   @override
