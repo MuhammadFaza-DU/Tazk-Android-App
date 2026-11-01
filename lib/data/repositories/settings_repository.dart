@@ -29,6 +29,7 @@ class SettingsRepository {
                 notifyHabits: true,
                 notifyStreakWarning: true,
                 notifyFreezeUsed: true,
+                notifyFocusSession: true,
               ),
         );
   }

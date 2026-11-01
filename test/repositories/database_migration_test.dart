@@ -443,7 +443,7 @@ void main() {
       expect(taskCategoryKey.read<String>('on_delete'), 'SET NULL');
 
       final versionRow = await db.customSelect('PRAGMA user_version').getSingle();
-      expect(versionRow.read<int>('user_version'), 6);
+      expect(versionRow.read<int>('user_version'), 7);
 
       // The enum order is the stored contract: pin the raw ints, not the symbols.
       const expectedColorInts = <String, int>{
@@ -537,6 +537,124 @@ void main() {
             ..where((row) => row.id.equals(habitId)))
           .getSingle();
       expect(habit.categoryId, isNull);
+    } finally {
+      await db.close();
+    }
+  });
+
+  test('opens a version 6 database and adds notify_focus_session', () async {
+    final tempDir = await Directory.systemTemp.createTemp('tazk_db_migration_');
+    final dbFile =
+        File('${tempDir.path}${Platform.pathSeparator}tazk.sqlite');
+    final db = AppDatabase.forTesting(
+      NativeDatabase(
+        dbFile,
+        setup: (rawDb) {
+          rawDb.execute('''
+            CREATE TABLE categories (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL,
+              color INTEGER NOT NULL
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE tasks (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              title TEXT NOT NULL,
+              date INTEGER NOT NULL,
+              time INTEGER,
+              priority INTEGER NOT NULL,
+              is_completed INTEGER NOT NULL DEFAULT 0 CHECK (is_completed IN (0, 1)),
+              location TEXT,
+              auto_complete_subtasks INTEGER NOT NULL DEFAULT 1 CHECK (auto_complete_subtasks IN (0, 1)),
+              category_id INTEGER REFERENCES categories (id) ON DELETE SET NULL,
+              created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000)
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE subtasks (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              task_id INTEGER NOT NULL REFERENCES tasks (id) ON DELETE CASCADE,
+              title TEXT NOT NULL,
+              is_completed INTEGER NOT NULL DEFAULT 0 CHECK (is_completed IN (0, 1)),
+              position INTEGER NOT NULL DEFAULT 0
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE habits (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL,
+              frequency INTEGER NOT NULL,
+              scheduled_time INTEGER,
+              has_progress INTEGER NOT NULL DEFAULT 0 CHECK (has_progress IN (0, 1)),
+              target_minutes INTEGER,
+              is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+              category_id INTEGER REFERENCES categories (id) ON DELETE SET NULL,
+              created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000),
+              custom_days_of_week INTEGER,
+              custom_interval INTEGER,
+              custom_day_of_month INTEGER,
+              custom_frequency_type INTEGER
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE app_settings (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              theme_mode INTEGER NOT NULL DEFAULT 0,
+              language INTEGER NOT NULL DEFAULT 0,
+              notify_tasks INTEGER NOT NULL DEFAULT 1 CHECK (notify_tasks IN (0, 1)),
+              notify_habits INTEGER NOT NULL DEFAULT 1 CHECK (notify_habits IN (0, 1)),
+              notify_streak_warning INTEGER NOT NULL DEFAULT 1 CHECK (notify_streak_warning IN (0, 1)),
+              notify_freeze_used INTEGER NOT NULL DEFAULT 1 CHECK (notify_freeze_used IN (0, 1))
+            );
+          ''');
+          rawDb.execute(
+            "INSERT INTO app_settings "
+            "(id, theme_mode, language, notify_tasks, notify_habits, "
+            "notify_streak_warning, notify_freeze_used) "
+            "VALUES (1, 1, 1, 0, 1, 0, 1);",
+          );
+          rawDb.execute('PRAGMA user_version = 6;');
+        },
+      ),
+    );
+    try {
+      final columns = await db
+          .customSelect("PRAGMA table_info('app_settings')")
+          .get();
+      expect(
+        columns.map((row) => row.read<String>('name')),
+        contains('notify_focus_session'),
+      );
+
+      final settings = await (db.select(db.appSettings)
+            ..where((row) => row.id.equals(1)))
+          .getSingle();
+      expect(settings.notifyFocusSession, isTrue);
+      expect(settings.themeMode, AppThemeMode.dark);
+      expect(settings.language, AppLanguage.english);
+      expect(settings.notifyTasks, isFalse);
+      expect(settings.notifyHabits, isTrue);
+      expect(settings.notifyStreakWarning, isFalse);
+      expect(settings.notifyFreezeUsed, isTrue);
+
+      final versionRow = await db.customSelect('PRAGMA user_version').getSingle();
+      expect(versionRow.read<int>('user_version'), 7);
+    } finally {
+      await db.close();
+      await tempDir.delete(recursive: true);
+    }
+  });
+
+  test('fresh database defaults notify_focus_session to true', () async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    try {
+      final id =
+          await db.into(db.appSettings).insert(const AppSettingsCompanion());
+      final settings = await (db.select(db.appSettings)
+            ..where((row) => row.id.equals(id)))
+          .getSingle();
+      expect(settings.notifyFocusSession, isTrue);
     } finally {
       await db.close();
     }

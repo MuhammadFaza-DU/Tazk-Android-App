@@ -3774,6 +3774,20 @@ class $AppSettingsTable extends AppSettings
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _notifyFocusSessionMeta =
+      const VerificationMeta('notifyFocusSession');
+  @override
+  late final GeneratedColumn<bool> notifyFocusSession = GeneratedColumn<bool>(
+    'notify_focus_session',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("notify_focus_session" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3783,6 +3797,7 @@ class $AppSettingsTable extends AppSettings
     notifyHabits,
     notifyStreakWarning,
     notifyFreezeUsed,
+    notifyFocusSession,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3835,6 +3850,15 @@ class $AppSettingsTable extends AppSettings
         ),
       );
     }
+    if (data.containsKey('notify_focus_session')) {
+      context.handle(
+        _notifyFocusSessionMeta,
+        notifyFocusSession.isAcceptableOrUnknown(
+          data['notify_focus_session']!,
+          _notifyFocusSessionMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3876,6 +3900,10 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.bool,
         data['${effectivePrefix}notify_freeze_used'],
       )!,
+      notifyFocusSession: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}notify_focus_session'],
+      )!,
     );
   }
 
@@ -3898,6 +3926,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
   final bool notifyHabits;
   final bool notifyStreakWarning;
   final bool notifyFreezeUsed;
+  final bool notifyFocusSession;
   const AppSetting({
     required this.id,
     required this.themeMode,
@@ -3906,6 +3935,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     required this.notifyHabits,
     required this.notifyStreakWarning,
     required this.notifyFreezeUsed,
+    required this.notifyFocusSession,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3925,6 +3955,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     map['notify_habits'] = Variable<bool>(notifyHabits);
     map['notify_streak_warning'] = Variable<bool>(notifyStreakWarning);
     map['notify_freeze_used'] = Variable<bool>(notifyFreezeUsed);
+    map['notify_focus_session'] = Variable<bool>(notifyFocusSession);
     return map;
   }
 
@@ -3937,6 +3968,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       notifyHabits: Value(notifyHabits),
       notifyStreakWarning: Value(notifyStreakWarning),
       notifyFreezeUsed: Value(notifyFreezeUsed),
+      notifyFocusSession: Value(notifyFocusSession),
     );
   }
 
@@ -3959,6 +3991,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
         json['notifyStreakWarning'],
       ),
       notifyFreezeUsed: serializer.fromJson<bool>(json['notifyFreezeUsed']),
+      notifyFocusSession: serializer.fromJson<bool>(json['notifyFocusSession']),
     );
   }
   @override
@@ -3976,6 +4009,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       'notifyHabits': serializer.toJson<bool>(notifyHabits),
       'notifyStreakWarning': serializer.toJson<bool>(notifyStreakWarning),
       'notifyFreezeUsed': serializer.toJson<bool>(notifyFreezeUsed),
+      'notifyFocusSession': serializer.toJson<bool>(notifyFocusSession),
     };
   }
 
@@ -3987,6 +4021,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     bool? notifyHabits,
     bool? notifyStreakWarning,
     bool? notifyFreezeUsed,
+    bool? notifyFocusSession,
   }) => AppSetting(
     id: id ?? this.id,
     themeMode: themeMode ?? this.themeMode,
@@ -3995,6 +4030,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     notifyHabits: notifyHabits ?? this.notifyHabits,
     notifyStreakWarning: notifyStreakWarning ?? this.notifyStreakWarning,
     notifyFreezeUsed: notifyFreezeUsed ?? this.notifyFreezeUsed,
+    notifyFocusSession: notifyFocusSession ?? this.notifyFocusSession,
   );
   AppSetting copyWithCompanion(AppSettingsCompanion data) {
     return AppSetting(
@@ -4013,6 +4049,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       notifyFreezeUsed: data.notifyFreezeUsed.present
           ? data.notifyFreezeUsed.value
           : this.notifyFreezeUsed,
+      notifyFocusSession: data.notifyFocusSession.present
+          ? data.notifyFocusSession.value
+          : this.notifyFocusSession,
     );
   }
 
@@ -4025,7 +4064,8 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
           ..write('notifyTasks: $notifyTasks, ')
           ..write('notifyHabits: $notifyHabits, ')
           ..write('notifyStreakWarning: $notifyStreakWarning, ')
-          ..write('notifyFreezeUsed: $notifyFreezeUsed')
+          ..write('notifyFreezeUsed: $notifyFreezeUsed, ')
+          ..write('notifyFocusSession: $notifyFocusSession')
           ..write(')'))
         .toString();
   }
@@ -4039,6 +4079,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     notifyHabits,
     notifyStreakWarning,
     notifyFreezeUsed,
+    notifyFocusSession,
   );
   @override
   bool operator ==(Object other) =>
@@ -4050,7 +4091,8 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
           other.notifyTasks == this.notifyTasks &&
           other.notifyHabits == this.notifyHabits &&
           other.notifyStreakWarning == this.notifyStreakWarning &&
-          other.notifyFreezeUsed == this.notifyFreezeUsed);
+          other.notifyFreezeUsed == this.notifyFreezeUsed &&
+          other.notifyFocusSession == this.notifyFocusSession);
 }
 
 class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
@@ -4061,6 +4103,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   final Value<bool> notifyHabits;
   final Value<bool> notifyStreakWarning;
   final Value<bool> notifyFreezeUsed;
+  final Value<bool> notifyFocusSession;
   const AppSettingsCompanion({
     this.id = const Value.absent(),
     this.themeMode = const Value.absent(),
@@ -4069,6 +4112,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     this.notifyHabits = const Value.absent(),
     this.notifyStreakWarning = const Value.absent(),
     this.notifyFreezeUsed = const Value.absent(),
+    this.notifyFocusSession = const Value.absent(),
   });
   AppSettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -4078,6 +4122,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     this.notifyHabits = const Value.absent(),
     this.notifyStreakWarning = const Value.absent(),
     this.notifyFreezeUsed = const Value.absent(),
+    this.notifyFocusSession = const Value.absent(),
   });
   static Insertable<AppSetting> custom({
     Expression<int>? id,
@@ -4087,6 +4132,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     Expression<bool>? notifyHabits,
     Expression<bool>? notifyStreakWarning,
     Expression<bool>? notifyFreezeUsed,
+    Expression<bool>? notifyFocusSession,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4097,6 +4143,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
       if (notifyStreakWarning != null)
         'notify_streak_warning': notifyStreakWarning,
       if (notifyFreezeUsed != null) 'notify_freeze_used': notifyFreezeUsed,
+      if (notifyFocusSession != null)
+        'notify_focus_session': notifyFocusSession,
     });
   }
 
@@ -4108,6 +4156,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     Value<bool>? notifyHabits,
     Value<bool>? notifyStreakWarning,
     Value<bool>? notifyFreezeUsed,
+    Value<bool>? notifyFocusSession,
   }) {
     return AppSettingsCompanion(
       id: id ?? this.id,
@@ -4117,6 +4166,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
       notifyHabits: notifyHabits ?? this.notifyHabits,
       notifyStreakWarning: notifyStreakWarning ?? this.notifyStreakWarning,
       notifyFreezeUsed: notifyFreezeUsed ?? this.notifyFreezeUsed,
+      notifyFocusSession: notifyFocusSession ?? this.notifyFocusSession,
     );
   }
 
@@ -4148,6 +4198,9 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     if (notifyFreezeUsed.present) {
       map['notify_freeze_used'] = Variable<bool>(notifyFreezeUsed.value);
     }
+    if (notifyFocusSession.present) {
+      map['notify_focus_session'] = Variable<bool>(notifyFocusSession.value);
+    }
     return map;
   }
 
@@ -4160,7 +4213,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
           ..write('notifyTasks: $notifyTasks, ')
           ..write('notifyHabits: $notifyHabits, ')
           ..write('notifyStreakWarning: $notifyStreakWarning, ')
-          ..write('notifyFreezeUsed: $notifyFreezeUsed')
+          ..write('notifyFreezeUsed: $notifyFreezeUsed, ')
+          ..write('notifyFocusSession: $notifyFocusSession')
           ..write(')'))
         .toString();
   }
@@ -7798,6 +7852,7 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
       Value<bool> notifyHabits,
       Value<bool> notifyStreakWarning,
       Value<bool> notifyFreezeUsed,
+      Value<bool> notifyFocusSession,
     });
 typedef $$AppSettingsTableUpdateCompanionBuilder =
     AppSettingsCompanion Function({
@@ -7808,6 +7863,7 @@ typedef $$AppSettingsTableUpdateCompanionBuilder =
       Value<bool> notifyHabits,
       Value<bool> notifyStreakWarning,
       Value<bool> notifyFreezeUsed,
+      Value<bool> notifyFocusSession,
     });
 
 class $$AppSettingsTableFilterComposer
@@ -7855,6 +7911,11 @@ class $$AppSettingsTableFilterComposer
     column: $table.notifyFreezeUsed,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<bool> get notifyFocusSession => $composableBuilder(
+    column: $table.notifyFocusSession,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$AppSettingsTableOrderingComposer
@@ -7900,6 +7961,11 @@ class $$AppSettingsTableOrderingComposer
     column: $table.notifyFreezeUsed,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get notifyFocusSession => $composableBuilder(
+    column: $table.notifyFocusSession,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AppSettingsTableAnnotationComposer
@@ -7937,6 +8003,11 @@ class $$AppSettingsTableAnnotationComposer
 
   GeneratedColumn<bool> get notifyFreezeUsed => $composableBuilder(
     column: $table.notifyFreezeUsed,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get notifyFocusSession => $composableBuilder(
+    column: $table.notifyFocusSession,
     builder: (column) => column,
   );
 }
@@ -7979,6 +8050,7 @@ class $$AppSettingsTableTableManager
                 Value<bool> notifyHabits = const Value.absent(),
                 Value<bool> notifyStreakWarning = const Value.absent(),
                 Value<bool> notifyFreezeUsed = const Value.absent(),
+                Value<bool> notifyFocusSession = const Value.absent(),
               }) => AppSettingsCompanion(
                 id: id,
                 themeMode: themeMode,
@@ -7987,6 +8059,7 @@ class $$AppSettingsTableTableManager
                 notifyHabits: notifyHabits,
                 notifyStreakWarning: notifyStreakWarning,
                 notifyFreezeUsed: notifyFreezeUsed,
+                notifyFocusSession: notifyFocusSession,
               ),
           createCompanionCallback:
               ({
@@ -7997,6 +8070,7 @@ class $$AppSettingsTableTableManager
                 Value<bool> notifyHabits = const Value.absent(),
                 Value<bool> notifyStreakWarning = const Value.absent(),
                 Value<bool> notifyFreezeUsed = const Value.absent(),
+                Value<bool> notifyFocusSession = const Value.absent(),
               }) => AppSettingsCompanion.insert(
                 id: id,
                 themeMode: themeMode,
@@ -8005,6 +8079,7 @@ class $$AppSettingsTableTableManager
                 notifyHabits: notifyHabits,
                 notifyStreakWarning: notifyStreakWarning,
                 notifyFreezeUsed: notifyFreezeUsed,
+                notifyFocusSession: notifyFocusSession,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

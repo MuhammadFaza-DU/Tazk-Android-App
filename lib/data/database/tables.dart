@@ -121,6 +121,8 @@ class AppSettings extends Table {
       boolean().withDefault(const Constant(true))();
   BoolColumn get notifyFreezeUsed =>
       boolean().withDefault(const Constant(true))();
+  BoolColumn get notifyFocusSession =>
+      boolean().withDefault(const Constant(true))();
 }
 
 @TableIndex(name: 'idx_focus_sessions_started_at', columns: {#startedAt})

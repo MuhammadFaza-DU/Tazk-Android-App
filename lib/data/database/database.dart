@@ -37,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -82,6 +82,12 @@ class AppDatabase extends _$AppDatabase {
             await _createTableIfMissing(m, categories);
             await _addColumnIfMissing(m, tasks, tasks.categoryId);
             await _addColumnIfMissing(m, habits, habits.categoryId);
+          }
+          if (from < 7) {
+            // Same tolerance as from<6: older files may lack app_settings entirely.
+            await _createTableIfMissing(m, appSettings);
+            await _addColumnIfMissing(
+                m, appSettings, appSettings.notifyFocusSession);
           }
         },
       );
