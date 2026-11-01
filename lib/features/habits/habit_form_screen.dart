@@ -10,6 +10,7 @@ import '../../core/widgets/app_chip.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/app_text_field.dart';
+import '../../core/widgets/category_picker.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
@@ -67,6 +68,9 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   TimeOfDay? _scheduledTime;
   late bool _hasProgress;
 
+  /// Kategori tunggal (opsional) — tidak ada di board `24`, lihat laporan.
+  int? _categoryId;
+
   // Custom frequency fields
   late Set<int> _customDaysOfWeek; // 1=Mon, 2=Tue, 4=Wed, 8=Thu, 16=Fri, 32=Sat, 64=Sun
   late int _customInterval;
@@ -88,6 +92,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
         ? TimeOfDay.fromDateTime(habit!.scheduledTime!)
         : null;
     _hasProgress = habit?.hasProgress ?? false;
+    _categoryId = habit?.categoryId;
 
     // Initialize custom frequency fields
     _customDaysOfWeek = _intToDaySet(habit?.customDaysOfWeek ?? 0);
@@ -162,6 +167,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     }
 
     final repo = ref.read(habitRepositoryProvider);
+    final categoryRepo = ref.read(categoryRepositoryProvider);
     final name = _nameController.text.trim();
     final targetMinutes =
         _hasProgress ? int.tryParse(_targetMinutesController.text.trim()) : null;
@@ -191,8 +197,11 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
         customFrequencyType: customFrequencyType,
       );
       await repo.updateHabit(updated);
+      // `Habit.categoryId` tidak ikut `copyWith` di atas: jalur tulis kategori
+      // hanya lewat repository kategori (yang memvalidasi id-nya masih ada).
+      await categoryRepo.setHabitCategory(widget.habit!.id, _categoryId);
     } else {
-      await repo.createHabit(
+      final newId = await repo.createHabit(
         name: name,
         frequency: _frequency,
         scheduledTime: _combinedScheduledTime,
@@ -203,6 +212,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
         customDayOfMonth: customDayOfMonth.value,
         customFrequencyType: customFrequencyType.value,
       );
+      await categoryRepo.setHabitCategory(newId, _categoryId);
     }
 
     if (!mounted) return;
@@ -251,7 +261,17 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
               _buildCustomFrequencyCard(l10n, colors, theme),
             ],
 
-            const SizedBox(height: 11),
+            // Kategori (tidak ada di board `24`; kebutuhan produk T7). Jarak 16
+            // (`spacing.lg`) memisahkannya sebagai grup baru dari Frekuensi.
+            const SizedBox(height: 16),
+            _FieldLabel(l10n.fieldCategoryOptionalLabel),
+            const SizedBox(height: 8),
+            CategoryPicker(
+              value: _categoryId,
+              onChanged: (value) => setState(() => _categoryId = value),
+            ),
+
+            const SizedBox(height: 16),
             _FieldLabel(l10n.fieldScheduledTimeOptionalLabel),
             const SizedBox(height: 2),
             _buildReminderRow(l10n, colors),

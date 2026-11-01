@@ -338,5 +338,50 @@
   "customDurationHint": "1 to 180 minutes",
   "customDurationInvalid": "Enter 1 to 180 minutes",
   "presetEditTitle": "Edit duration chip",
-  "presetEditHint": "Long-press a chip to change its value"
+  "presetEditHint": "Long-press a chip to change its value",
+
+  "fieldCategoryOptionalLabel": "Category (optional)",
+  "categoryNoneLabel": "No category",
+  "settingsCategories": "Categories",
+  "manageCategoriesLabel": "Manage categories",
+  "categoriesScreenTitle": "Manage categories",
+  "addCategoryTitle": "New category",
+  "editCategoryTitle": "Edit category",
+  "categoryNameLabel": "Category name",
+  "categoryNameHint": "e.g. Work, Shopping",
+  "categoryColorLabel": "Color",
+  "saveCategoryLabel": "Save category",
+  "deleteCategoryTitle": "Delete category?",
+  "deleteCategoryBody": "Tasks and habits in this category stay — only the category is removed.",
+  "deleteCategoryConfirm": "Delete",
+  "categoryEmptyTitle": "No categories yet",
+  "categoryEmptyBody": "Create a category to group your tasks and habits.",
+  "categoryEmptyAction": "Create category",
+  "categoryNameDuplicateError": "That category name is already used",
+  "categoryNameRequiredError": "Category name cannot be empty",
+  "categorySaveFailedMessage": "Category was not saved. Try again.",
+  "categoryColorSage": "Sage",
+  "categoryColorHoney": "Honey",
+  "categoryColorRose": "Rose",
+  "categoryColorSky": "Sky",
+  "categoryColorPlum": "Plum",
+  "categoryColorSand": "Sand",
+
+  "searchScreenTitle": "Search",
+  "searchFieldHint": "Search tasks and habits",
+  "searchPromptBody": "Matches titles, locations, and category names while you type.",
+  "searchFilterAll": "All",
+  "searchFilterHabits": "Habit",
+  "searchFilterCompleted": "Done",
+  "searchNoResultsTitle": "No results",
+  "searchNoResultsBody": "Nothing matches \"{query}\". Try another word or change the filter.",
+  "@searchNoResultsBody": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
+  "searchClearTooltip": "Clear search",
+  "searchTypeTask": "Task",
+  "searchTypeHabit": "Habit",
+  "searchCompletedLabel": "completed"
 }

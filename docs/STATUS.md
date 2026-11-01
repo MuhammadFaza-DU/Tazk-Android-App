@@ -7,6 +7,8 @@ Terakhir diperbarui: **2026-10-31**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-11-01 — **T7 Kategori & Pencarian tuntas (T7.1–T7.4)**: schema **v6** (`Categories` + `categoryId` nullable di tasks/habits, `REFERENCES … ON DELETE SET NULL` teruji di jalur migrasi *dan* fresh DB, kontrak int `CategoryColor` dipaku 0–5); `CategoryRepository` (nama unik case-insensitive, `deleteCategory` men-null-kan referensi eksplisit karena `PRAGMA foreign_keys` = **OFF**, `updateCategoryColor`) + palette 6 warna **12/12 lolos kontras** (min 4,61:1); `CategoryPicker` di Task Form & Habit Form (set/ubah), layar **Kelola kategori** (tambah/ubah/warna/hapus) + grup `KATEGORI` di Pengaturan; **pencarian lintas item** (`SearchRepository`: `LIKE … ESCAPE '\'` literal, escape `%`/`_`/`\` berurutan, query kosong → `[]` tanpa menyentuh DB, cocok judul/lokasi/nama kategori, item selesai ikut) + `SearchScreen` board 26 D (chip `Semua`→kategori→`Habit`→`Selesai`, debounce 250 ms tanpa kehilangan huruf pertama, hasil di-invalidate setelah edit) + ikon cari di header Tasks. `AppTextField` dapat `prefixIcon`/`hintStyle` opsional (satu sumber styling input). **475 test hijau, analyze 0.** Deviasi tercatat: streak habit di subjudul diganti frekuensi, kotak cari + kartu hasil dipisah (hindari card-in-card dengan `EmptyState`), warna kategori di light lebih gelap dari token mentah (token `honey`/`clay` gagal 4,5:1). **Verifikasi HP ditunda.** — *(belum commit)*
+
 - 2026-11-01 — **T6 Subtask & Lokasi tuntas (T6.0–T6.4)**: XP task berbobot prioritas **15/10/5** + rekonsiliasi bila prioritas task yang sudah selesai diubah (menutup celah farming XP); schema **v5** (`Subtasks.position` 1-based + `Tasks.autoCompleteSubtasks`, backfill `position=id`, migrasi v4→v5 teruji di file SQLite nyata); subtask reorder (drag + aksi reorder semantik bawaan Flutter) + `toggleSubtask` auto-selesai/refund **atomik** (tick + task + XP satu transaksi); Task Form dapat sakelar auto-selesai, ikon "Buka di Maps" (`geo:` + manifest `<queries>` geo/https), dan kartu Tasks menampilkan `{done}/{total} subtask` (bodyMedium, sama dengan label jam) serta memindahkan `Tanpa jam`/header grup ke l10n. **392 test hijau, analyze 0, APK debug terbangun (179 MB) dan manifest hasil-merge memuat `scheme="geo"`/`https`.** Deviasi tercatat: drag handle, sakelar auto-selesai, dan field lokasi **tidak ada di board 10** (kebutuhan produk), dan baris checklist memakai **hit-area 48dp** di atas visual 40dp (a11y §7). **Verifikasi HP ditunda** (device tidak tersambung). — *(belum commit)*
 
 - 2026-10-31 — **Plan T6–T10 selesai ditulis (14 task, 5 fase, tanpa celah)** → `docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`. Owner **akan mengeksekusi di sesi lain**. Keputusan final terekam di plan: offline JSON dulu (Drive ditunda), 1 kategori per item, reorder drag, auto-selesai = XP konsisten, lokasi `geo:` fallback web, checkpoint per tahap. **Ditemukan & ditutup (D1): bug XP task masih rata 10** (`gamification_repository.taskXp = 10`) padahal keputusan = 15/10/5 → jadi Task T6.0 wajib di plan. *(belum commit)*
@@ -51,7 +53,8 @@ layar selesai** (tab bar 5 + sheet "Lainnya" tanpa drawer, 12 layar pakai widget
 reduced-motion dihormati di semua animasi), dan **T5 statistik selesai** (schema v4
 `focus_sessions` + `xp_events`, query agregat, layar Statistik dengan chart + heatmap,
 tanpa angka palsu), dan **T6 subtask & lokasi selesai** (schema v5, XP 15/10/5 + rekonsiliasi,
-reorder + toggle atomik, "Buka di Maps", progress `x/y` di kartu). Fase berikutnya: **T7 — kategori/tag & pencarian**.
+reorder + toggle atomik, "Buka di Maps", progress `x/y` di kartu), dan **T7 kategori & pencarian selesai**
+(schema v6, kategori 1/item + kelola, pencarian lintas task/habit literal). Fase berikutnya: **T8 — widget scroll**.
 
 ---
 
@@ -227,7 +230,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 | T4 Animasi | ✅ selesai | motion token di kode (`app_motion.dart`), `AppPageRoute` 220ms fade+slide, press scale, celebration one-shot (ticker idle hilang), XP glow composite-only, shine sweep, reduced-motion (`MediaQuery.disableAnimations`) di semua animasi |
 | T5 Statistik | ✅ selesai | schema v4 `focus_sessions` + `xp_events` (index), titik tulis XP (net, termasuk refund) + sesi fokus, `StatsRepository` + 5 provider, layar board 07 (segmented 3 periode, 2 kartu stat + delta, bar chart 7/30/12 bucket, heatmap 13×7, kartu insight), entri sheet "Lainnya" 4 item. Empty state per periode, `–` bila metrik belum ada data. 304 test |
 | T6 Subtask & Lokasi | ✅ selesai | **T6.0** XP 15/10/5 + rekonsiliasi prioritas; **T6.1** schema v5 (`position` + `autoCompleteSubtasks`); **T6.2** reorder; **T6.3** `toggleSubtask` atomik; **T6.4** UI reorder/maps/progress. 392 test |
-| T7 Kategori/tag & pencarian | 🟡 desain selesai | Board 26, fitur belum |
+| T7 Kategori/tag & pencarian | ✅ selesai | **T7.1** schema v6 `Categories`+`categoryId`; **T7.2** repo+palette (12/12 kontras); **T7.3** picker+Kelola kategori; **T7.4** pencarian lintas item (board 26 D). 475 test |
 | T8 Widget | 🟡 desain selesai | 5 varian + state kosong digambar; scroll butuh `RemoteViewsService` (belum ada) |
 | T9 Notifikasi | 🟡 desain selesai | 5 channel + banner + layar pengaturan digambar |
 | T10 Backup/restore | 🟡 desain selesai | Alur Google Drive digambar, belum dikode |
@@ -352,24 +355,24 @@ adb -s RR8RC027VGL pull "/sdcard/s.png" "docs\artifacts\nama.png"
 #    ⚠️ Kalau layar terkunci, screenshot jadi hitam penuh walaupun file ada isinya.
 ```
 
-**Baseline terakhir terverifikasi (2026-11-01, T6 selesai):** `dart analyze` bersih,
-`flutter test` **392/392**, `flutter build apk --debug` sukses (APK debug 179 MB) dan manifest
-hasil-merge memuat `<queries>` `scheme="geo"` + `scheme="https"`, versi tetap **2.0.0+5**.
+**Baseline terakhir terverifikasi (2026-11-01, T7 selesai):** `dart analyze` bersih,
+`flutter test` **475/475**, `flutter build apk --debug` sukses, versi tetap **2.0.0+5**.
 `DESIGN.md` tidak disentuh sejak T5 (lint `exit 0` terakhir 2026-10-31).
-**Belum terverifikasi:** perilaku di HP (drag, maps, sakelar auto-selesai, progress) — device
-tidak tersambung; ditunda ke verifikasi HP akhir (permintaan owner).
+**Belum terverifikasi:** perilaku di HP (drag subtask, maps, sakelar auto-selesai, progress `x/y`,
+picker kategori, layar Kelola kategori, pencarian) — device tidak tersambung; ditunda ke
+verifikasi HP akhir (permintaan owner).
 
 ---
 
 ## Langkah berikutnya
 
-**T6 selesai.** Lanjut **T7–T10** — plan lengkap ada di:
+**T6 & T7 selesai.** Lanjut **T8–T10** — plan lengkap ada di:
 `docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`
 
 | Fase | Isi | Migrasi |
 |---|---|---|
 | ~~T6~~ | ~~Subtask + lokasi + XP 15/10/5~~ | **v5 ✅** |
-| T7 | Kategori (1/item) + pencarian lintas task/habit | v5→v6 |
+| ~~T7~~ | ~~Kategori (1/item) + pencarian lintas task/habit~~ | **v6 ✅** |
 | T8 | Widget scroll (`RemoteViewsService` Kotlin) + empty state | — |
 | T9 | Channel focus-session (ke-5) + toggle | v6→v7 |
 | T10 | Backup offline JSON + checksum (Drive ditunda) | — |

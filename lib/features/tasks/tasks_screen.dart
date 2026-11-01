@@ -17,7 +17,12 @@ import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/task_providers.dart';
+import '../search/search_screen.dart';
 import 'task_form_screen.dart';
+
+/// Key tombol pencarian di header — pintu masuk layar Pencarian (board `26`
+/// bagian D) dari tab Tasks.
+const Key tasksSearchButtonKey = ValueKey('tasks-search');
 
 /// Board `02 Tasks`: header with a circular add button, two grouped sections
 /// ("Belum selesai" then "Selesai", each with a count), and one bordered card
@@ -43,6 +48,18 @@ class TasksScreen extends ConsumerWidget {
     return AppScaffold(
       title: l10n.tasksScreenTitle,
       actions: [
+        // Board `26` D: pencarian dibuka dari header, satu gaya dengan tombol
+        // tambah (lingkaran `primary-container`, ikon `primary`).
+        IconButton(
+          key: tasksSearchButtonKey,
+          icon: const Icon(Icons.search_rounded),
+          tooltip: l10n.searchScreenTitle,
+          style: IconButton.styleFrom(
+            backgroundColor: colors.primaryContainer,
+            foregroundColor: colors.primary,
+          ),
+          onPressed: () => _openSearch(context),
+        ),
         IconButton(
           icon: const Icon(Icons.add_rounded),
           tooltip: l10n.addTaskTitle,
@@ -91,6 +108,12 @@ class TasksScreen extends ConsumerWidget {
   static void _openForm(BuildContext context, {Task? task}) {
     Navigator.of(context).push(
       AppPageRoute(builder: (_) => TaskFormScreen(task: task)),
+    );
+  }
+
+  static void _openSearch(BuildContext context) {
+    Navigator.of(context).push(
+      AppPageRoute(builder: (_) => const SearchScreen()),
     );
   }
 }

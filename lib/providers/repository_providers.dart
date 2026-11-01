@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/repositories/category_repository.dart';
 import '../data/repositories/daily_maintenance_service.dart';
 import '../data/repositories/gamification_repository.dart';
 import '../data/repositories/habit_repository.dart';
@@ -11,6 +12,10 @@ import 'notification_provider.dart';
 
 final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
   return SettingsRepository(ref.watch(appDatabaseProvider));
+});
+
+final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
+  return CategoryRepository(ref.watch(appDatabaseProvider));
 });
 
 final gamificationRepositoryProvider = Provider<GamificationRepository>((ref) {

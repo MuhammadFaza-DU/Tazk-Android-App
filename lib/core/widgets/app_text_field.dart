@@ -19,7 +19,9 @@ class AppTextField extends StatelessWidget {
     this.validator,
     this.onChanged,
     this.onFieldSubmitted,
+    this.prefixIcon,
     this.suffixIcon,
+    this.hintStyle,
     this.autofocus = false,
     this.enabled = true,
   });
@@ -35,7 +37,17 @@ class AppTextField extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onFieldSubmitted;
+
+  /// Ikon di kiri isian (mis. kaca pembesar kotak pencarian). `null` =
+  /// tidak ada ikon, sama seperti sebelum parameter ini ada.
+  final Widget? prefixIcon;
+
   final Widget? suffixIcon;
+
+  /// Gaya teks hint. `null` = bawaan design system (`bodyMedium` + `inkMuted`).
+  /// Berguna saat pemanggil perlu ukuran lain tanpa menyalin seluruh dekorasi.
+  final TextStyle? hintStyle;
+
   final bool autofocus;
   final bool enabled;
 
@@ -78,10 +90,12 @@ class AppTextField extends StatelessWidget {
         fillColor: colors.surface,
         hintText: hintText,
         labelText: labelText,
-        hintStyle: theme.textTheme.bodyMedium?.copyWith(color: colors.inkMuted),
+        hintStyle: hintStyle ??
+            theme.textTheme.bodyMedium?.copyWith(color: colors.inkMuted),
         labelStyle: theme.textTheme.labelLarge?.copyWith(color: colors.inkMuted),
         floatingLabelStyle:
             theme.textTheme.labelLarge?.copyWith(color: colors.primary),
+        prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 14),

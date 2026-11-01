@@ -34,6 +34,9 @@ enum AppLanguage { indonesian, english }
 
 enum XpSource { task, habit, streak, badge }
 
+/// Stored as an int — the order is part of the database contract.
+enum CategoryColor { sage, honey, rose, sky, plum, sand }
+
 StreakRank streakRankForDays(int days) {
   if (days >= 120) return StreakRank.legenda;
   if (days >= 90) return StreakRank.sangMaster;

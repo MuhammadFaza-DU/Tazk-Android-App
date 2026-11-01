@@ -17,6 +17,11 @@ Future<void> _pumpForm(WidgetTester tester) async {
   await tester.binding.setSurfaceSize(const Size(600, 2200));
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
+  // Form kategori membaca stream dari database, jadi DB harus benar-benar
+  // ditutup setelah tree dilepas (lihat `_disposeForm`).
+  final db = AppDatabase.forTesting(NativeDatabase.memory());
+  addTearDown(db.close);
+
   // Mock the home_widget platform channel: without a native side the real
   // channel never answers inside the test binding, which would leave
   // HomeWidgetService.refreshAll() (and therefore save) hanging forever.
@@ -31,9 +36,7 @@ Future<void> _pumpForm(WidgetTester tester) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        appDatabaseProvider.overrideWithValue(
-          AppDatabase.forTesting(NativeDatabase.memory()),
-        ),
+        appDatabaseProvider.overrideWithValue(db),
       ],
       child: MaterialApp(
         localizationsDelegates: const [
@@ -66,6 +69,14 @@ Future<void> _pumpForm(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// Lepas tree di dalam body test supaya langganan stream Drift berhenti dan
+/// timer nol-detaknya ter-flush oleh `pump` berikutnya (bukan menggantung di
+/// fake clock sampai pemeriksaan invariant binding).
+Future<void> _disposeForm(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump(const Duration(milliseconds: 1));
+}
+
 void main() {
   testWidgets('custom weekly habit with no day selected blocks save',
       (tester) async {
@@ -84,6 +95,8 @@ void main() {
     // error plus the SnackBar echo of it.
     expect(find.byType(HabitFormScreen), findsOneWidget);
     expect(find.text('Pilih minimal satu hari'), findsNWidgets(2));
+
+    await _disposeForm(tester);
   });
 
   testWidgets('custom weekly habit saves once a day is selected',
@@ -103,5 +116,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(HabitFormScreen), findsNothing);
+
+    await _disposeForm(tester);
   });
 }

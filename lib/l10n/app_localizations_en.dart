@@ -993,4 +993,123 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get presetEditHint => 'Long-press a chip to change its value';
+
+  @override
+  String get fieldCategoryOptionalLabel => 'Category (optional)';
+
+  @override
+  String get categoryNoneLabel => 'No category';
+
+  @override
+  String get settingsCategories => 'Categories';
+
+  @override
+  String get manageCategoriesLabel => 'Manage categories';
+
+  @override
+  String get categoriesScreenTitle => 'Manage categories';
+
+  @override
+  String get addCategoryTitle => 'New category';
+
+  @override
+  String get editCategoryTitle => 'Edit category';
+
+  @override
+  String get categoryNameLabel => 'Category name';
+
+  @override
+  String get categoryNameHint => 'e.g. Work, Shopping';
+
+  @override
+  String get categoryColorLabel => 'Color';
+
+  @override
+  String get saveCategoryLabel => 'Save category';
+
+  @override
+  String get deleteCategoryTitle => 'Delete category?';
+
+  @override
+  String get deleteCategoryBody =>
+      'Tasks and habits in this category stay — only the category is removed.';
+
+  @override
+  String get deleteCategoryConfirm => 'Delete';
+
+  @override
+  String get categoryEmptyTitle => 'No categories yet';
+
+  @override
+  String get categoryEmptyBody =>
+      'Create a category to group your tasks and habits.';
+
+  @override
+  String get categoryEmptyAction => 'Create category';
+
+  @override
+  String get categoryNameDuplicateError => 'That category name is already used';
+
+  @override
+  String get categoryNameRequiredError => 'Category name cannot be empty';
+
+  @override
+  String get categorySaveFailedMessage => 'Category was not saved. Try again.';
+
+  @override
+  String get categoryColorSage => 'Sage';
+
+  @override
+  String get categoryColorHoney => 'Honey';
+
+  @override
+  String get categoryColorRose => 'Rose';
+
+  @override
+  String get categoryColorSky => 'Sky';
+
+  @override
+  String get categoryColorPlum => 'Plum';
+
+  @override
+  String get categoryColorSand => 'Sand';
+
+  @override
+  String get searchScreenTitle => 'Search';
+
+  @override
+  String get searchFieldHint => 'Search tasks and habits';
+
+  @override
+  String get searchPromptBody =>
+      'Matches titles, locations, and category names while you type.';
+
+  @override
+  String get searchFilterAll => 'All';
+
+  @override
+  String get searchFilterHabits => 'Habit';
+
+  @override
+  String get searchFilterCompleted => 'Done';
+
+  @override
+  String get searchNoResultsTitle => 'No results';
+
+  @override
+  String searchNoResultsBody(String query) {
+    return 'Nothing matches \"$query\". Try another word or change the filter.';
+  }
+
+  @override
+  String get searchClearTooltip => 'Clear search';
+
+  @override
+  String get searchTypeTask => 'Task';
+
+  @override
+  String get searchTypeHabit => 'Habit';
+
+  @override
+  String get searchCompletedLabel => 'completed';
 }

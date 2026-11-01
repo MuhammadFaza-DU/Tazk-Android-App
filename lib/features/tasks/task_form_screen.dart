@@ -9,6 +9,7 @@ import '../../core/utils/geo_uri.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/app_text_field.dart';
+import '../../core/widgets/category_picker.dart';
 import '../../core/widgets/completion_checkbox.dart';
 import '../../data/database/database.dart';
 import '../../data/models/enums.dart';
@@ -87,6 +88,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   TimeOfDay? _time;
   late TaskPriority _priority;
 
+  /// Kategori tunggal (opsional) — tidak ada di board `10`, lihat laporan.
+  int? _categoryId;
+
   /// Task selesai otomatis saat semua subtask dicentang (AGENTS §5). Task
   /// lama tanpa nilai eksplisit memakai `true`, sama dengan default skema.
   late bool _autoCompleteSubtasks;
@@ -105,6 +109,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     _date = task?.date ?? DateTime.now();
     _time = task?.time != null ? TimeOfDay.fromDateTime(task!.time!) : null;
     _priority = task?.priority ?? TaskPriority.medium;
+    _categoryId = task?.categoryId;
     _autoCompleteSubtasks = task?.autoCompleteSubtasks ?? true;
   }
 
@@ -175,6 +180,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final repo = ref.read(taskRepositoryProvider);
+    final categoryRepo = ref.read(categoryRepositoryProvider);
     final title = _titleController.text.trim();
     final location = _locationController.text.trim();
 
@@ -188,6 +194,10 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
         autoCompleteSubtasks: _autoCompleteSubtasks,
       );
       await repo.updateTask(updated);
+      // `Task.categoryId` sengaja tidak ikut `copyWith` di atas: satu-satunya
+      // jalur tulis kategori adalah repository kategori (yang juga memvalidasi
+      // id-nya masih ada).
+      await categoryRepo.setTaskCategory(widget.task!.id, _categoryId);
     } else {
       final newId = await repo.createTask(
         title: title,
@@ -197,6 +207,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
         location: location.isEmpty ? null : location,
         autoCompleteSubtasks: _autoCompleteSubtasks,
       );
+      await categoryRepo.setTaskCategory(newId, _categoryId);
       for (final subtaskTitle in _newSubtaskTitles) {
         await repo.addSubtask(newId, subtaskTitle);
       }
@@ -298,6 +309,15 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             _PrioritySelector(
               value: _priority,
               onChanged: (value) => setState(() => _priority = value),
+            ),
+            const SizedBox(height: _groupGap),
+
+            // 3b. Kategori (tidak ada di board `10`; kebutuhan produk T7).
+            _FieldLabel(l10n.fieldCategoryOptionalLabel),
+            const SizedBox(height: _labelGap),
+            CategoryPicker(
+              value: _categoryId,
+              onChanged: (value) => setState(() => _categoryId = value),
             ),
             const SizedBox(height: _groupGap),
 

@@ -470,5 +470,50 @@
   "customDurationHint": "1 sampai 180 menit",
   "customDurationInvalid": "Masukkan 1 sampai 180 menit",
   "presetEditTitle": "Ubah chip durasi",
-  "presetEditHint": "Tekan lama chip untuk mengubah nilainya"
+  "presetEditHint": "Tekan lama chip untuk mengubah nilainya",
+
+  "fieldCategoryOptionalLabel": "Kategori (opsional)",
+  "categoryNoneLabel": "Tanpa kategori",
+  "settingsCategories": "Kategori",
+  "manageCategoriesLabel": "Kelola kategori",
+  "categoriesScreenTitle": "Kelola kategori",
+  "addCategoryTitle": "Kategori baru",
+  "editCategoryTitle": "Ubah kategori",
+  "categoryNameLabel": "Nama kategori",
+  "categoryNameHint": "mis. Kerja, Belanja",
+  "categoryColorLabel": "Warna",
+  "saveCategoryLabel": "Simpan kategori",
+  "deleteCategoryTitle": "Hapus kategori?",
+  "deleteCategoryBody": "Tugas dan habit di kategori ini tetap ada — hanya kategorinya yang dilepas.",
+  "deleteCategoryConfirm": "Hapus",
+  "categoryEmptyTitle": "Belum ada kategori",
+  "categoryEmptyBody": "Buat kategori untuk mengelompokkan tugas dan habit.",
+  "categoryEmptyAction": "Buat kategori",
+  "categoryNameDuplicateError": "Nama kategori itu sudah dipakai",
+  "categoryNameRequiredError": "Nama kategori tidak boleh kosong",
+  "categorySaveFailedMessage": "Kategori belum tersimpan. Coba lagi.",
+  "categoryColorSage": "Sage",
+  "categoryColorHoney": "Madu",
+  "categoryColorRose": "Ros",
+  "categoryColorSky": "Langit",
+  "categoryColorPlum": "Plum",
+  "categoryColorSand": "Pasir",
+
+  "searchScreenTitle": "Pencarian",
+  "searchFieldHint": "Cari tugas dan habit",
+  "searchPromptBody": "Mencocokkan judul, lokasi, dan nama kategori saat kamu mengetik.",
+  "searchFilterAll": "Semua",
+  "searchFilterHabits": "Habit",
+  "searchFilterCompleted": "Selesai",
+  "searchNoResultsTitle": "Tidak ada hasil",
+  "searchNoResultsBody": "Tidak ada yang cocok dengan \"{query}\". Coba kata lain atau ganti filter.",
+  "@searchNoResultsBody": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
+  "searchClearTooltip": "Hapus pencarian",
+  "searchTypeTask": "Task",
+  "searchTypeHabit": "Habit",
+  "searchCompletedLabel": "selesai"
 }

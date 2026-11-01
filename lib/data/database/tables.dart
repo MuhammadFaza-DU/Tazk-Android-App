@@ -2,6 +2,12 @@ import 'package:drift/drift.dart';
 
 import '../models/enums.dart';
 
+class Categories extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+  IntColumn get color => intEnum<CategoryColor>()();
+}
+
 @TableIndex(name: 'idx_tasks_date', columns: {#date})
 @TableIndex(name: 'idx_tasks_is_completed', columns: {#isCompleted})
 class Tasks extends Table {
@@ -14,6 +20,8 @@ class Tasks extends Table {
   TextColumn get location => text().nullable()();
   BoolColumn get autoCompleteSubtasks =>
       boolean().withDefault(const Constant(true))();
+  IntColumn get categoryId =>
+      integer().references(Categories, #id, onDelete: KeyAction.setNull).nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
@@ -36,6 +44,8 @@ class Habits extends Table {
   BoolColumn get hasProgress => boolean().withDefault(const Constant(false))();
   IntColumn get targetMinutes => integer().nullable()();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+  IntColumn get categoryId =>
+      integer().references(Categories, #id, onDelete: KeyAction.setNull).nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
   // Custom frequency columns

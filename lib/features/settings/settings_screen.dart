@@ -14,6 +14,7 @@ import '../../providers/notification_provider.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/settings_providers.dart';
 import 'about_screen.dart';
+import 'categories_screen.dart';
 import 'notification_settings_screen.dart';
 
 /// Layar Pengaturan — fidelity board `design-export/08 Pengaturan.png`
@@ -27,7 +28,7 @@ import 'notification_settings_screen.dart';
 /// - tiap baris: petak ikon 30×30 `primary-container` radius 8 + ikon 18
 ///   `primary`, judul `body` 15, sub-judul `caption` 12 `ink-muted`, chevron
 ///   18 `ink-muted` di kanan;
-/// - urutan grup: Pemberitahuan → Tampilan → Bahasa → Lainnya.
+/// - urutan grup: Pemberitahuan → Tampilan → Bahasa → Kategori → Lainnya.
 ///
 /// Deviasi yang disengaja (dicatat di laporan): gutter memakai 16 (aturan
 /// DESIGN "satu wrapper, padding diterapkan sekali" + konsisten dengan 12 layar
@@ -187,6 +188,26 @@ class SettingsScreen extends ConsumerWidget {
               ],
               value: language,
               onChanged: repo.updateLanguage,
+            ),
+          ),
+
+          const SizedBox(height: 24),
+          // Grup baru — board `08` belum memilikinya (deviasi tercatat di
+          // laporan T7.3). Ditaruh sebelum LAINNYA supaya grup DATA (T10) tetap
+          // berisi backup/ekspor saja.
+          _SectionLabel(l10n.settingsCategories),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: ListRow(
+              leading: const _IconTile(Icons.label_outline_rounded),
+              title: l10n.manageCategoriesLabel,
+              trailing: const _Chevron(),
+              showDivider: false,
+              onTap: () {
+                Navigator.of(
+                  context,
+                ).push(AppPageRoute(builder: (_) => const CategoriesScreen()));
+              },
             ),
           ),
 

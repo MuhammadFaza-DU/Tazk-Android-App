@@ -10,6 +10,7 @@ import 'package:tazk/core/widgets/app_card.dart';
 import 'package:tazk/core/widgets/list_row.dart';
 import 'package:tazk/data/database/database.dart';
 import 'package:tazk/data/models/enums.dart';
+import 'package:tazk/features/settings/categories_screen.dart';
 import 'package:tazk/features/settings/notification_settings_screen.dart';
 import 'package:tazk/features/settings/settings_screen.dart';
 import 'package:tazk/l10n/app_localizations.dart';
@@ -46,6 +47,7 @@ class _FakeExactAlarmController extends ExactAlarmController {
 
 /// Pump [SettingsScreen] dengan DB memori + locale `id` (copy board), pada
 /// viewport 390dp supaya seluruh grup ikut dibangun (ListView bersifat lazy).
+/// Tinggi 1200dp: lima grup (termasuk KATEGORI, T7.3) tidak lagi muat di 900.
 Future<AppDatabase> _pumpScreen(
   WidgetTester tester, {
   NotificationPermissionState permission = const NotificationPermissionState(
@@ -55,7 +57,7 @@ Future<AppDatabase> _pumpScreen(
     status: ExactAlarmStatus.allowed,
   ),
   double width = 390,
-  double height = 900,
+  double height = 1200,
 }) async {
   tester.view.physicalSize = Size(width * 3, height * 3);
   tester.view.devicePixelRatio = 3;
@@ -115,8 +117,9 @@ void main() {
       await _pumpScreen(tester);
 
       // Empat grup, label huruf besar sesuai board (Pemberitahuan di board
-      // memakai string "Notifikasi" di app — tidak ada key l10n lain).
-      final labels = ['NOTIFIKASI', 'TAMPILAN', 'BAHASA', 'LAINNYA'];
+      // memakai string "Notifikasi" di app — tidak ada key l10n lain). Grup
+      // KATEGORI adalah tambahan T7.3 (deviasi: board 08 belum punya grup ini).
+      final labels = ['NOTIFIKASI', 'TAMPILAN', 'BAHASA', 'KATEGORI', 'LAINNYA'];
       for (final label in labels) {
         expect(find.text(label), findsOneWidget, reason: 'label $label hilang');
       }
@@ -136,6 +139,7 @@ void main() {
         'Streak Warning',
         'Status notifikasi',
         'Alarm presisi',
+        'Kelola kategori',
         'Tentang App',
       ];
       final rowTops = [
@@ -157,9 +161,9 @@ void main() {
     ) async {
       await _pumpScreen(tester);
 
-      // 5 baris grup Pemberitahuan + 1 baris Tentang App.
-      expect(_iconTiles, findsNWidgets(6));
-      expect(find.byIcon(Icons.chevron_right_rounded), findsNWidgets(6));
+      // 5 baris grup Pemberitahuan + 1 baris Kelola kategori + 1 baris Tentang App.
+      expect(_iconTiles, findsNWidgets(7));
+      expect(find.byIcon(Icons.chevron_right_rounded), findsNWidgets(7));
 
       final tile = tester.widget<Container>(_iconTiles.first);
       final decoration = tile.decoration! as BoxDecoration;
@@ -171,10 +175,11 @@ void main() {
         const Size(18, 18),
       );
 
-      // Ikon board: bell, panah siklus, api, info.
+      // Ikon board: bell, panah siklus, api, info. Label = grup kategori T7.3.
       expect(find.byIcon(Icons.notifications_rounded), findsOneWidget);
       expect(find.byIcon(Icons.repeat_rounded), findsOneWidget);
       expect(find.byIcon(Icons.local_fire_department_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.label_outline_rounded), findsOneWidget);
       expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
 
       await _disposeScreen(tester);
@@ -186,7 +191,7 @@ void main() {
       await _pumpScreen(tester);
 
       final cards = find.byType(AppCard);
-      expect(cards, findsNWidgets(4));
+      expect(cards, findsNWidgets(5));
 
       final first = tester.getRect(cards.at(0));
       expect(first.left, 20); // gutter
@@ -228,10 +233,10 @@ void main() {
 
   group('SettingsScreen — stress data', () {
     testWidgets('tidak overflow di layar sempit 320dp', (tester) async {
-      await _pumpScreen(tester, width: 320, height: 900);
+      await _pumpScreen(tester, width: 320, height: 1200);
 
       expect(tester.takeException(), isNull);
-      expect(find.byType(AppCard), findsNWidgets(4));
+      expect(find.byType(AppCard), findsNWidgets(5));
       expect(find.text('Streak Warning'), findsOneWidget);
 
       await _disposeScreen(tester);
@@ -294,13 +299,24 @@ void main() {
       await _disposeScreen(tester);
     });
 
+    testWidgets('baris Kelola kategori membuka layar Kategori', (tester) async {
+      await _pumpScreen(tester);
+
+      await tester.tap(find.text('Kelola kategori'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CategoriesScreen), findsOneWidget);
+
+      await _disposeScreen(tester);
+    });
+
     testWidgets(
       'setiap baris punya aksi, dan toggle tidak diduplikasi di sini',
       (tester) async {
         await _pumpScreen(tester);
 
         final rows = tester.widgetList<ListRow>(find.byType(ListRow)).toList();
-        expect(rows, hasLength(6));
+        expect(rows, hasLength(7));
         for (final row in rows) {
           expect(
             row.onTap,

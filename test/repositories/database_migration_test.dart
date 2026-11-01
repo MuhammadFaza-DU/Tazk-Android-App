@@ -297,6 +297,22 @@ void main() {
               is_completed INTEGER NOT NULL DEFAULT 0 CHECK (is_completed IN (0, 1))
             );
           ''');
+          rawDb.execute('''
+            CREATE TABLE habits (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL,
+              frequency INTEGER NOT NULL,
+              scheduled_time INTEGER,
+              has_progress INTEGER NOT NULL DEFAULT 0 CHECK (has_progress IN (0, 1)),
+              target_minutes INTEGER,
+              is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+              created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000),
+              custom_days_of_week INTEGER,
+              custom_interval INTEGER,
+              custom_day_of_month INTEGER,
+              custom_frequency_type INTEGER
+            );
+          ''');
           rawDb.execute(
             "INSERT INTO tasks (id, title, date, priority) "
             "VALUES (1, 'Belanja bulanan', strftime('%s', 'now'), 1);",
@@ -326,6 +342,203 @@ void main() {
     } finally {
       await db.close();
       await tempDir.delete(recursive: true);
+    }
+  });
+
+  test('opens a version 5 database and adds categories + category_id columns',
+      () async {
+    final tempDir = await Directory.systemTemp.createTemp('tazk_db_migration_');
+    final dbFile =
+        File('${tempDir.path}${Platform.pathSeparator}tazk.sqlite');
+    final db = AppDatabase.forTesting(
+      NativeDatabase(
+        dbFile,
+        setup: (rawDb) {
+          rawDb.execute('''
+            CREATE TABLE tasks (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              title TEXT NOT NULL,
+              date INTEGER NOT NULL,
+              time INTEGER,
+              priority INTEGER NOT NULL,
+              is_completed INTEGER NOT NULL DEFAULT 0 CHECK (is_completed IN (0, 1)),
+              location TEXT,
+              auto_complete_subtasks INTEGER NOT NULL DEFAULT 1 CHECK (auto_complete_subtasks IN (0, 1)),
+              created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000)
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE subtasks (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              task_id INTEGER NOT NULL REFERENCES tasks (id) ON DELETE CASCADE,
+              title TEXT NOT NULL,
+              is_completed INTEGER NOT NULL DEFAULT 0 CHECK (is_completed IN (0, 1)),
+              position INTEGER NOT NULL DEFAULT 0
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE habits (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL,
+              frequency INTEGER NOT NULL,
+              scheduled_time INTEGER,
+              has_progress INTEGER NOT NULL DEFAULT 0 CHECK (has_progress IN (0, 1)),
+              target_minutes INTEGER,
+              is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+              created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000),
+              custom_days_of_week INTEGER,
+              custom_interval INTEGER,
+              custom_day_of_month INTEGER,
+              custom_frequency_type INTEGER
+            );
+          ''');
+          rawDb.execute(
+            "INSERT INTO tasks (id, title, date, priority) "
+            "VALUES (1, 'Belanja bulanan', strftime('%s', 'now'), 1);",
+          );
+          rawDb.execute(
+            "INSERT INTO habits (id, name, frequency) "
+            "VALUES (1, 'Minum air', 0);",
+          );
+          rawDb.execute('PRAGMA user_version = 5;');
+        },
+      ),
+    );
+    try {
+      Future<List<String>> columnNames(String table) async {
+        final rows = await db.customSelect("PRAGMA table_info('$table')").get();
+        return rows.map((row) => row.read<String>('name')).toList();
+      }
+
+      expect(await columnNames('categories'), ['id', 'name', 'color']);
+      expect(await columnNames('tasks'), contains('category_id'));
+      expect(await columnNames('habits'), contains('category_id'));
+
+      final task = await (db.select(db.tasks)..where((row) => row.id.equals(1)))
+          .getSingle();
+      expect(task.title, 'Belanja bulanan');
+      expect(task.categoryId, isNull);
+
+      final habit = await (db.select(db.habits)..where((row) => row.id.equals(1)))
+          .getSingle();
+      expect(habit.name, 'Minum air');
+      expect(habit.categoryId, isNull);
+
+      final migratedKeys = await db.customSelect(
+        "PRAGMA foreign_key_list('habits')",
+      ).get();
+      final habitCategoryKey = migratedKeys.firstWhere(
+        (row) => row.read<String>('from') == 'category_id',
+      );
+      expect(habitCategoryKey.read<String>('table'), 'categories');
+      expect(habitCategoryKey.read<String>('on_delete'), 'SET NULL');
+
+      final migratedTaskKeys = await db.customSelect(
+        "PRAGMA foreign_key_list('tasks')",
+      ).get();
+      final taskCategoryKey = migratedTaskKeys.firstWhere(
+        (row) => row.read<String>('from') == 'category_id',
+      );
+      expect(taskCategoryKey.read<String>('table'), 'categories');
+      expect(taskCategoryKey.read<String>('on_delete'), 'SET NULL');
+
+      final versionRow = await db.customSelect('PRAGMA user_version').getSingle();
+      expect(versionRow.read<int>('user_version'), 6);
+
+      // The enum order is the stored contract: pin the raw ints, not the symbols.
+      const expectedColorInts = <String, int>{
+        'sage': 0,
+        'honey': 1,
+        'rose': 2,
+        'sky': 3,
+        'plum': 4,
+        'sand': 5,
+      };
+      for (final color in CategoryColor.values) {
+        await db.into(db.categories).insert(
+              CategoriesCompanion.insert(name: color.name, color: color),
+            );
+      }
+      final storedColors =
+          await db.customSelect('SELECT name, color FROM categories').get();
+      expect(
+        {
+          for (final row in storedColors)
+            row.read<String>('name'): row.read<int>('color'),
+        },
+        expectedColorInts,
+      );
+
+      final categoryId = await db.into(db.categories).insert(
+            CategoriesCompanion.insert(
+              name: 'Rumah',
+              color: CategoryColor.honey,
+            ),
+          );
+      final category = await (db.select(db.categories)
+            ..where((row) => row.id.equals(categoryId)))
+          .getSingle();
+      expect(category.name, 'Rumah');
+      expect(category.color, CategoryColor.honey);
+    } finally {
+      await db.close();
+      await tempDir.delete(recursive: true);
+    }
+  });
+
+  test('fresh database has an empty categories table and null category_id',
+      () async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    try {
+      final rows = await db
+          .customSelect("PRAGMA table_info('categories')")
+          .get();
+      final categoryColumns = rows.map((row) => row.read<String>('name'));
+      expect(categoryColumns, ['id', 'name', 'color']);
+      expect(await db.select(db.categories).get(), isEmpty);
+
+      final foreignKeys = await db.customSelect(
+        "PRAGMA foreign_key_list('tasks')",
+      ).get();
+      final toCategories = foreignKeys.firstWhere(
+        (row) => row.read<String>('from') == 'category_id',
+      );
+      expect(toCategories.read<String>('table'), 'categories');
+      expect(toCategories.read<String>('on_delete'), 'SET NULL');
+
+      final habitForeignKeys = await db.customSelect(
+        "PRAGMA foreign_key_list('habits')",
+      ).get();
+      final habitToCategories = habitForeignKeys.firstWhere(
+        (row) => row.read<String>('from') == 'category_id',
+      );
+      expect(habitToCategories.read<String>('table'), 'categories');
+      expect(habitToCategories.read<String>('on_delete'), 'SET NULL');
+
+      final taskId = await db.into(db.tasks).insert(
+            TasksCompanion.insert(
+              title: 'Tugas baru',
+              date: DateTime(2026, 11, 1),
+              priority: TaskPriority.high,
+            ),
+          );
+      final task = await (db.select(db.tasks)
+            ..where((row) => row.id.equals(taskId)))
+          .getSingle();
+      expect(task.categoryId, isNull);
+
+      final habitId = await db.into(db.habits).insert(
+            HabitsCompanion.insert(
+              name: 'Minum air',
+              frequency: HabitFrequency.daily,
+            ),
+          );
+      final habit = await (db.select(db.habits)
+            ..where((row) => row.id.equals(habitId)))
+          .getSingle();
+      expect(habit.categoryId, isNull);
+    } finally {
+      await db.close();
     }
   });
 

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:tazk/core/theme/app_colors.dart';
 import 'package:tazk/core/theme/app_theme.dart';
+import 'package:tazk/data/database/database.dart';
 import 'package:tazk/data/models/enums.dart';
 import 'package:tazk/features/tasks/task_form_screen.dart';
 import 'package:tazk/l10n/app_localizations.dart';
+import 'package:tazk/providers/database_provider.dart';
 
 /// Board `10 Task Form` fidelity tests.
 ///
@@ -21,8 +24,9 @@ import 'package:tazk/l10n/app_localizations.dart';
 const double _screenWidth = 390;
 const double _gutter = 20;
 
-Widget _app({bool dark = false}) {
+Widget _app({bool dark = false, required AppDatabase db}) {
   return ProviderScope(
+    overrides: [appDatabaseProvider.overrideWithValue(db)],
     child: MaterialApp(
       locale: const Locale('id'),
       theme: dark ? AppTheme.dark : AppTheme.light,
@@ -38,8 +42,21 @@ Widget _app({bool dark = false}) {
 Future<void> _pumpForm(WidgetTester tester, {bool dark = false}) async {
   await tester.binding.setSurfaceSize(const Size(_screenWidth, 1400));
   addTearDown(() => tester.binding.setSurfaceSize(null));
-  await tester.pumpWidget(_app(dark: dark));
+
+  // Form kategori membaca stream dari database: DB memori + ditutup setelah
+  // tree dilepas (lihat `_disposeScreen`).
+  final db = AppDatabase.forTesting(NativeDatabase.memory());
+  addTearDown(db.close);
+
+  await tester.pumpWidget(_app(dark: dark, db: db));
   await tester.pump();
+}
+
+/// Lepas tree di dalam body test supaya langganan stream Drift berhenti dan
+/// timer nol-detaknya ter-flush sebelum pemeriksaan invariant binding.
+Future<void> _disposeScreen(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump(const Duration(milliseconds: 1));
 }
 
 BoxDecoration _segmentDecoration(WidgetTester tester, TaskPriority priority) {
@@ -84,10 +101,13 @@ void main() {
     await _pumpForm(tester);
 
     // Tanggal dan Jam satu baris, jadi yang diuji urutan vertikalnya grup.
+    // `Kategori (opsional)` adalah sisipan T7.3 (board 10 tidak punya field ini);
+    // dipatok di sini supaya posisinya tidak bergeser tanpa ketahuan.
     const labels = [
       'Judul',
       'Tanggal',
       'Prioritas',
+      'Kategori (opsional)',
       'Lokasi (opsional)',
       'Checklist/Subtask (opsional)',
     ];
@@ -109,6 +129,8 @@ void main() {
       greaterThan(ys.last),
       reason: 'tombol simpan harus di bawah blok checklist',
     );
+
+    await _disposeScreen(tester);
   });
 
   testWidgets('tanggal dan jam tampil sebagai dua kotak sejajar', (tester) async {
@@ -143,6 +165,8 @@ void main() {
         .whereType<String>();
     expect(dateTexts, isNotEmpty);
     expect(dateTexts.first, matches(datePattern));
+
+    await _disposeScreen(tester);
   });
 
   testWidgets('prioritas memakai segmented tiga kotak, bukan radio', (
@@ -188,6 +212,8 @@ void main() {
       expect(_segmentBorder(tester, priority).color, selected.border);
       expect(_segmentTextColor(tester, priority), selected.inkMuted);
     }
+
+    await _disposeScreen(tester);
   });
 
   testWidgets('mengetuk segmen memindahkan sorotan prioritas', (tester) async {
@@ -210,6 +236,8 @@ void main() {
       _segmentTextColor(tester, TaskPriority.medium),
       colors.inkMuted,
     );
+
+    await _disposeScreen(tester);
   });
 
   testWidgets('tombol simpan selebar isi, primary, radius md', (tester) async {
@@ -240,6 +268,8 @@ void main() {
         tester.getTopLeft(find.byKey(taskFormAddItemFieldKey)).dy,
       ),
     );
+
+    await _disposeScreen(tester);
   });
 
   testWidgets('Tambah item menambah baris checklist dan menghitung 0/1', (
@@ -254,6 +284,8 @@ void main() {
     // Perilaku T3 dipertahankan: submit keyboard menambah item.
     expect(find.text('Siapkan materi'), findsOneWidget);
     expect(find.text('0/1'), findsOneWidget);
+
+    await _disposeScreen(tester);
   });
 
   testWidgets('tema gelap memakai token Dusk Forest untuk sorotan prioritas', (
@@ -271,5 +303,7 @@ void main() {
       _segmentTextColor(tester, TaskPriority.medium),
       colors.warningStrong,
     );
+
+    await _disposeScreen(tester);
   });
 }

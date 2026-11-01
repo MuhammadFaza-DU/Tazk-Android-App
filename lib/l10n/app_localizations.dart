@@ -1855,6 +1855,234 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Tekan lama chip untuk mengubah nilainya'**
   String get presetEditHint;
+
+  /// No description provided for @fieldCategoryOptionalLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori (opsional)'**
+  String get fieldCategoryOptionalLabel;
+
+  /// No description provided for @categoryNoneLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanpa kategori'**
+  String get categoryNoneLabel;
+
+  /// No description provided for @settingsCategories.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori'**
+  String get settingsCategories;
+
+  /// No description provided for @manageCategoriesLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Kelola kategori'**
+  String get manageCategoriesLabel;
+
+  /// No description provided for @categoriesScreenTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kelola kategori'**
+  String get categoriesScreenTitle;
+
+  /// No description provided for @addCategoryTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori baru'**
+  String get addCategoryTitle;
+
+  /// No description provided for @editCategoryTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah kategori'**
+  String get editCategoryTitle;
+
+  /// No description provided for @categoryNameLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama kategori'**
+  String get categoryNameLabel;
+
+  /// No description provided for @categoryNameHint.
+  ///
+  /// In id, this message translates to:
+  /// **'mis. Kerja, Belanja'**
+  String get categoryNameHint;
+
+  /// No description provided for @categoryColorLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Warna'**
+  String get categoryColorLabel;
+
+  /// No description provided for @saveCategoryLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan kategori'**
+  String get saveCategoryLabel;
+
+  /// No description provided for @deleteCategoryTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus kategori?'**
+  String get deleteCategoryTitle;
+
+  /// No description provided for @deleteCategoryBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Tugas dan habit di kategori ini tetap ada — hanya kategorinya yang dilepas.'**
+  String get deleteCategoryBody;
+
+  /// No description provided for @deleteCategoryConfirm.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus'**
+  String get deleteCategoryConfirm;
+
+  /// No description provided for @categoryEmptyTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada kategori'**
+  String get categoryEmptyTitle;
+
+  /// No description provided for @categoryEmptyBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Buat kategori untuk mengelompokkan tugas dan habit.'**
+  String get categoryEmptyBody;
+
+  /// No description provided for @categoryEmptyAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Buat kategori'**
+  String get categoryEmptyAction;
+
+  /// No description provided for @categoryNameDuplicateError.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama kategori itu sudah dipakai'**
+  String get categoryNameDuplicateError;
+
+  /// No description provided for @categoryNameRequiredError.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama kategori tidak boleh kosong'**
+  String get categoryNameRequiredError;
+
+  /// No description provided for @categorySaveFailedMessage.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori belum tersimpan. Coba lagi.'**
+  String get categorySaveFailedMessage;
+
+  /// No description provided for @categoryColorSage.
+  ///
+  /// In id, this message translates to:
+  /// **'Sage'**
+  String get categoryColorSage;
+
+  /// No description provided for @categoryColorHoney.
+  ///
+  /// In id, this message translates to:
+  /// **'Madu'**
+  String get categoryColorHoney;
+
+  /// No description provided for @categoryColorRose.
+  ///
+  /// In id, this message translates to:
+  /// **'Ros'**
+  String get categoryColorRose;
+
+  /// No description provided for @categoryColorSky.
+  ///
+  /// In id, this message translates to:
+  /// **'Langit'**
+  String get categoryColorSky;
+
+  /// No description provided for @categoryColorPlum.
+  ///
+  /// In id, this message translates to:
+  /// **'Plum'**
+  String get categoryColorPlum;
+
+  /// No description provided for @categoryColorSand.
+  ///
+  /// In id, this message translates to:
+  /// **'Pasir'**
+  String get categoryColorSand;
+
+  /// No description provided for @searchScreenTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Pencarian'**
+  String get searchScreenTitle;
+
+  /// No description provided for @searchFieldHint.
+  ///
+  /// In id, this message translates to:
+  /// **'Cari tugas dan habit'**
+  String get searchFieldHint;
+
+  /// No description provided for @searchPromptBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Mencocokkan judul, lokasi, dan nama kategori saat kamu mengetik.'**
+  String get searchPromptBody;
+
+  /// No description provided for @searchFilterAll.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua'**
+  String get searchFilterAll;
+
+  /// No description provided for @searchFilterHabits.
+  ///
+  /// In id, this message translates to:
+  /// **'Habit'**
+  String get searchFilterHabits;
+
+  /// No description provided for @searchFilterCompleted.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesai'**
+  String get searchFilterCompleted;
+
+  /// No description provided for @searchNoResultsTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada hasil'**
+  String get searchNoResultsTitle;
+
+  /// No description provided for @searchNoResultsBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada yang cocok dengan \"{query}\". Coba kata lain atau ganti filter.'**
+  String searchNoResultsBody(String query);
+
+  /// No description provided for @searchClearTooltip.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus pencarian'**
+  String get searchClearTooltip;
+
+  /// No description provided for @searchTypeTask.
+  ///
+  /// In id, this message translates to:
+  /// **'Task'**
+  String get searchTypeTask;
+
+  /// No description provided for @searchTypeHabit.
+  ///
+  /// In id, this message translates to:
+  /// **'Habit'**
+  String get searchTypeHabit;
+
+  /// No description provided for @searchCompletedLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'selesai'**
+  String get searchCompletedLabel;
 }
 
 class _AppLocalizationsDelegate

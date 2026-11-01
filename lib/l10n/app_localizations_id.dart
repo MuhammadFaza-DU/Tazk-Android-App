@@ -982,4 +982,124 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get presetEditHint => 'Tekan lama chip untuk mengubah nilainya';
+
+  @override
+  String get fieldCategoryOptionalLabel => 'Kategori (opsional)';
+
+  @override
+  String get categoryNoneLabel => 'Tanpa kategori';
+
+  @override
+  String get settingsCategories => 'Kategori';
+
+  @override
+  String get manageCategoriesLabel => 'Kelola kategori';
+
+  @override
+  String get categoriesScreenTitle => 'Kelola kategori';
+
+  @override
+  String get addCategoryTitle => 'Kategori baru';
+
+  @override
+  String get editCategoryTitle => 'Ubah kategori';
+
+  @override
+  String get categoryNameLabel => 'Nama kategori';
+
+  @override
+  String get categoryNameHint => 'mis. Kerja, Belanja';
+
+  @override
+  String get categoryColorLabel => 'Warna';
+
+  @override
+  String get saveCategoryLabel => 'Simpan kategori';
+
+  @override
+  String get deleteCategoryTitle => 'Hapus kategori?';
+
+  @override
+  String get deleteCategoryBody =>
+      'Tugas dan habit di kategori ini tetap ada — hanya kategorinya yang dilepas.';
+
+  @override
+  String get deleteCategoryConfirm => 'Hapus';
+
+  @override
+  String get categoryEmptyTitle => 'Belum ada kategori';
+
+  @override
+  String get categoryEmptyBody =>
+      'Buat kategori untuk mengelompokkan tugas dan habit.';
+
+  @override
+  String get categoryEmptyAction => 'Buat kategori';
+
+  @override
+  String get categoryNameDuplicateError => 'Nama kategori itu sudah dipakai';
+
+  @override
+  String get categoryNameRequiredError => 'Nama kategori tidak boleh kosong';
+
+  @override
+  String get categorySaveFailedMessage =>
+      'Kategori belum tersimpan. Coba lagi.';
+
+  @override
+  String get categoryColorSage => 'Sage';
+
+  @override
+  String get categoryColorHoney => 'Madu';
+
+  @override
+  String get categoryColorRose => 'Ros';
+
+  @override
+  String get categoryColorSky => 'Langit';
+
+  @override
+  String get categoryColorPlum => 'Plum';
+
+  @override
+  String get categoryColorSand => 'Pasir';
+
+  @override
+  String get searchScreenTitle => 'Pencarian';
+
+  @override
+  String get searchFieldHint => 'Cari tugas dan habit';
+
+  @override
+  String get searchPromptBody =>
+      'Mencocokkan judul, lokasi, dan nama kategori saat kamu mengetik.';
+
+  @override
+  String get searchFilterAll => 'Semua';
+
+  @override
+  String get searchFilterHabits => 'Habit';
+
+  @override
+  String get searchFilterCompleted => 'Selesai';
+
+  @override
+  String get searchNoResultsTitle => 'Tidak ada hasil';
+
+  @override
+  String searchNoResultsBody(String query) {
+    return 'Tidak ada yang cocok dengan \"$query\". Coba kata lain atau ganti filter.';
+  }
+
+  @override
+  String get searchClearTooltip => 'Hapus pencarian';
+
+  @override
+  String get searchTypeTask => 'Task';
+
+  @override
+  String get searchTypeHabit => 'Habit';
+
+  @override
+  String get searchCompletedLabel => 'selesai';
 }

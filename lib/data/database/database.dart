@@ -18,6 +18,7 @@ part 'database.g.dart';
 final databaseRecoveredFromCorruption = ValueNotifier<bool>(false);
 
 @DriftDatabase(tables: [
+  Categories,
   Tasks,
   Subtasks,
   Habits,
@@ -36,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,8 +76,28 @@ class AppDatabase extends _$AppDatabase {
             await customStatement(
                 'UPDATE subtasks SET position = id WHERE position = 0;');
           }
+          if (from < 6) {
+            // from<2 already ran createAll() on the current schema, so this
+            // branch must tolerate tables and columns that already exist.
+            await _createTableIfMissing(m, categories);
+            await _addColumnIfMissing(m, tasks, tasks.categoryId);
+            await _addColumnIfMissing(m, habits, habits.categoryId);
+          }
         },
       );
+
+  Future<void> _createTableIfMissing(
+    Migrator migrator,
+    TableInfo<Table, dynamic> table,
+  ) async {
+    final existing = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+      variables: [Variable<String>(table.actualTableName)],
+    ).get();
+    if (existing.isEmpty) {
+      await migrator.createTable(table);
+    }
+  }
 
   Future<void> _addColumnIfMissing(
     Migrator migrator,

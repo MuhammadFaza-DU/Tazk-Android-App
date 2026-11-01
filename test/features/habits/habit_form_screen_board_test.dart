@@ -8,6 +8,7 @@ import 'package:tazk/core/theme/app_colors.dart';
 import 'package:tazk/core/theme/app_theme.dart';
 import 'package:tazk/core/widgets/app_card.dart';
 import 'package:tazk/core/widgets/app_scaffold.dart';
+import 'package:tazk/core/widgets/category_picker.dart';
 import 'package:tazk/data/database/database.dart';
 import 'package:tazk/data/models/enums.dart';
 import 'package:tazk/features/habits/habit_form_screen.dart';
@@ -32,6 +33,9 @@ import 'package:tazk/providers/database_provider.dart';
 /// field→label 16, label→chip 4, chip→label 11, label→pill 2, pill→kartu 8,
 /// kartu→tombol 16, tinggi chip visual 38 di area sentuh 48, pill 32 di 48,
 /// tombol 48.
+///
+/// **Deviasi T7.3:** blok kategori (label + chip) tidak ada di board 24. Blok itu
+/// disisipkan setelah Frekuensi dengan jarak 16 / 8 / 16 (lihat uji urutan).
 
 Future<void> _pumpForm(WidgetTester tester, {Habit? habit}) async {
   tester.view.physicalSize = const Size(390 * 3, 1400 * 3);
@@ -78,6 +82,13 @@ Future<void> _pumpForm(WidgetTester tester, {Habit? habit}) async {
   );
   await tester.tap(find.text('BUKA FORM'));
   await tester.pumpAndSettle();
+}
+
+/// Lepas tree di dalam body test supaya langganan stream Drift (kategori)
+/// berhenti dan timer nol-detaknya ter-flush sebelum pemeriksaan invariant.
+Future<void> _disposeScreen(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump(const Duration(milliseconds: 1));
 }
 
 AppColors _colors(WidgetTester tester) => Theme.of(
@@ -131,15 +142,20 @@ void main() {
       final frequencyLabel = tester.getRect(find.text('Frekuensi'));
       final selector = tester.getRect(find.byKey(habitFormFrequencySelectorKey));
       final reminderLabel = tester.getRect(find.text('Waktu (opsional)'));
+      final categoryLabel = tester.getRect(find.text('Kategori (opsional)'));
+      final categoryPicker = tester.getRect(find.byKey(categoryPickerKey));
       final reminderRow = tester.getRect(find.byKey(habitFormReminderRowKey));
       final card = tester.getRect(find.byKey(habitFormProgressCardKey));
       final save = tester.getRect(find.byKey(habitFormSaveButtonKey));
 
       // Urutan persis board: nama → frekuensi → waktu → progress → simpan.
+      // Blok kategori (deviasi T7.3) duduk di antara frekuensi dan waktu.
       expect(nameLabel.top, lessThan(nameField.top));
       expect(nameField.bottom, lessThan(frequencyLabel.top));
       expect(frequencyLabel.bottom, lessThan(selector.top));
-      expect(selector.bottom, lessThan(reminderLabel.top));
+      expect(selector.bottom, lessThan(categoryLabel.top));
+      expect(categoryLabel.bottom, lessThan(categoryPicker.top));
+      expect(categoryPicker.bottom, lessThan(reminderLabel.top));
       expect(reminderLabel.bottom, lessThan(reminderRow.top));
       expect(reminderRow.bottom, lessThan(card.top));
       expect(card.bottom, lessThan(save.top));
@@ -157,7 +173,10 @@ void main() {
       expect(nameField.top - nameLabel.bottom, 8);
       expect(frequencyLabel.top - nameField.bottom, 16);
       expect(selector.top - frequencyLabel.bottom, 4);
-      expect(reminderLabel.top - selector.bottom, 11);
+      // Blok kategori T7.3: 16 sebelum label, 8 label→chip, 16 chip→label waktu.
+      expect(categoryLabel.top - selector.bottom, 16);
+      expect(categoryPicker.top - categoryLabel.bottom, 8);
+      expect(reminderLabel.top - categoryPicker.bottom, 16);
       expect(reminderRow.top - reminderLabel.bottom, 2);
       expect(card.top - reminderRow.bottom, 8);
       expect(save.top - card.bottom, 16);
@@ -169,6 +188,8 @@ void main() {
       // Label field berada DI ATAS field, bukan label mengambang di dalamnya.
       final field = tester.widget<TextField>(find.byType(TextField).first);
       expect(field.decoration?.labelText, isNull);
+
+      await _disposeScreen(tester);
     });
 
     testWidgets('pemilih frekuensi = empat chip sejajar, bukan radio', (
@@ -225,6 +246,8 @@ void main() {
         _chipDecoration(tester, HabitFrequency.daily).color,
         colors.surface,
       );
+
+      await _disposeScreen(tester);
     });
 
     testWidgets('memilih Custom memunculkan opsi frekuensi kustom', (
@@ -243,6 +266,8 @@ void main() {
       expect(find.text('Tanggal tertentu tiap bulan'), findsOneWidget);
       // Opsi hari (board tidak menggambar state ini, tapi harus tetap ada).
       expect(find.text('Sen'), findsOneWidget);
+
+      await _disposeScreen(tester);
     });
 
     testWidgets('waktu pengingat: pill jam + Hapus saat terisi', (tester) async {
@@ -272,6 +297,8 @@ void main() {
       expect(find.text('Hapus'), findsNothing);
       expect(find.text(expectedTime), findsNothing);
       expect(find.byIcon(Icons.access_time_rounded), findsOneWidget);
+
+      await _disposeScreen(tester);
     });
 
     testWidgets('progress: switch (bukan radio) + baris target saat aktif', (
@@ -302,6 +329,8 @@ void main() {
       await tester.tap(find.byType(Switch));
       await tester.pumpAndSettle();
       expect(find.byKey(habitFormTargetRowKey), findsNothing);
+
+      await _disposeScreen(tester);
     });
 
     testWidgets('edit mode: judul, nama, dan target terisi dari habit', (
@@ -318,6 +347,8 @@ void main() {
       expect(find.text('30'), findsOneWidget);
       // Kartu progress memakai `AppCard` berbingkai (bukan kartu di kartu).
       expect(find.byType(AppCard), findsOneWidget);
+
+      await _disposeScreen(tester);
     });
   });
 }
