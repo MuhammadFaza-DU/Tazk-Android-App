@@ -5,11 +5,27 @@ mengulang keputusan yang sudah diambil atau mengerjakan hal yang sudah selesai.
 
 Terakhir diperbarui: **2026-11-02**
 
+## Handoff cepat (2026-11-02) — untuk sesi berikutnya
+
+- **HEAD `b4f0bd0`** · tag terakhir **`stable-2026-11-02-v4`** · **tree bersih** · **belum di-push**.
+- **T1–T10 SELESAI & terverifikasi** (T6–T10 + fix batch dari uji HP). `dart analyze` 0 · `flutter test`
+  **530/530**. APK **release build 2027** terpasang di HP, **dikonfirmasi owner** (data asli selamat,
+  migrasi DB v4→v7 berjalan).
+- **Fix batch terakhir (tag `-v4`)**: `WidgetPushGate` tak lagi cache (akar "task tak muncul di widget"),
+  hapus task di form edit, baris "Kelola kategori" bisa diketuk, widget Calendar → **week-strip**.
+- **BELUM** (lihat "Status 16 tahap" + "Langkah berikutnya" di bawah):
+  **T0** CI gate · **T11** cek update · **T12** gamifikasi polish · **T13** bug audit/hardening ·
+  **T14** ikon app persegi · **T15** landing page · **T16** docs final + rilis v2.0.
+  Plus: Google Drive backup (#14), widget Calendar sempit di 4×2 (#15), scan Strix pre-release, push.
+- **Rekomendasi lanjut:** **T13 dulu** (hardening + a11y + minor tertunda), lalu T12 → T14 → T11 → T15 → T16.
+- **Rujukan kerja:** ledger `.superpowers/sdd/t6-t10/progress.md` (semua `Ruling:` + minor tertunda),
+  plan T6–T10 di `docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`.
+
 ## Log Perubahan (terbaru duluan)
 
 > **Commit/tag per tahap T6–T10 (lokal, belum di-push):** T6 `48bed1c`/`stable-2026-11-01-v1` · T7 `47cf831`/`-v2` · T9.1 `6b0cd3a` + T9.2 `1e8a14d`/`-v3` · T10.1 `ae1441d` + T10.2 `a312dfb`/`stable-2026-11-02-v1` · T8 `d115ae5`/`stable-2026-11-02-v2`. Entri log di bawah yang masih menulis *(belum commit)* **sudah ter-commit** dengan hash di atas.
 
-- 2026-11-02 — **Fix batch dari uji HP** (gate widget, hapus task, kategori, Calendar): (1) **`WidgetPushGate` tak lagi cache** — cache hasil pertama (bisa `{}` saat app start sebelum widget dipasang) membuat `refreshAll()` jadi no-op selamanya → **task baru tak pernah muncul di widget** (habit yang tampil = data lama); sekarang di-query ulang tiap panggilan. (2) **Hapus task**: ikon 🗑 di header form edit + dialog konfirmasi → `deleteTask` (sebelumnya `deleteTask()` ada di repo tapi **tak ada UI**). (3) **Kelola kategori**: ketuk baris → sheet edit (sebelumnya hanya ikon pensil). (4) **Widget Calendar → week-strip** (7 sel) + header 24dp (label tanggal tak terpotong). **530 test hijau, analyze 0, APK release (build 2027) terpasang di HP — data asli aman.** — *(belum commit)*
+- 2026-11-02 — **Fix batch dari uji HP** (gate widget, hapus task, kategori, Calendar): (1) **`WidgetPushGate` tak lagi cache** — cache hasil pertama (bisa `{}` saat app start sebelum widget dipasang) membuat `refreshAll()` jadi no-op selamanya → **task baru tak pernah muncul di widget** (habit yang tampil = data lama); sekarang di-query ulang tiap panggilan. (2) **Hapus task**: ikon 🗑 di header form edit + dialog konfirmasi → `deleteTask` (sebelumnya `deleteTask()` ada di repo tapi **tak ada UI**). (3) **Kelola kategori**: ketuk baris → sheet edit (sebelumnya hanya ikon pensil). (4) **Widget Calendar → week-strip** (7 sel) + header 24dp (label tanggal tak terpotong). **530 test hijau, analyze 0, APK release (build 2027) terpasang di HP — data asli aman.** Owner mengetes & mengonfirmasi bagian ini. Commit `af7b587` + `b4f0bd0`, tag `stable-2026-11-02-v4`.
 
 - 2026-11-02 — **Task D: widget Kalender jadi week-strip (bukan grid 6x7)** — `_refreshCalendar` kini push 7 sel (Senin..Minggu dari tanggal terpilih) dengan key `_millis/_label/_dow/_is_today/_is_selected/_has_items`; `CalendarWidgetWeekSnapshot` baru (API month lama tetap utuh, `calendar_widget_models_test` hijau); layout `widget_calendar_tasks_habits.xml` = header 20dp (bulan + label terpilih) + strip 7 sel 30dp (dow 8sp, angka 12sp) + 2 ListView + tombol Go to App 20dp, jadi chrome turun ~161dp -> ~84dp (grid lama menghabiskan seluruh 4x2); provider bind 7 sel, prev/next kirim `calendarPreviousWeek`/`calendarNextWeek`; callback geser tanggal terpilih +-7 hari (`previousMonth`/`nextMonth` tetap dilayani sebagai alias +-7 hari) dan mengabaikan `millis==0`. 530 test hijau (+3), analyze 0, APK debug terbangun (213 MB). **Belum diverifikasi di HP**: `adb install` ditolak `INSTALL_FAILED_VERSION_DOWNGRADE` (versi terpasang versionCode 2026, debug 5) — butuh keputusan owner. — (belum commit)
 
@@ -81,8 +97,8 @@ akhir** (owner) lalu review whole-branch.
 | Branch | `main` |
 | Commit terakhir | jalankan `git log -1` — dokumen ini di-commit sesudahnya, jadi hash di teks akan selalu tertinggal satu |
 | Commit terakhir yang tercatat saat dokumen ditulis | `8627cf7` — fix(canvas): tengahkan sheet grab handle + jadikan komponen |
-| Tag stabil terakhir | `stable-2026-11-02-v2` (lihat `git tag \| Select-String stable` untuk yang terbaru) |
-| Status push | **8 commit T6–T10 belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
+| Tag stabil terakhir | `stable-2026-11-02-v4` (lihat `git tag \| Select-String stable` untuk yang terbaru) |
+| Status push | **9 commit (T6–T10 + 2 fix batch) belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
 | Working tree | bersih |
 
 > Catatan: hash commit dan jumlah commit di dokumen ini **selalu tertinggal satu** dari
@@ -377,35 +393,35 @@ adb -s RR8RC027VGL pull "/sdcard/s.png" "docs\artifacts\nama.png"
 #    ⚠️ Kalau layar terkunci, screenshot jadi hitam penuh walaupun file ada isinya.
 ```
 
-**Baseline terakhir terverifikasi (2026-11-02, T8 selesai — T6–T10 tuntas):** `dart analyze` bersih,
-`flutter test` **527/527**, `flutter build apk --debug` sukses (**213 MB**), versi tetap **2.0.0+5**.
-`DESIGN.md` tidak disentuh sejak T5 (lint `exit 0` terakhir 2026-10-31).
-**Belum terverifikasi:** perilaku di HP (drag subtask, maps, sakelar auto-selesai, progress `x/y`,
-picker kategori, Kelola kategori, pencarian, toggle + notifikasi focus-session, share sheet ekspor backup,
-file picker impor, restore data nyata, **widget scroll + tap→selesai + refresh + empty state**) — device
-tidak tersambung; ditunda ke verifikasi HP akhir (permintaan owner).
+**Baseline terakhir terverifikasi (2026-11-02, T6–T10 + fix batch uji HP):** `dart analyze` bersih,
+`flutter test` **530/530**. APK **release arm64 36 MB (build 2027)** terpasang di HP, **data asli aman**,
+migrasi DB **v4→v7** terbukti di perangkat. `pubspec` tetap `2.0.0+5` (build number 2027 hanya untuk
+instalasi uji, karena perangkat sudah ber-versionCode 2005). `DESIGN.md` tidak disentuh sejak T5.
+**Sudah dikonfirmasi owner di HP:** migrasi, gate widget (task muncul), hapus task, kategori bisa diketuk,
+Calendar week-strip. **Belum diverifikasi di HP:** drag subtask, Maps, auto-selesai+XP, pencarian,
+ekspor/impor backup round-trip, toggle notifikasi focus-session, interaksi widget lengkap
+(scroll / tap→selesai / empty / reboot).
 
 ---
 
 ## Langkah berikutnya
 
-**Semua tahap T6–T10 selesai** (T8 terakhir). Checkpoint per tahap: `stable-2026-11-01-v1` (T6),
-`-v2` (T7), `-v3` (T9), `stable-2026-11-02-v1` (T10), `stable-2026-11-02-v2` (T8).
+**T6–T10 + fix batch selesai.** Tag: `stable-2026-11-01-v1` (T6), `-v2` (T7), `-v3` (T9),
+`stable-2026-11-02-v1` (T10), `-v2` (T8), `-v4` (fix batch).
 
-**Sisa pekerjaan (bukan tahap baru, menunggu owner):**
-1. **Verifikasi HP akhir** — semua yang belum bisa diuji tanpa device (lihat baseline di atas).
-2. **Whole-branch review** vs `stable-2026-10-31-v12` (sudah dijalankan PM; temuan dilaporkan).
-3. Redesign widget **Calendar** (isu #15) + pilihan rilis/scan Strix (menunggu keputusan owner).
+Sisa tahap (detail lengkap di "Status 16 tahap" di atas):
 
-**Rujukan:** `.superpowers/sdd/t6-t10/RESUME.md` + `.superpowers/sdd/t6-t10/progress.md` (ledger lengkap
-dengan semua `Ruling:`) + plan `docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`.
-
-| Fase | Isi | Migrasi |
+| Tahap | Isi | Catatan |
 |---|---|---|
-| ~~T6~~ | ~~Subtask + lokasi + XP 15/10/5~~ | **v5 ✅** |
-| ~~T7~~ | ~~Kategori (1/item) + pencarian lintas task/habit~~ | **v6 ✅** |
-| ~~T9~~ | ~~Channel focus-session (ke-5) + toggle~~ | **v7 ✅** |
-| ~~T10~~ | ~~Backup offline JSON + checksum (Drive ditunda)~~ | — ✅ |
-| ~~T8~~ | ~~Widget scroll (`RemoteViewsService` Kotlin) + empty state~~ | — ✅ |
+| T0 | CI gate | sebagian — CI belum ada |
+| **T11** | Cek update | endpoint versi dari landing page + prompt update |
+| **T12** | Gamifikasi polish | badge/kosmetik/celebration/visual XP |
+| **T13** | Bug audit & hardening | `setSubtaskCompleted` mati, a11y widget, `deleteTask` refund XP, hardening DB, minor lain |
+| **T14** | Ikon app persegi | adaptive icon (maskot & wordmark sudah ada) |
+| **T15** | Landing page | Astro + Vercel + distribusi APK |
+| **T16** | Docs final + rilis | bump versi, release build, tag **v2.0** |
 
-Verifikasi HP ditunda ke akhir semua tahap.
+Isu terbuka: **#14** Google Drive ditunda, **#15** widget Calendar 4×2 sempit (bisa dinaikkan default),
+toggle focus mid-session, minor tertunda T13. Sebelum rilis: **scan Strix** + **izin push**.
+
+Rujukan: ledger `.superpowers/sdd/t6-t10/progress.md` (semua `Ruling:` + minor) + plan T6–T10.
