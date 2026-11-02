@@ -68,21 +68,21 @@ Future<void> homeWidgetBackgroundCallback(Uri? uri) async {
             selectedDate: selectedDate,
           );
         }
+      case 'calendarpreviousweek':
       case 'calendarpreviousmonth':
+      case 'calendarnextweek':
       case 'calendarnextmonth':
-        final visibleMonth = await _calendarVisibleMonth();
         final currentSelected = await _calendarSelectedDate();
-        final nextMonth = DateTime(
-          visibleMonth.year,
-          visibleMonth.month + (host == 'calendarnextmonth' ? 1 : -1),
-        );
+        final isNext = host == 'calendarnextweek' || host == 'calendarnextmonth';
+        final nextSelected =
+            currentSelected.add(Duration(days: isNext ? 7 : -7));
         await widgetService.updateCalendarSelection(
-          visibleMonth: nextMonth,
-          selectedDate: currentSelected,
+          visibleMonth: DateTime(nextSelected.year, nextSelected.month),
+          selectedDate: nextSelected,
         );
       case 'calendarselectdate':
         final millis = int.tryParse(uri.queryParameters['millis'] ?? '');
-        if (millis != null) {
+        if (millis != null && millis > 0) {
           final selected = DateTime.fromMillisecondsSinceEpoch(millis);
           await widgetService.updateCalendarSelection(
             visibleMonth: DateTime(selected.year, selected.month),

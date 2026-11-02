@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tazk/data/database/database.dart';
 import 'package:tazk/data/models/enums.dart';
 import 'package:tazk/data/repositories/settings_repository.dart';
+import 'package:tazk/widgets/calendar_widget_models.dart';
 import 'package:tazk/widgets/home_widget_service.dart';
 import 'package:tazk/widgets/widget_push_gate.dart';
 
@@ -153,6 +154,49 @@ void main() {
 
     expect(saved['tazk_tasks_empty_text'], 'No tasks yet');
     expect(saved['tazk_habits_empty_text'], 'No habits yet');
+  });
+
+  test('the week strip runs Monday to Sunday around the selected date', () {
+    final snapshot = CalendarWidgetWeekSnapshot.build(
+      selectedDate: DateTime(2026, 11, 4),
+      today: DateTime(2026, 11, 4),
+      itemDates: {DateTime(2026, 11, 6)},
+    );
+
+    expect(snapshot.cells, hasLength(7));
+    expect(snapshot.cells.first.date, DateTime(2026, 11, 2));
+    expect(snapshot.cells.first.date.weekday, DateTime.monday);
+    expect(snapshot.cells.last.date, DateTime(2026, 11, 8));
+    expect(snapshot.cells[2].isSelected, isTrue);
+    expect(snapshot.cells[4].hasItems, isTrue);
+    expect(snapshot.cells[2].hasItems, isFalse);
+  });
+
+  test('the calendar widget pushes a seven-day strip, not a month grid', () async {
+    await settings.updateLanguage(AppLanguage.indonesian);
+
+    final service = HomeWidgetService(db, settings, gate: _CalendarGate());
+    await service.refreshCalendarWidget();
+
+    final today = _today();
+    final monday = today.subtract(Duration(days: today.weekday - 1));
+    expect(saved['tazk_calendar_day_0_millis'], monday.millisecondsSinceEpoch);
+    expect(
+      saved['tazk_calendar_day_6_millis'],
+      monday.add(const Duration(days: 6)).millisecondsSinceEpoch,
+    );
+    for (var i = 0; i < 7; i++) {
+      expect(saved['tazk_calendar_day_${i}_label'], isNotEmpty, reason: 'cell $i label');
+      expect(saved['tazk_calendar_day_${i}_dow'], isNotEmpty, reason: 'cell $i dow');
+      expect(saved.containsKey('tazk_calendar_day_${i}_is_today'), isTrue);
+      expect(saved.containsKey('tazk_calendar_day_${i}_is_selected'), isTrue);
+      expect(saved.containsKey('tazk_calendar_day_${i}_has_items'), isTrue);
+    }
+    expect(saved['tazk_calendar_day_0_dow'], 'Sen');
+    expect(saved['tazk_calendar_day_6_dow'], 'Min');
+    expect(saved['tazk_calendar_day_${today.weekday - 1}_is_selected'], isTrue);
+    expect(saved['tazk_calendar_day_${today.weekday - 1}_is_today'], isTrue);
+    expect(saved.containsKey('tazk_calendar_day_7_label'), isFalse);
   });
 
   test('the calendar pushes every row and counts only what it wrote', () async {

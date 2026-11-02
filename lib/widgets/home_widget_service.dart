@@ -215,13 +215,12 @@ class HomeWidgetService {
     final normalizedMonth = DateTime(visibleMonth.year, visibleMonth.month);
     final normalizedSelected = _dateOnly(selectedDate);
     final settings = await _settings.ensureSettings();
-    final itemDates = await _itemDatesForMonthGrid(normalizedMonth);
-    final snapshot = CalendarWidgetMonthSnapshot.build(
-      visibleMonth: normalizedMonth,
+    final snapshot = CalendarWidgetWeekSnapshot.build(
       selectedDate: normalizedSelected,
       today: DateTime.now(),
-      itemDates: itemDates,
+      itemDates: await _itemDatesForWeek(normalizedSelected),
     );
+    final dowLabels = _dowLabels(settings.language);
     final tasks = await _calendarTasksForDate(normalizedSelected);
     final habits = await _calendarHabitsForDate(normalizedSelected);
 
@@ -250,8 +249,8 @@ class HomeWidgetService {
       );
       await HomeWidget.saveWidgetData('tazk_calendar_day_${i}_label', cell.dayLabel);
       await HomeWidget.saveWidgetData(
-        'tazk_calendar_day_${i}_in_month',
-        cell.isInVisibleMonth,
+        'tazk_calendar_day_${i}_dow',
+        dowLabels[i],
       );
       await HomeWidget.saveWidgetData(
         'tazk_calendar_day_${i}_is_today',
@@ -408,10 +407,9 @@ class HomeWidgetService {
     return incomplete;
   }
 
-  Future<Set<DateTime>> _itemDatesForMonthGrid(DateTime visibleMonth) async {
-    final snapshot = CalendarWidgetMonthSnapshot.build(
-      visibleMonth: visibleMonth,
-      selectedDate: _dateOnly(DateTime.now()),
+  Future<Set<DateTime>> _itemDatesForWeek(DateTime selectedDate) async {
+    final snapshot = CalendarWidgetWeekSnapshot.build(
+      selectedDate: selectedDate,
       today: DateTime.now(),
       itemDates: const {},
     );
@@ -475,10 +473,13 @@ class HomeWidgetService {
     return '${names[month.month - 1]} ${month.year}';
   }
 
+  List<String> _dowLabels(AppLanguage language) =>
+      language == AppLanguage.english
+          ? const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          : const ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+
   String _selectedDateLabel(DateTime date, AppLanguage language) {
-    final names = language == AppLanguage.english
-        ? const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        : const ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+    final names = _dowLabels(language);
     return '${names[date.weekday - 1]}, ${date.day}/${date.month}/${date.year}';
   }
 

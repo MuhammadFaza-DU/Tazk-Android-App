@@ -49,15 +49,52 @@ void main() {
     expect(info, contains('android:targetCellHeight="2"'));
   });
 
-  test('calendar widget layout keeps vertical content compact', () {
+  test('calendar widget layout renders one week strip, not a month grid', () {
+    final layout = File(
+      'android/app/src/main/res/layout/widget_calendar_tasks_habits.xml',
+    ).readAsStringSync();
+
+    expect(layout, contains('android:id="@+id/calendar_week_strip"'));
+    for (var i = 0; i < 7; i++) {
+      expect(
+        layout,
+        contains('android:id="@+id/calendar_day_$i"'),
+        reason: 'day cell $i exists',
+      );
+      expect(
+        layout,
+        contains('android:id="@+id/calendar_day_${i}_dow"'),
+        reason: 'day cell $i has a weekday label',
+      );
+    }
+    expect(layout, isNot(contains('@+id/calendar_day_7"')));
+    expect(layout, contains('android:id="@+id/widget_tasks_list"'));
+    expect(layout, contains('android:id="@+id/widget_habits_list"'));
+
+    final provider = File(
+      'android/app/src/main/kotlin/com/tazk/tazk/TazkCalendarTasksHabitsWidgetProvider.kt',
+    ).readAsStringSync();
+    expect(provider, contains(r'tazk_calendar_day_${index}_dow'));
+    expect(provider, isNot(contains('R.id.calendar_day_7')));
+  });
+
+  test('calendar widget chrome stays slim around the week strip', () {
     final layout = File(
       'android/app/src/main/res/layout/widget_calendar_tasks_habits.xml',
     ).readAsStringSync();
 
     expect(layout, contains('android:padding="5dp"'));
-    expect(layout, isNot(contains('android:layout_height="20dp"')));
-    expect(layout, isNot(contains('android:layout_height="17dp"')));
-    expect(layout, contains('android:layout_height="14dp"'));
+    expect(layout, isNot(contains('android:layout_height="14dp"')));
+    expect(
+      RegExp(r'android:layout_height="30dp"').allMatches(layout).length,
+      8,
+      reason: 'the week strip plus its seven day cells',
+    );
+    expect(
+      RegExp(r'android:textSize="12sp"').allMatches(layout).length,
+      7,
+      reason: 'one day-number label per cell',
+    );
   });
 
   test('calendar widget has a dedicated go to app button instead of background launch', () {
@@ -85,6 +122,8 @@ void main() {
     final callback = File('lib/widgets/home_widget_callback.dart').readAsStringSync();
 
     expect(callback, contains('final host = uri.host.toLowerCase();'));
+    expect(callback, contains("case 'calendarpreviousweek':"));
+    expect(callback, contains("case 'calendarnextweek':"));
     expect(callback, contains("case 'calendarnextmonth':"));
     expect(callback, contains("case 'calendarselectdate':"));
     expect(callback, contains("case 'calendarcompletetask':"));

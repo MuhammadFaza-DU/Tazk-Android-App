@@ -25,8 +25,8 @@ class TazkCalendarTasksHabitsWidgetProvider : HomeWidgetProvider() {
             setTextViewText(
                 R.id.calendar_selected_label,
                 widgetData.getString("tazk_calendar_selected_label", ""))
-            setOnClickPendingIntent(R.id.calendar_prev, backgroundPending(context, "homeWidget://calendarPreviousMonth", 600001))
-            setOnClickPendingIntent(R.id.calendar_next, backgroundPending(context, "homeWidget://calendarNextMonth", 600002))
+            setOnClickPendingIntent(R.id.calendar_prev, backgroundPending(context, "homeWidget://calendarPreviousWeek", 600001))
+            setOnClickPendingIntent(R.id.calendar_next, backgroundPending(context, "homeWidget://calendarNextWeek", 600002))
             setOnClickPendingIntent(
                 R.id.calendar_go_to_app,
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java))
@@ -57,7 +57,25 @@ private fun bindCalendarDays(
     views: RemoteViews,
     widgetData: SharedPreferences
 ) {
-  val dayIds =
+  val cellIds =
+      intArrayOf(
+          R.id.calendar_day_cell_0,
+          R.id.calendar_day_cell_1,
+          R.id.calendar_day_cell_2,
+          R.id.calendar_day_cell_3,
+          R.id.calendar_day_cell_4,
+          R.id.calendar_day_cell_5,
+          R.id.calendar_day_cell_6)
+  val dowIds =
+      intArrayOf(
+          R.id.calendar_day_0_dow,
+          R.id.calendar_day_1_dow,
+          R.id.calendar_day_2_dow,
+          R.id.calendar_day_3_dow,
+          R.id.calendar_day_4_dow,
+          R.id.calendar_day_5_dow,
+          R.id.calendar_day_6_dow)
+  val labelIds =
       intArrayOf(
           R.id.calendar_day_0,
           R.id.calendar_day_1,
@@ -65,66 +83,36 @@ private fun bindCalendarDays(
           R.id.calendar_day_3,
           R.id.calendar_day_4,
           R.id.calendar_day_5,
-          R.id.calendar_day_6,
-          R.id.calendar_day_7,
-          R.id.calendar_day_8,
-          R.id.calendar_day_9,
-          R.id.calendar_day_10,
-          R.id.calendar_day_11,
-          R.id.calendar_day_12,
-          R.id.calendar_day_13,
-          R.id.calendar_day_14,
-          R.id.calendar_day_15,
-          R.id.calendar_day_16,
-          R.id.calendar_day_17,
-          R.id.calendar_day_18,
-          R.id.calendar_day_19,
-          R.id.calendar_day_20,
-          R.id.calendar_day_21,
-          R.id.calendar_day_22,
-          R.id.calendar_day_23,
-          R.id.calendar_day_24,
-          R.id.calendar_day_25,
-          R.id.calendar_day_26,
-          R.id.calendar_day_27,
-          R.id.calendar_day_28,
-          R.id.calendar_day_29,
-          R.id.calendar_day_30,
-          R.id.calendar_day_31,
-          R.id.calendar_day_32,
-          R.id.calendar_day_33,
-          R.id.calendar_day_34,
-          R.id.calendar_day_35,
-          R.id.calendar_day_36,
-          R.id.calendar_day_37,
-          R.id.calendar_day_38,
-          R.id.calendar_day_39,
-          R.id.calendar_day_40,
-          R.id.calendar_day_41)
+          R.id.calendar_day_6)
 
-  dayIds.forEachIndexed { index, viewId ->
+  labelIds.indices.forEach { index ->
     val label = widgetData.getString("tazk_calendar_day_${index}_label", "") ?: ""
+    val dow = widgetData.getString("tazk_calendar_day_${index}_dow", "") ?: ""
     val millis = widgetData.getLong("tazk_calendar_day_${index}_millis", 0L)
-    val inMonth = widgetData.getBoolean("tazk_calendar_day_${index}_in_month", false)
     val isToday = widgetData.getBoolean("tazk_calendar_day_${index}_is_today", false)
     val isSelected = widgetData.getBoolean("tazk_calendar_day_${index}_is_selected", false)
     val hasItems = widgetData.getBoolean("tazk_calendar_day_${index}_has_items", false)
     val displayLabel = if (hasItems) "$label•" else label
 
-    views.setTextViewText(viewId, displayLabel)
-    views.setTextColor(viewId, colorForDay(inMonth, isToday, isSelected))
-    views.setInt(viewId, "setBackgroundResource", backgroundForDay(isToday, isSelected))
-    views.setOnClickPendingIntent(viewId, backgroundPending(context, "homeWidget://calendarSelectDate?millis=$millis", 500000 + index))
+    views.setTextViewText(dowIds[index], dow)
+    views.setTextViewText(labelIds[index], displayLabel)
+    views.setTextColor(labelIds[index], colorForDay(isToday, isSelected))
+    views.setTextColor(dowIds[index], colorForDow(isSelected))
+    views.setInt(cellIds[index], "setBackgroundResource", backgroundForDay(isToday, isSelected))
+    views.setOnClickPendingIntent(cellIds[index], backgroundPending(context, "homeWidget://calendarSelectDate?millis=$millis", 500000 + index))
   }
 }
 
-private fun colorForDay(inMonth: Boolean, isToday: Boolean, isSelected: Boolean): Int {
+private fun colorForDay(isToday: Boolean, isSelected: Boolean): Int {
   return when {
     isSelected -> Color.WHITE
     isToday -> Color.parseColor("#F0A83C")
-    !inMonth -> Color.parseColor("#9AA394")
     else -> Color.parseColor("#1E2E22")
   }
+}
+
+private fun colorForDow(isSelected: Boolean): Int {
+  return if (isSelected) Color.WHITE else Color.parseColor("#8A6A45")
 }
 
 private fun backgroundForDay(isToday: Boolean, isSelected: Boolean): Int {

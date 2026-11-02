@@ -71,3 +71,42 @@ class CalendarWidgetMonthSnapshot {
   static DateTime _dateOnly(DateTime value) =>
       DateTime(value.year, value.month, value.day);
 }
+
+class CalendarWidgetWeekSnapshot {
+  const CalendarWidgetWeekSnapshot({
+    required this.selectedDate,
+    required this.cells,
+  });
+
+  final DateTime selectedDate;
+
+  /// Seven cells, Monday first, for the week that contains [selectedDate].
+  final List<CalendarWidgetDayCell> cells;
+
+  static CalendarWidgetWeekSnapshot build({
+    required DateTime selectedDate,
+    required DateTime today,
+    required Set<DateTime> itemDates,
+  }) {
+    final selected = _dateOnly(selectedDate);
+    final now = _dateOnly(today);
+    final normalizedItemDates = itemDates.map(_dateOnly).toSet();
+    final monday = selected.subtract(Duration(days: selected.weekday - 1));
+
+    final cells = List<CalendarWidgetDayCell>.generate(7, (index) {
+      final date = _dateOnly(monday.add(Duration(days: index)));
+      return CalendarWidgetDayCell(
+        date: date,
+        isInVisibleMonth: date.month == selected.month,
+        isToday: date == now,
+        isSelected: date == selected,
+        hasItems: normalizedItemDates.contains(date),
+      );
+    });
+
+    return CalendarWidgetWeekSnapshot(selectedDate: selected, cells: cells);
+  }
+
+  static DateTime _dateOnly(DateTime value) =>
+      DateTime(value.year, value.month, value.day);
+}
