@@ -40,6 +40,9 @@ const Key taskFormLocationFieldKey = ValueKey('task-form-location-field');
 /// Key tombol "buka di Maps" pada field lokasi.
 const Key taskFormOpenMapsKey = ValueKey('task-form-open-maps');
 
+/// Key tombol hapus task di header form (hanya muncul saat mengedit).
+const Key taskFormDeleteButtonKey = ValueKey('task-form-delete');
+
 /// Key baris sakelar "tandai tugas selesai saat semua subtask beres".
 const Key taskFormAutoCompleteSwitchKey =
     ValueKey('task-form-auto-complete-switch');
@@ -217,7 +220,33 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     Navigator.of(context).pop();
   }
 
-  /// Tanggal memakai bentuk board `29 Okt 2026` (d MMM yyyy).
+  /// Edit mode only: confirm, then delete the task and leave the form.
+  Future<void> _delete() async {
+    final task = widget.task;
+    if (task == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.deleteTaskTitle),
+        content: Text(l10n.deleteTaskBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancelButton),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.deleteButton),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await ref.read(taskRepositoryProvider).deleteTask(task.id);
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
   String _dateLabel(BuildContext context) {
     final locale = Localizations.localeOf(context).toLanguageTag();
     try {
@@ -235,6 +264,15 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
     return AppScaffold(
       title: _isEditing ? l10n.editTaskTitle : l10n.addTaskTitle,
+      actions: [
+        if (_isEditing)
+          IconButton(
+            key: taskFormDeleteButtonKey,
+            icon: const Icon(Icons.delete_outline_rounded),
+            tooltip: l10n.deleteButton,
+            onPressed: _delete,
+          ),
+      ],
       body: Form(
         key: _formKey,
         child: ListView(

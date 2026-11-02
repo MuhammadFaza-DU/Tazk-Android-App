@@ -97,6 +97,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get deleteButton => 'Hapus';
 
   @override
+  String get deleteTaskTitle => 'Hapus task ini?';
+
+  @override
+  String get deleteTaskBody =>
+      'Task ini akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.';
+
+  @override
   String get startButton => 'Mulai';
 
   @override

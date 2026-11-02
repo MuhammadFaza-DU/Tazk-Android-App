@@ -12,7 +12,7 @@ void main() {
         .setMockMethodCallHandler(channel, null);
   });
 
-  test('mountedProviders returns mounted set and caches it', () async {
+  test('mountedProviders re-queries every call (no stale cache)', () async {
     List<String> mockedResult = ['calendar'];
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
@@ -23,12 +23,15 @@ void main() {
     final gate = WidgetPushGate();
     expect(await gate.mountedProviders(), {'calendar'});
 
-    // Second call must serve from cache, ignoring the (now changed) mock.
+    // The mounted set can change when the user adds/removes a widget; every
+    // call must observe the current set rather than a pinned first answer.
+    // Before the fix an empty first result pinned the whole process, so tasks
+    // created later were never pushed.
     mockedResult = <String>[];
-    expect(await gate.mountedProviders(), {'calendar'});
-
-    gate.resetCache();
     expect(await gate.mountedProviders(), <String>{});
+
+    mockedResult = ['tasksHabits', 'calendar'];
+    expect(await gate.mountedProviders(), {'tasksHabits', 'calendar'});
   });
 
   test('mountedProviders falls back to all names on channel error', () async {

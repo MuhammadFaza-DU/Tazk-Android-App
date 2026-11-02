@@ -40,6 +40,8 @@
   "habitDayNotDueSemantics": "tidak dijadwalkan",
   "okButton": "OK",
   "deleteButton": "Hapus",
+  "deleteTaskTitle": "Hapus task ini?",
+  "deleteTaskBody": "Task ini akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.",
   "startButton": "Mulai",
   "yesLabel": "Ya",
   "noLabel": "Tidak",

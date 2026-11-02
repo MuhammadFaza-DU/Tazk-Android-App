@@ -97,6 +97,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteButton => 'Delete';
 
   @override
+  String get deleteTaskTitle => 'Delete this task?';
+
+  @override
+  String get deleteTaskBody =>
+      'This task will be permanently deleted. This can\'t be undone.';
+
+  @override
   String get startButton => 'Start';
 
   @override

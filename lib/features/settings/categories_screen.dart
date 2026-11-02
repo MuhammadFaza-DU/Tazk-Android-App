@@ -247,6 +247,7 @@ class _CategoryRow extends StatelessWidget {
       leading: CategoryColorDot(color: category.color),
       title: category.name,
       showDivider: showDivider,
+      onTap: onRename,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -32,6 +32,8 @@
   "habitDayNotDueSemantics": "not scheduled",
   "okButton": "OK",
   "deleteButton": "Delete",
+  "deleteTaskTitle": "Delete this task?",
+  "deleteTaskBody": "This task will be permanently deleted. This can't be undone.",
   "startButton": "Start",
   "yesLabel": "Yes",
   "noLabel": "No",

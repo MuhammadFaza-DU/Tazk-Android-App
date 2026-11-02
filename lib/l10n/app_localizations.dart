@@ -266,6 +266,18 @@ abstract class AppLocalizations {
   /// **'Hapus'**
   String get deleteButton;
 
+  /// No description provided for @deleteTaskTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus task ini?'**
+  String get deleteTaskTitle;
+
+  /// No description provided for @deleteTaskBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Task ini akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.'**
+  String get deleteTaskBody;
+
   /// No description provided for @startButton.
   ///
   /// In id, this message translates to:
