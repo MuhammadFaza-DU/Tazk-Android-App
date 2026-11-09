@@ -138,6 +138,31 @@
   diuji `am kill` + tap + reboot di perangkat.
 - **Aturan:** **dilarang** "memperbaiki" dengan menyuruh user membuka app.
 
+---
+
+## L-006 · Jebakan alat (PowerShell/SSH) yang berulang
+- **Tanggal:** 2026-11-09
+- **Salah:** (a) `adb exec-out screencap -p > file` di PowerShell menghasilkan
+  PNG rusak (UTF-16) → screenshot tak terbaca; (b) perintah SSH dengan tanda
+  kurung/pipa/double-quote di-strip oleh PowerShell → `syntax error near unexpected token`.
+- **Aturan baru:** (a) ambil biner lewat `cmd /c "adb ... > file"`;
+  (b) selalu kirim skrip ke server via **base64**
+  (`$b64=[Convert]::ToBase64String(...)` → `echo $b64 | base64 -d > /tmp/s.sh` → `bash /tmp/s.sh`).
+- **Verifikasi:** keduanya terbukti pada sesi ini (screenshot 224 KB valid;
+  semua skrip multi-baris berjalan).
+
+---
+
+## L-007 · Menunggu build lama tanpa memberi nilai tambah
+- **Tanggal:** 2026-11-09
+- **Salah:** build `assembleRelease` di server memakan 1903 s (31 menit) dan selama
+  itu tidak ada pekerjaan lain yang disiapkan.
+- **Aturan baru:** saat build berjalan, kerjakan hal yang tidak bergantung padanya
+  (dokumentasi, guard otomatis, penulisan tes). Dan ukur dulu beban server
+  (`uptime`) sebelum memilih jalur build.
+
+---
+
 ## L-008 · `force-stop` membuat tes broadcast jadi palsu
 - **Tanggal:** 2026-11-09
 - **Salah:** memakai `adb shell am force-stop com.tazk.tazk` untuk menguji jalur tap
@@ -155,36 +180,26 @@
 
 ---
 
-
-## L-006 · Jebakan alat (PowerShell/SSH) yang berulang
+## L-009 · `lookupCallbackInformation` sebelum loader Flutter diinisialisasi
 - **Tanggal:** 2026-11-09
-- **Salah:** (a) `adb exec-out screencap -p > file` di PowerShell menghasilkan
-  PNG rusak (UTF-16) → screenshot tak terbaca; (b) perintah SSH dengan tanda
-  kurung/pipa/double-quote di-strip oleh PowerShell → `syntax error near unexpected token`.
-- **Aturan baru:** (a) ambil biner lewat `cmd /c "adb ... > file"`;
-  (b) selalu kirim skrip ke server via **base64**
-  (`$b64=[Convert]::ToBase64String(...)` → `echo $b64 | base64 -d > /tmp/s.sh` → `bash /tmp/s.sh`).
-- **Verifikasi:** keduanya terbukti pada sesi ini (screenshot 224 KB valid;
-  semua skrip multi-baris berjalan).
-
----
-
-## L-010 · `FlutterLoader.startInitialization()` dipanggil dari background thread
-- **Tanggal:** 2026-11-09
-- **Salah (di `TazkWidgetTapReceiver`, v2034):** memindahkan inisialisasi loader Flutter
-  ke dalam `Thread { ... }` yang kubuat sendiri.
+- **Salah (di `TazkWidgetTapReceiver`, v2033):** memanggil
+  `FlutterCallbackInformation.lookupCallbackInformation(handle)` **sebelum**
+  `FlutterLoader.startInitialization()` / `ensureInitializationComplete()`.
 - **Bukti:** `adb logcat` -> `E/TazkWidgetTap: Widget tap crashed`
-  `java.lang.IllegalStateException: startInitialization must be called on the main thread`.
-- **Dampak:** tap widget tetap tidak berubah pada v2034 (`updateAppWidget = 0`).
-- **Aturan baru:** `startInitialization()` **wajib di main thread** (di
-  `BroadcastReceiver.onReceive` sudah main thread). `ensureInitializationComplete()`
-  boleh di-await dari thread lain — itu yang dipakai di worker.
-- **Verifikasi:** dibuktikan ulang pada v2035 (`am kill` -> tap -> `updateAppWidget` > 0).
-- **Pola yang terulang:** ini kali **kedua** bug urutan inisialisasi Flutter di jalur
-  yang sama (L-009 lalu L-010). Aturan turunan: setiap kali menyentuh
-  `FlutterLoader`/`FlutterEngine`/`DartExecutor` di luar aktivitas normal,
-  **periksa kontrak thread-nya di dokumentasi Flutter dulu**, jangan berasumsi
-  API native boleh dipanggil dari thread mana pun.
+  `java.lang.UnsatisfiedLinkError: No implementation found for
+  io.flutter.view.FlutterCallbackInformation ...
+  FlutterJNI.nativeLookupCallbackInformation(long)`.
+- **Dampak:** tap widget tetap tidak berubah (`updateAppWidget = 0`) pada v2033.
+  Positifnya kali ini **gagal berisik**, bukan senyap seperti L-005, jadi akar
+  masalahnya langsung terlihat.
+- **Aturan baru:** di proses/isolate baru, **inisialisasi loader Flutter dulu**,
+  baru panggil API native apa pun (`lookupCallbackInformation`, `FlutterEngine`,
+  `DartExecutor`).
+- **Verifikasi:** urutan dibalik; dibuktikan ulang pada build v2034
+  (`am kill` -> tap -> `updateAppWidget` > 0, tanpa `UnsatisfiedLinkError`).
+- **Pelajaran proses:** menaruh `Log.e` di jalur `catch` **membayar dirinya
+  sendiri**. Tanpa itu kegagalan ini tampak seperti "masih diam" dan memancing
+  tambalan buta. Jalur background **wajib** punya logging eksplisit.
 
 ---
 
@@ -229,33 +244,3 @@
 
 ---
 
-## L-009 · `lookupCallbackInformation` sebelum loader Flutter diinisialisasi
-- **Tanggal:** 2026-11-09
-- **Salah (di `TazkWidgetTapReceiver`, v2033):** memanggil
-  `FlutterCallbackInformation.lookupCallbackInformation(handle)` **sebelum**
-  `FlutterLoader.startInitialization()` / `ensureInitializationComplete()`.
-- **Bukti:** `adb logcat` -> `E/TazkWidgetTap: Widget tap crashed`
-  `java.lang.UnsatisfiedLinkError: No implementation found for
-  io.flutter.view.FlutterCallbackInformation ...
-  FlutterJNI.nativeLookupCallbackInformation(long)`.
-- **Dampak:** tap widget tetap tidak berubah (`updateAppWidget = 0`) pada v2033.
-  Positifnya kali ini **gagal berisik**, bukan senyap seperti L-005, jadi akar
-  masalahnya langsung terlihat.
-- **Aturan baru:** di proses/isolate baru, **inisialisasi loader Flutter dulu**,
-  baru panggil API native apa pun (`lookupCallbackInformation`, `FlutterEngine`,
-  `DartExecutor`).
-- **Verifikasi:** urutan dibalik; dibuktikan ulang pada build v2034
-  (`am kill` -> tap -> `updateAppWidget` > 0, tanpa `UnsatisfiedLinkError`).
-- **Pelajaran proses:** menaruh `Log.e` di jalur `catch` **membayar dirinya
-  sendiri**. Tanpa itu kegagalan ini tampak seperti "masih diam" dan memancing
-  tambalan buta. Jalur background **wajib** punya logging eksplisit.
-
----
-
-## L-007 · Menunggu build lama tanpa memberi nilai tambah
-- **Tanggal:** 2026-11-09
-- **Salah:** build `assembleRelease` di server memakan 1903 s (31 menit) dan selama
-  itu tidak ada pekerjaan lain yang disiapkan.
-- **Aturan baru:** saat build berjalan, kerjakan hal yang tidak bergantung padanya
-  (dokumentasi, guard otomatis, penulisan tes). Dan ukur dulu beban server
-  (`uptime`) sebelum memilih jalur build.
