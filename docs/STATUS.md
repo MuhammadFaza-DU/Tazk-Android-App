@@ -5,23 +5,36 @@ mengulang keputusan yang sudah diambil atau mengerjakan hal yang sudah selesai.
 
 Terakhir diperbarui: **2026-11-09**
 
-## Handoff cepat (2026-11-02) — untuk sesi berikutnya
+## Handoff cepat (2026-11-09) — untuk sesi berikutnya
 
-- **HEAD `b4f0bd0`** · tag terakhir **`stable-2026-11-02-v4`** · **tree bersih** · **belum di-push**.
-- **T1–T10 SELESAI & terverifikasi** (T6–T10 + fix batch dari uji HP). `dart analyze` 0 · `flutter test`
-  **530/530**. APK **release build 2027** terpasang di HP, **dikonfirmasi owner** (data asli selamat,
-  migrasi DB v4→v7 berjalan).
-- **Fix batch terakhir (tag `-v4`)**: `WidgetPushGate` tak lagi cache (akar "task tak muncul di widget"),
-  hapus task di form edit, baris "Kelola kategori" bisa diketuk, widget Calendar → **week-strip**.
-- **BELUM** (lihat "Status 16 tahap" + "Langkah berikutnya" di bawah):
-  **T0** CI gate · **T11** cek update · **T12** gamifikasi polish · **T13** bug audit/hardening ·
-  **T14** ikon app persegi · **T15** landing page · **T16** docs final + rilis v2.0.
-  Plus: Google Drive backup (#14), widget Calendar sempit di 4×2 (#15), scan Strix pre-release, push.
-- **Rekomendasi lanjut:** **T13 dulu** (hardening + a11y + minor tertunda), lalu T12 → T14 → T11 → T15 → T16.
-- **Rujukan kerja:** ledger `.superpowers/sdd/t6-t10/progress.md` (semua `Ruling:` + minor tertunda),
-  plan T6–T10 di `docs/superpowers/plans/2026-10-31-t6-t10-subtask-kategori-widget-notifikasi-backup.md`.
+- **HEAD** `79def0d` · tag **`stable-2026-11-09-v1`** (+ `-v2` sesudah dokumen ini) · **tree bersih** · **belum di-push**.
+- **T1–T10 SELESAI & terverifikasi di perangkat.** `flutter analyze` 0 issue · `flutter test` **535/535**.
+- **T0 SELESAI** — gate CI (`.github/workflows/ci.yml` + `tool/verify.sh`/`.ps1`).
+- **Widget: tuntas & terverifikasi owner** (v2036, Galaxy A52). Tap berfungsi saat proses app
+  **mati** (~600 ms) **dan setelah reboot** tanpa membuka app (~1,2 s); widget mengikuti
+  **tema app** (terang & gelap, token-exact); layout dirapikan. Akar masalah + 11 pelajaran di
+  **`docs/LESSONS.md`** (L-001…L-011) — **baca itu dulu** sebelum menyentuh widget lagi.
+- **Build APK di LAPTOP** (`ANDROID_HOME=D:\Android\Sdk`): **44–149 s** vs server **875–1903 s**.
+  Server hanya arsip (HEAD `adcfc40`). Jangan build di server kecuali butuh Linux.
+- **Data app di HP sudah DIHAPUS** (`pm clear`) atas permintaan owner — onboarding dari nol,
+  terverifikasi muncul. Kalau butuh data uji, buat baru.
+- **BELUM** (lihat "Status 16 tahap"): **T11** cek update · **T12** gamifikasi polish ·
+  **T13** bug audit/hardening · **T14** ikon app persegi · **T15** landing page ·
+  **T16** docs final + rilis v2.0. Plus: Google Drive backup (isu #14), scan Strix pre-release, push.
+- **Rekomendasi lanjut:** **T13 dulu** (hardening + a11y + isu tertunda), lalu T12 → T14 → T11 → T15 → T16.
 
 ## Log Perubahan (terbaru duluan)
+- 2026-11-09 (penutup) — **Capaian sesi dikunci + data HP direset atas permintaan owner.**
+  Checkpoint: commit `79def0d` + tag `stable-2026-11-09-v1`, tree bersih, server arsip
+  disinkronkan (`adcfc40`). **Data app di HP dihapus** (`adb shell pm clear com.tazk.tazk`
+  → `Success`) setelah konfirmasi eksplisit owner — backup **tidak mungkin** karena build
+  release (tanpa `run-as`/root), jadi data lama hilang permanen dan onboarding muncul lagi
+  (terverifikasi lewat screenshot). APK tetap **v2036**. Catatan: `pm clear` juga mereset
+  preferensi tema, jadi tema widget perlu di-set ulang setelah onboarding.
+  **T0 ditutup** (gate CI ada). **Widget dinyatakan SELESAI** — tidak ada lagi item widget
+  terbuka kecuali pengecekan tinggi chrome Calendar (isu #15) yang perlu diukur ulang.
+  Dokumen ini diperbarui: handoff 2026-11-09, tabel T0/T8, posisi git. — *(commit menyusul)*
+
 
 - 2026-11-09 (v2036 — **VERIFIED DI PERANGKAT**) — **Tap widget akhirnya benar-benar
   berfungsi saat app mati DAN setelah reboot.** Rantai perbaikan hari ini, jujur apa adanya:
@@ -175,9 +188,11 @@ akhir** (owner) lalu review whole-branch.
 |---|---|
 | Branch | `main` |
 | Commit terakhir | jalankan `git log -1` — dokumen ini di-commit sesudahnya, jadi hash di teks akan selalu tertinggal satu |
-| Commit terakhir yang tercatat saat dokumen ditulis | `8627cf7` — fix(canvas): tengahkan sheet grab handle + jadikan komponen |
-| Tag stabil terakhir | `stable-2026-11-02-v4` (lihat `git tag \| Select-String stable` untuk yang terbaru) |
-| Status push | **9 commit (T6–T10 + 2 fix batch) belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
+| Commit terakhir yang tercatat saat dokumen ditulis | `79def0d` — fix(widget): make taps work while the app is dead, follow the app theme |
+| Tag stabil terakhir | `stable-2026-11-09-v1` (lihat `git tag \| Select-String stable` untuk yang terbaru) |
+| Status push | **belum di-push** ke `origin` (GitHub) — sengaja, atas permintaan owner |
+| Sumber kebenaran kode | **laptop** (`D:\Progamming\Project-SourceCode\Aplikasi\Tazk`); server `resserver` = arsip (`adcfc40`) |
+| Build | **laptop** (`ANDROID_HOME=D:\Android\Sdk`), 44–149 s — jangan di server |
 | Working tree | bersih |
 
 > Catatan: hash commit dan jumlah commit di dokumen ini **selalu tertinggal satu** dari
@@ -334,7 +349,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 
 | Tahap | Status | Catatan |
 |---|---|---|
-| T0 Fondasi | 🟡 sebagian | Arsip v1 selesai, `.gitignore` dirapikan. Belum ada gate CI |
+| T0 Fondasi | ✅ selesai | Arsip v1 selesai, `.gitignore` dirapikan, **gate CI** (`.github/workflows/ci.yml` + `tool/verify.sh`/`.ps1`), `android/.kotlin/` di-ignore |
 | T1 Performa (lag) | ✅ selesai | 8/8: index DB, push coalesce+gate, checkbox DB-langsung, home lazy sliver, pomodoro label-only, startup non-blocking, splash decouple, minify+split ABI |
 | T2 Design system | ✅ selesai | font Fredoka+PJS, 19 token `ThemeExtension`, `ColorScheme` eksplisit (bukan fromSeed), widget kit 12 komponen + preview dev-only |
 | T3 Redesign layar | ✅ selesai | app shell tab bar 5 + sheet "Lainnya" (tanpa drawer); 12 layar pakai widget kit + token; shared-widget & 0 `AppColors.*` deprecated |
@@ -342,7 +357,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 | T5 Statistik | ✅ selesai | schema v4 `focus_sessions` + `xp_events` (index), titik tulis XP (net, termasuk refund) + sesi fokus, `StatsRepository` + 5 provider, layar board 07 (segmented 3 periode, 2 kartu stat + delta, bar chart 7/30/12 bucket, heatmap 13×7, kartu insight), entri sheet "Lainnya" 4 item. Empty state per periode, `–` bila metrik belum ada data. 304 test |
 | T6 Subtask & Lokasi | ✅ selesai | **T6.0** XP 15/10/5 + rekonsiliasi prioritas; **T6.1** schema v5 (`position` + `autoCompleteSubtasks`); **T6.2** reorder; **T6.3** `toggleSubtask` atomik; **T6.4** UI reorder/maps/progress. 392 test |
 | T7 Kategori/tag & pencarian | ✅ selesai | **T7.1** schema v6 `Categories`+`categoryId`; **T7.2** repo+palette (12/12 kontras); **T7.3** picker+Kelola kategori; **T7.4** pencarian lintas item (board 26 D). 475 test |
-| T8 Widget | ✅ selesai | `RemoteViewsService`/`Factory` Kotlin + ListView scroll + empty view + full-list push (`count == keys`, diuji today+calendar) + teks kosong l10n. Runtime HP belum diuji; Calendar (4x2) perlu redesign (isu #15). 527 test |
+| T8 Widget | ✅ selesai & **terverifikasi perangkat** (v2036) | 5 varian + ListView scroll + empty view + full-list push. **Tap berfungsi saat app mati (~600 ms) dan setelah reboot (~1,2 s)** lewat `TazkWidgetTapReceiver` (BroadcastReceiver + `goAsync`, bukan JobScheduler). **Tema ikut app** (terang & gelap, token-exact: `#FBF9F4`/`#26251F`/`#C97B5A`/`#E2DACB`/`#4A5A44`). Layout: baris tanggal dobel dihapus, divider kolom 1dp, empty state rata atas. Calendar kini **week-strip 7 sel**. 535 test |
 | T9 Notifikasi | ✅ selesai | **T9.1** schema v7 `notifyFocusSession`; **T9.2** 5 toggle judul+subjudul (board 21) + baris Focus di Pengaturan + gate notifikasi selesai sesi di `start`/`resume`. 492 test |
 | T10 Backup/restore | ✅ selesai (offline) | **T10.1** `BackupRepository` JSON + SHA-256 kanonik + restore atomik + guard singleton; **T10.2** layar Cadangkan & pulihkan + grup DATA (`share_plus` + `file_selector`). Google Drive **ditunda**. 515 test |
 | T11 Cek update | ⬜ belum | |
@@ -400,7 +415,9 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 
 14. **Backup Google Drive `drive.appdata` DITUNDA** — butuh proyek Google Cloud + OAuth client ID + SHA-1 owner; antarmuka Drive **tidak dibuat**, dan dep `google_sign_in`/Drive **tidak** ditambahkan. Backup **offline** (JSON + `share_plus` ekspor + `file_selector` impor) tersedia di Pengaturan → DATA.
 
-15. **Widget Calendar: konten melebihi ukuran 4x2** — board 20 E (`Calendar+Tasks+Habits`, 4x2) sebenarnya menampilkan **week-strip** (1 baris 7 hari), tetapi implementasi memakai grid **6×7 (42 sel)** + list, jadi chrome ≈160dp > `minHeight=110dp` dan `<ListView>` bisa terpotong. `test/widgets/android_calendar_widget_config_test.dart` memaku 110dp (board), jadi tinggi **tidak** dinaikkan. Perlu **redesign** widget Calendar ke week-strip (task tersendiri). Tiga widget lain (Tasks&Habits, Tasks Only, Habits Only) normal.
+15. ~~**Widget Calendar: konten melebihi ukuran 4x2**~~ **TERKIKIS — perlu verifikasi ulang.** Layout kini memakai **week-strip 7 sel** (`calendar_week_strip` + `calendar_day_cell_0..6`) + list, bukan grid 6×7. Yang belum diukur: apakah chrome (header + strip + tombol) masih melebihi `minHeight=110dp` di 4x2. Ukur dulu sebelum menyatakan tertutup.
+
+15b. **Widget Calendar: konten melebihi ukuran 4x2 (catatan lama, arsip)** — board 20 E (`Calendar+Tasks+Habits`, 4x2) sebenarnya menampilkan **week-strip** (1 baris 7 hari), tetapi implementasi memakai grid **6×7 (42 sel)** + list, jadi chrome ≈160dp > `minHeight=110dp` dan `<ListView>` bisa terpotong. `test/widgets/android_calendar_widget_config_test.dart` memaku 110dp (board), jadi tinggi **tidak** dinaikkan. Perlu **redesign** widget Calendar ke week-strip (task tersendiri). Tiga widget lain (Tasks&Habits, Tasks Only, Habits Only) normal.
 
 ---
 
