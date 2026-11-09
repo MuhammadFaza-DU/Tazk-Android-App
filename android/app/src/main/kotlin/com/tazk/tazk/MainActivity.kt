@@ -11,6 +11,11 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     private val channelName = "com.tazk.tazk/app_settings"
 
+    private companion object {
+        const val BATTERY_PREFS = "TazkBatteryPrompt"
+        const val BATTERY_PROMPTED = "prompted"
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName)
@@ -34,9 +39,65 @@ class MainActivity : FlutterActivity() {
                         }.map { it.first }
                         result.success(mounted)
                     }
+                    "saveWidgetTapHandle" -> {
+                        val handle = (call.arguments as? Number)?.toLong() ?: 0L
+                        applicationContext
+                            .getSharedPreferences(
+                                TazkWidgetTapReceiver.PREFS, MODE_PRIVATE)
+                            .edit()
+                            .putLong(TazkWidgetTapReceiver.KEY_HANDLE, handle)
+                            .apply()
+                        result.success(null)
+                    }
+                    "isIgnoringBatteryOptimizations" -> {
+                        result.success(isIgnoringBatteryOptimizations())
+                    }
+                    "requestIgnoreBatteryOptimizations" -> {
+                        requestIgnoreBatteryOptimizations()
+                        result.success(null)
+                    }
+                    "batteryPromptShown" -> {
+                        result.success(
+                            applicationContext
+                                .getSharedPreferences(BATTERY_PREFS, MODE_PRIVATE)
+                                .getBoolean(BATTERY_PROMPTED, false))
+                    }
+                    "markBatteryPromptShown" -> {
+                        applicationContext
+                            .getSharedPreferences(BATTERY_PREFS, MODE_PRIVATE)
+                            .edit()
+                            .putBoolean(BATTERY_PROMPTED, true)
+                            .apply()
+                        result.success(null)
+                    }
                     else -> result.notImplemented()
                 }
             }
+    }
+
+    private fun isIgnoringBatteryOptimizations(): Boolean {
+        val pm = getSystemService(POWER_SERVICE) as android.os.PowerManager
+        return pm.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    @android.annotation.SuppressLint("BatteryLife")
+    private fun requestIgnoreBatteryOptimizations() {
+        try {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = android.net.Uri.parse("package:$packageName")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(intent)
+        } catch (_: Exception) {
+            try {
+                val fallback = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                startActivity(fallback)
+            } catch (_: Exception) {
+                // Best effort â€” the user can still enable it from system settings.
+            }
+        }
     }
 
     private fun openNotificationSettings() {

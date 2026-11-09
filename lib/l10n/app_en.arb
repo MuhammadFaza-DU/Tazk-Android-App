@@ -408,5 +408,9 @@
   "searchClearTooltip": "Clear search",
   "searchTypeTask": "Task",
   "searchTypeHabit": "Habit",
-  "searchCompletedLabel": "completed"
+  "searchCompletedLabel": "completed",
+  "batteryTitle": "Keep Tazk running",
+  "batteryBody": "Android defers work for apps that sit idle, which can hold back widget taps. Allow a battery optimisation exemption so widgets and reminders stay on time.",
+  "batteryAllow": "Allow",
+  "batteryLater": "Not now"
 }

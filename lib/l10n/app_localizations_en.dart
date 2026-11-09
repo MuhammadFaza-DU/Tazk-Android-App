@@ -1187,4 +1187,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchCompletedLabel => 'completed';
+
+  @override
+  String get batteryTitle => 'Keep Tazk running';
+
+  @override
+  String get batteryBody =>
+      'Android defers work for apps that sit idle, which can hold back widget taps. Allow a battery optimisation exemption so widgets and reminders stay on time.';
+
+  @override
+  String get batteryAllow => 'Allow';
+
+  @override
+  String get batteryLater => 'Not now';
 }

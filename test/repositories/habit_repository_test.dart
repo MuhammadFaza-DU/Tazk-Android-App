@@ -131,4 +131,23 @@ void main() {
     expect(logs, hasLength(2));
     expect(logs.map((l) => l.habitId).toSet(), {idA, idB});
   });
+
+  test('toggleHabitToday flips today completion then back', () async {
+    final habitId = await habits.createHabit(
+      name: 'Toggle habit',
+      frequency: HabitFrequency.daily,
+    );
+
+    await habits.toggleHabitToday(habitId);
+    var log = await (db.select(db.habitLogs)
+          ..where((l) => l.habitId.equals(habitId)))
+        .getSingle();
+    expect(log.isCompleted, isTrue, reason: 'pending -> complete');
+
+    await habits.toggleHabitToday(habitId);
+    log = await (db.select(db.habitLogs)
+          ..where((l) => l.habitId.equals(habitId)))
+        .getSingle();
+    expect(log.isCompleted, isFalse, reason: 'complete -> pending');
+  });
 }

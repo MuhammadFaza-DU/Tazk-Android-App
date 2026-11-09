@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +26,7 @@ import '../../providers/gamification_providers.dart';
 import '../../providers/habit_providers.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/task_providers.dart';
+import '../../widgets/battery_optimization.dart';
 import '../pomodoro/pomodoro_screen.dart';
 import '../profile/profile_screen.dart';
 import '../tasks/task_form_screen.dart';
@@ -58,6 +61,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.dbResetMessage)),
       );
+    });
+    // Asks once, only if Android is restricting this app: an idle app has its
+    // background work deferred, which is what made widget taps look frozen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(maybePromptBatteryOptimization(context));
     });
   }
 

@@ -3,7 +3,7 @@
 Dokumen penanda posisi kerja. Baca ini dulu sebelum melanjutkan, supaya tidak
 mengulang keputusan yang sudah diambil atau mengerjakan hal yang sudah selesai.
 
-Terakhir diperbarui: **2026-11-02**
+Terakhir diperbarui: **2026-11-09**
 
 ## Handoff cepat (2026-11-02) — untuk sesi berikutnya
 
@@ -23,9 +23,88 @@ Terakhir diperbarui: **2026-11-02**
 
 ## Log Perubahan (terbaru duluan)
 
+- 2026-11-09 (v2036 — **VERIFIED DI PERANGKAT**) — **Tap widget akhirnya benar-benar
+  berfungsi saat app mati DAN setelah reboot.** Rantai perbaikan hari ini, jujur apa adanya:
+  v2030 (fix sync) → v2031 (tema+layout, **widget gagal inflate** karena `<View>`) →
+  v2032 (`<FrameLayout>`) → v2033 (receiver baru, **`UnsatisfiedLinkError`**) →
+  v2034 (**`startInitialization` bukan main thread**) → v2035 (**`ensureInitializationComplete`
+  bukan main thread**) → **v2036 (lulus semua)**.
+  **Bukti uji v2036 di Galaxy A52:**
+  - `am kill` lalu tap `>`: broadcast `23:07:32.071` → `updateAppWidget ×2` `23:07:32.671` (**600 ms**).
+  - Tap kedua (proses hidup): 2 update. Tap ketiga: 2 update.
+  - **Reboot HP** (`sys.boot_completed=1`), app **tidak pernah dibuka**, tap `>`:
+    `updateAppWidget = 1` (~1,2 detik).
+  - Latensi terukur broadcast → update: **787 ms** (cold), ~600 ms (warm).
+  **Tema terverifikasi lewat analisis piksel screenshot** (bukan penilaian mata):
+  latar `#FBF9F4` (`canvas`), teks `#26251F` (`text`), label `#C97B5A` (`label`),
+  muted `#6A6659`, header + hari terpilih `#4A5A44` (`primary`), divider `#E2DACB`
+  (`border`) — semuanya **cocok token `DESIGN.md`**. Tema gelap dikonfirmasi owner.
+  **Gerbang:** `flutter analyze` 0 issue · `flutter test` **535 lulus** ·
+  `aapt` versionCode 2036 · manifest di APK memuat `TazkWidgetTapReceiver` dan
+  **tidak** memuat receiver/service plugin.
+  **Build dipindah ke laptop**: 149 s → 44–60 s (vs server 875–1903 s) — lihat `docs/LESSONS.md` L-011.
+  **Ledger:** `docs/LESSONS.md` kini 11 entri (L-001…L-011). — *(commit menyusul)*
+
+- 2026-11-09 (v2033) — **AKAR MASALAH TAP WIDGET DITEMUKAN & DIPERBAIKI (menunggu verifikasi).**
+  Keluhan owner: tap centang widget mati setelah beberapa menit; setelah HP reboot widget
+  freeze walau diketuk; harus buka app. **Reproduksi deterministik** dengan `am kill` (BUKAN
+  `force-stop` — itu membuat tes palsu, lihat `docs/LESSONS.md` L-008): tap -> `updateAppWidget
+  count = 0`, proses baru hidup, tanpa error. **Bukti akar masalah:** `dumpsys jobscheduler`
+  menunjukkan 3 job menumpuk `WAITING` untuk `HomeWidgetBackgroundService`, dan
+  `dumpsys activity services com.tazk.tazk` = `(nothing)`. **Sebab:** plugin `home_widget`
+  menyalurkan tap lewat `JobIntentService` (= JobScheduler), dan JobScheduler menahan job
+  untuk app yang prosesnya idle -> gagal senyap; membuka app membuat app aktif lagi sehingga
+  seolah "sembuh". **Perbaikan:** `TazkWidgetTapReceiver` baru mengeksekusi tap langsung di
+  `BroadcastReceiver` (`goAsync()` + `FlutterEngine` sendiri, channel
+  `com.tazk.tazk/widget_tap`); receiver & service plugin **dihapus** dari manifest; semua
+  `PendingIntent` diarahkan ke receiver baru; handle entry-point Dart disimpan tiap app start.
+  Ditambah (B) pengecualian optimasi baterai: izin `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` +
+  dialog sekali yang hanya muncul bila Android memang membatasi app.
+  **Juga diperbaiki:** widget tema ikut tema app (8 drawable terang/gelap, `WidgetTheme`,
+  `WidgetApply`, 5 provider + factory), baris tanggal dobel dihapus, divider kolom 1dp
+  (token `border`), empty state rata atas, dan `widget_push_gate_test` dikunci ke kontrak baru
+  (jawaban kosong = push semua). `flutter analyze` = **0 issue**. **BELUM terverifikasi:**
+  hasil build v2033, uji `am kill` + tap + reboot di perangkat. — *(belum commit)*
+
+- 2026-11-09 (build v2031 → v2032) — **PELAJARAN PENTING: `<View>` dilarang di layout widget.**
+  Build **v2031** (tema + layout) berhasil dikompilasi, `versionCode` 2031, resource tema terverifikasi ada di APK
+  (`aapt dump resources`: 8 drawable, `widget_border` #FFE2DACB/#FF23382A, `calendar_selected_label` sudah hilang),
+  dan APK terpasang di HP dengan **data utuh** (`firstInstallTime` tidak berubah). **TAPI** logcat sesudah app dibuka
+  menunjukkan `W/RemoteViews: inflate error, layoutId = 2131428547` dan `2131428541` — dipetakan via `aapt` sebagai
+  `layout/widget_tasks_habits` dan `layout/widget_calendar_tasks_habits`: **kedua widget gagal inflate** sehingga
+  tidak tampil. **Root cause:** divider kolom ditulis dengan tag `<View>`, padahal RemoteViews hanya mendukung
+  subset view (FrameLayout, LinearLayout, RelativeLayout, GridLayout, TextView, ImageView, Button, ListView, dst) —
+  `android.view.View` tidak termasuk, jadi inflation melempar exception di proses launcher.
+  **Fix:** `<View>` → `<FrameLayout>` pada `cal_col_divider` & `th_col_divider` + guard otomatis yang memeriksa
+  semua tag di `res/layout/widget_*.xml` terhadap daftar tag yang didukung (hasil: `UNSUPPORTED_TAGS: none`).
+  Rebuild **v2032** (build-number 2032) untuk dipasang ulang. **Catatan verifikasi:** `flutter analyze` = 0 issue
+  TIDAK menangkap kelas bug ini — hanya logcat perangkat yang menangkapnya; karena itu setiap perubahan layout
+  widget wajib dibuktikan lewat logcat `RemoteViews` + screenshot home screen.
+  — *(belum commit)*
+
+- 2026-11-09 (lanjutan) — **Widget: tema + perbaikan layout (kode selesai, build/tes menyusul).**
+  **Layout yang diperbaiki** (keluhan owner dari screenshot: tanggal dobel/terpotong, kolom tanpa pembatas):
+  (a) baris `Mon 9/11/2026` **dihapus** — penyebabnya header dipatok `height="24dp"` tapi isinya dua TextView
+  bertumpuk (11sp + 8sp) sehingga baris kedua tumpah & ketiban strip hari; id `calendar_selected_label`
+  dihapus dari layout, provider, dan `WidgetApply`. (b) **pembatas kolom** 1dp ditambahkan di
+  `widget_calendar_tasks_habits.xml` (`cal_col_divider`) dan `widget_tasks_habits.xml` (`th_col_divider`),
+  warnanya dari token `border` (#E2DACB light / #23382A dark) lewat `WidgetTheme.border()`.
+  (c) `widget_empty_state.xml` diubah `gravity="top|start"` (sebelumnya center → terlihat nyasar).
+  Kolom tetap **selalu 2 kolom** sesuai keputusan owner.
+  **Tema widget** (widget ikut **tema app**, bukan mode gelap sistem): 8 drawable varian terang/gelap,
+  `WidgetTheme.kt`, `WidgetApply.kt`, id label `tasks_label`/`habits_label`/`cal_*`, 5 provider + factory
+  mewarnai latar/teks/ikon centang/sel kalender; Dart push `tazk_widget_dark` tiap push dan
+  `SettingsRepository.updateThemeMode` memicu `refreshAll()` (widget langsung ikut saat tema diganti).
+  **Verifikasi:** `flutter analyze` → **No issues found**; 5 XML tersentuh lolos parse; tidak ada sisa
+  referensi `calendar_selected_label`. **BELUM:** build v2031, install, tes owner.
+  **Catatan:** logika sync widget (`widget_push_gate.dart`) **tidak disentuh** — sudah dinyatakan bagus oleh owner.
+  — *(belum commit)*
+
+- 2026-11-09 — **Widget SYNC terverifikasi owner BERHASIL (JANGAN DIUBAH) + sisa tema.** **Fix sync:** `WidgetPushGate.mountedProviders()` kini memperlakukan channel null/kosong sebagai "kurang tahu" → push **semua** provider. Sebelumnya push dari background isolate ter-skip (`getMountedWidgets` tak terjawab di isolate background → DB berubah tapi widget tak refresh). Owner mengonfirmasi: tap centang di widget kini **langsung** meng-update. **Tambahan:** `android/app/src/main/res/raw/keep.xml` menjaga `drawable/ic_notification` dari resource-shrink release (diverifikasi `aapt dump resources`: resource ada). **T0 CI gate** ditambahkan (workflow + `tool/verify.sh`/`.ps1`, commit `5b6f46e`). Build uji v2030 terpasang di Galaxy A52, data asli utuh. **MASIH TERBUKA — TEMA WIDGET:** widget memakai `values-night` (ikut mode gelap **sistem**), padahal app bertema **terang** (`AppSettings.themeMode`); target = widget **ikut tema app**, bukan sistem. — *(belum commit)*
+
 > **Commit/tag per tahap T6–T10 (lokal, belum di-push):** T6 `48bed1c`/`stable-2026-11-01-v1` · T7 `47cf831`/`-v2` · T9.1 `6b0cd3a` + T9.2 `1e8a14d`/`-v3` · T10.1 `ae1441d` + T10.2 `a312dfb`/`stable-2026-11-02-v1` · T8 `d115ae5`/`stable-2026-11-02-v2`. Entri log di bawah yang masih menulis *(belum commit)* **sudah ter-commit** dengan hash di atas.
 
-- 2026-11-02 — **Fix batch dari uji HP** (gate widget, hapus task, kategori, Calendar): (1) **`WidgetPushGate` tak lagi cache** — cache hasil pertama (bisa `{}` saat app start sebelum widget dipasang) membuat `refreshAll()` jadi no-op selamanya → **task baru tak pernah muncul di widget** (habit yang tampil = data lama); sekarang di-query ulang tiap panggilan. (2) **Hapus task**: ikon 🗑 di header form edit + dialog konfirmasi → `deleteTask` (sebelumnya `deleteTask()` ada di repo tapi **tak ada UI**). (3) **Kelola kategori**: ketuk baris → sheet edit (sebelumnya hanya ikon pensil). (4) **Widget Calendar → week-strip** (7 sel) + header 24dp (label tanggal tak terpotong). **530 test hijau, analyze 0, APK release (build 2027) terpasang di HP — data asli aman.** Owner mengetes & mengonfirmasi bagian ini. Commit `af7b587` + `b4f0bd0`, tag `stable-2026-11-02-v4`.
+- 2026-11-06 — **Widget: toggle dua arah & tak hilang (D1–D4) + ikut tema (D5)** — (1) callback kini **toggle** (`toggleTaskCompletion` / `toggleHabitToday` / `toggleHabitOnDate`) alih-alih `complete` satu arah, jadi centang dari widget bisa **dibatalkan** (uncheck) tanpa buka app; (2) task selesai **tetap tampil** (pending dulu, selesai di belakang) — `_tasksForDate` & `calendarTaskRowsForDate` tak lagi filter `isCompleted`, `_calendarHabitsForDate` sertakan state `done`; (3) `tazk_task_*_done` + `tazk_calendar_{task,habit}_*_done` ditulis, factory Kotlin `RemoteViewsFactory` baca `done` utk **task & kalender** (bukan cuma habit hari ini); (4) warna widget **ikut tema** via `values/colors.xml` + `values-night/colors.xml` (8 token dari DESIGN.md), ganti hex hardcode di 8 layout + 5 drawable + 3 ikon + `colorForDay/Dow` (kini pakai context resource). **534 test hijau, `dart analyze` 0, APK debug terbangun.** Catatan: resource `<color>` mengikuti **mode gelap sistem** (bukan override tema in-app). Tetap **belum diverifikasi di HP**. — (belum commit) (1) **`WidgetPushGate` tak lagi cache** — cache hasil pertama (bisa `{}` saat app start sebelum widget dipasang) membuat `refreshAll()` jadi no-op selamanya → **task baru tak pernah muncul di widget** (habit yang tampil = data lama); sekarang di-query ulang tiap panggilan. (2) **Hapus task**: ikon 🗑 di header form edit + dialog konfirmasi → `deleteTask` (sebelumnya `deleteTask()` ada di repo tapi **tak ada UI**). (3) **Kelola kategori**: ketuk baris → sheet edit (sebelumnya hanya ikon pensil). (4) **Widget Calendar → week-strip** (7 sel) + header 24dp (label tanggal tak terpotong). **530 test hijau, analyze 0, APK release (build 2027) terpasang di HP — data asli aman.** Owner mengetes & mengonfirmasi bagian ini. Commit `af7b587` + `b4f0bd0`, tag `stable-2026-11-02-v4`.
 
 - 2026-11-02 — **Task D: widget Kalender jadi week-strip (bukan grid 6x7)** — `_refreshCalendar` kini push 7 sel (Senin..Minggu dari tanggal terpilih) dengan key `_millis/_label/_dow/_is_today/_is_selected/_has_items`; `CalendarWidgetWeekSnapshot` baru (API month lama tetap utuh, `calendar_widget_models_test` hijau); layout `widget_calendar_tasks_habits.xml` = header 20dp (bulan + label terpilih) + strip 7 sel 30dp (dow 8sp, angka 12sp) + 2 ListView + tombol Go to App 20dp, jadi chrome turun ~161dp -> ~84dp (grid lama menghabiskan seluruh 4x2); provider bind 7 sel, prev/next kirim `calendarPreviousWeek`/`calendarNextWeek`; callback geser tanggal terpilih +-7 hari (`previousMonth`/`nextMonth` tetap dilayani sebagai alias +-7 hari) dan mengabaikan `millis==0`. 530 test hijau (+3), analyze 0, APK debug terbangun (213 MB). **Belum diverifikasi di HP**: `adb install` ditolak `INSTALL_FAILED_VERSION_DOWNGRADE` (versi terpasang versionCode 2026, debug 5) — butuh keputusan owner. — (belum commit)
 

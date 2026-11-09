@@ -24,6 +24,7 @@ class TazkTasksOnlyWidgetProvider : HomeWidgetProvider() {
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java))
 
             bindTasksToday(context, this, widgetData, widgetId)
+            applyTasksOnlyTheme(context, this, WidgetTheme.isDark(widgetData))
           }
       appWidgetManager.updateAppWidget(widgetId, views)
       appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.widget_tasks_list)

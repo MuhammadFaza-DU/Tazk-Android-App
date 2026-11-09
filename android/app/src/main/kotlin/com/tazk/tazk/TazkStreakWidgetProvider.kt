@@ -41,6 +41,7 @@ class TazkStreakWidgetProvider : HomeWidgetProvider() {
                 setTextViewText(R.id.streak_active, activeText)
             }
             setTextViewText(R.id.streak_rank, widgetData.getString("tazk_streak_rank", "-"))
+            applyStreakTheme(context, this, WidgetTheme.isDark(widgetData))
           }
       appWidgetManager.updateAppWidget(widgetId, views)
     }

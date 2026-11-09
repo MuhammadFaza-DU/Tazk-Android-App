@@ -49,10 +49,13 @@ class HomeWidgetService {
   ) {
     final selected = _dateOnly(date);
     final rows = tasks.where((task) {
-      return !task.isCompleted && _dateOnly(task.date) == selected;
+      return _dateOnly(task.date) == selected;
     }).toList();
 
     rows.sort((a, b) {
+      // Widget toggle-in-place: completed tasks stay visible but trail the
+      // pending ones, mirroring the app's "Belum selesai" then "Selesai".
+      if (a.isCompleted != b.isCompleted) return a.isCompleted ? 1 : -1;
       final byPriority = b.priority.index.compareTo(a.priority.index);
       if (byPriority != 0) return byPriority;
 
@@ -83,6 +86,9 @@ class HomeWidgetService {
     debugPushCount++;
     try {
       final mounted = await _gate.mountedProviders();
+      final widgetSettings = await _settings.ensureSettings();
+      await HomeWidget.saveWidgetData(
+          'tazk_widget_dark', widgetSettings.themeMode == AppThemeMode.dark);
       await Future.wait([
         if (mounted.contains('tasksHabits') ||
             mounted.contains('tasksOnly') ||
@@ -162,11 +168,13 @@ class HomeWidgetService {
       await HomeWidget.saveWidgetData('tazk_task_${i}_id', row.id);
       await HomeWidget.saveWidgetData('tazk_task_${i}_title', row.title);
       await HomeWidget.saveWidgetData('tazk_task_${i}_time', row.subtitle);
+      await HomeWidget.saveWidgetData('tazk_task_${i}_done', row.done);
     }
     for (var i = written; i < _staticTaskSlots; i++) {
       await HomeWidget.saveWidgetData('tazk_task_${i}_id', -1);
       await HomeWidget.saveWidgetData('tazk_task_${i}_title', '');
       await HomeWidget.saveWidgetData('tazk_task_${i}_time', '');
+      await HomeWidget.saveWidgetData('tazk_task_${i}_done', false);
     }
     await HomeWidget.saveWidgetData('tazk_task_count', written);
     return written;
@@ -274,10 +282,15 @@ class HomeWidgetService {
         'tazk_calendar_task_${i}_title',
         task.title,
       );
+      await HomeWidget.saveWidgetData(
+        'tazk_calendar_task_${i}_done',
+        task.isCompleted,
+      );
     }
     for (var i = calendarTaskCount; i < _staticCalendarSlots; i++) {
       await HomeWidget.saveWidgetData('tazk_calendar_task_${i}_id', -1);
       await HomeWidget.saveWidgetData('tazk_calendar_task_${i}_title', '');
+      await HomeWidget.saveWidgetData('tazk_calendar_task_${i}_done', false);
     }
     await HomeWidget.saveWidgetData(
       'tazk_calendar_task_count',
@@ -290,12 +303,17 @@ class HomeWidgetService {
       await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_id', habit.id);
       await HomeWidget.saveWidgetData(
         'tazk_calendar_habit_${i}_title',
-        habit.name,
+        habit.title,
+      );
+      await HomeWidget.saveWidgetData(
+        'tazk_calendar_habit_${i}_done',
+        habit.done,
       );
     }
     for (var i = calendarHabitCount; i < _staticCalendarSlots; i++) {
       await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_id', -1);
       await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_title', '');
+      await HomeWidget.saveWidgetData('tazk_calendar_habit_${i}_done', false);
     }
     await HomeWidget.saveWidgetData(
       'tazk_calendar_habit_count',
@@ -346,15 +364,14 @@ class HomeWidgetService {
         StreakRank.legenda => l10n.rankLegenda,
       };
 
-  Future<List<Task>> _tasksForDate(DateTime date) {
+  Future<List<Task>> _tasksForDate(DateTime date) async {
     final start = _dateOnly(date);
     final end = start.add(const Duration(days: 1));
-    return (_db.select(_db.tasks)
+    final tasks = await (_db.select(_db.tasks)
           ..where(
             (t) =>
                 t.date.isBiggerOrEqualValue(start) &
-                t.date.isSmallerThanValue(end) &
-                t.isCompleted.equals(false),
+                t.date.isSmallerThanValue(end),
           )
           ..orderBy([
             (t) => OrderingTerm(expression: t.priority, mode: OrderingMode.desc),
@@ -362,6 +379,12 @@ class HomeWidgetService {
             (t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc),
           ]))
         .get();
+    // Widget toggle-in-place: completed tasks stay visible but trail the
+    // pending ones, mirroring the app's "Belum selesai" then "Selesai".
+    return [
+      ...tasks.where((task) => !task.isCompleted),
+      ...tasks.where((task) => task.isCompleted),
+    ];
   }
 
   Future<List<Habit>> _habitsForDate(DateTime date) async {
@@ -375,36 +398,41 @@ class HomeWidgetService {
     return calendarTaskRowsForDate(await _tasksForDate(date), date);
   }
 
-  Future<List<Habit>> _calendarHabitsForDate(DateTime date) async {
+  Future<List<WidgetRow>> _calendarHabitsForDate(DateTime date) async {
     final selectedDate = _dateOnly(date);
     final habits = await _habitsForDate(selectedDate);
-    final incomplete = <Habit>[];
+    final rows = <({Habit habit, bool done})>[];
     for (final habit in habits) {
       final log = await (_db.select(_db.habitLogs)
             ..where(
-              (l) =>
-                  l.habitId.equals(habit.id) &
-                  l.date.equals(selectedDate) &
-                  l.isCompleted.equals(true),
+              (l) => l.habitId.equals(habit.id) & l.date.equals(selectedDate),
             ))
           .getSingleOrNull();
-      if (log == null) {
-        incomplete.add(habit);
-      }
+      rows.add((habit: habit, done: log?.isCompleted ?? false));
     }
-    incomplete.sort((a, b) {
-      final aTime = a.scheduledTime;
-      final bTime = b.scheduledTime;
+    rows.sort((a, b) {
+      // Pending first, completed last (widget toggle-in-place).
+      if (a.done != b.done) return a.done ? 1 : -1;
+      final aTime = a.habit.scheduledTime;
+      final bTime = b.habit.scheduledTime;
       if (aTime == null && bTime == null) {
-        return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        return a.habit.name.toLowerCase().compareTo(b.habit.name.toLowerCase());
       }
       if (aTime == null) return 1;
       if (bTime == null) return -1;
       final byTime = aTime.compareTo(bTime);
       if (byTime != 0) return byTime;
-      return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      return a.habit.name.toLowerCase().compareTo(b.habit.name.toLowerCase());
     });
-    return incomplete;
+    return [
+      for (final row in rows)
+        WidgetRow(
+          id: row.habit.id,
+          title: row.habit.name,
+          subtitle: '',
+          done: row.done,
+        ),
+    ];
   }
 
   Future<Set<DateTime>> _itemDatesForWeek(DateTime selectedDate) async {

@@ -6,26 +6,38 @@ import 'package:tazk/data/models/enums.dart';
 import 'package:tazk/widgets/home_widget_service.dart';
 
 void main() {
-  test('home widget background components are reachable from launcher taps', () {
+  test('launcher taps reach our own receiver, not a JobScheduler service', () {
     final manifest = File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
 
+    // Widget taps must be handled by a BroadcastReceiver. The home_widget
+    // plugin routes them through a JobIntentService, and JobScheduler holds
+    // back jobs for an idle app: taps sat in the queue forever and the widget
+    // looked frozen until the app was reopened (docs/LESSONS.md L-005).
     expect(
       manifest,
       matches(
         RegExp(
-          r'<receiver\s+android:name="es\.antonborri\.home_widget\.HomeWidgetBackgroundReceiver"\s+android:exported="true">',
+          r'<receiver\s+android:name="\.TazkWidgetTapReceiver"\s+android:exported="true">',
           multiLine: true,
         ),
       ),
     );
     expect(
       manifest,
-      matches(
-        RegExp(
-          r'<service\s+android:name="es\.antonborri\.home_widget\.HomeWidgetBackgroundService"\s+android:permission="android\.permission\.BIND_JOB_SERVICE"\s+android:exported="true"',
-          multiLine: true,
-        ),
-      ),
+      contains('android:name="es.antonborri.home_widget.action.BACKGROUND"'),
+    );
+
+    // Regression guard: bringing the plugin's job-based path back would
+    // silently reintroduce the frozen-widget bug.
+    expect(
+      manifest,
+      isNot(contains('HomeWidgetBackgroundReceiver')),
+      reason: 'the plugin receiver defers taps to JobScheduler and must stay out',
+    );
+    expect(
+      manifest,
+      isNot(contains('HomeWidgetBackgroundService')),
+      reason: 'the plugin service defers taps to JobScheduler and must stay out',
     );
   });
 
@@ -130,7 +142,7 @@ void main() {
     expect(callback, contains("case 'calendarcompletehabit':"));
   });
 
-  test('calendar widget task list matches app priority ordering and skips completed', () {
+  test('calendar widget task list orders pending first and keeps completed trailing', () {
     final selected = DateTime(2026, 7, 12);
     final tasks = [
       _task(
@@ -177,6 +189,7 @@ void main() {
       'medium no time',
       'medium timed',
       'low early',
+      'completed',
     ]);
   });
 }

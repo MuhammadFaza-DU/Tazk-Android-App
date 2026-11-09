@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark theme widget palette, mapped from DESIGN.md tokens (Dusk Forest).
+     The launcher resolves these from the SYSTEM dark mode. -->
+<resources>
+    <color name="widget_bg">#152219</color>
+    <color name="widget_primary">#8FE0A9</color>
+    <color name="widget_label">#E0A183</color>
+    <color name="widget_text">#E8F0E7</color>
+    <color name="widget_text_muted">#9DAF9F</color>
+    <color name="widget_honey">#F2C765</color>
+    <color name="widget_honey_container">#3A3220</color>
+    <color name="widget_on_primary">#0F1A14</color>
+    <color name="widget_border">#23382A</color>
+</resources>

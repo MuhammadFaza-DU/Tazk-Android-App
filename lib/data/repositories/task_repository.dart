@@ -295,6 +295,19 @@ class TaskRepository {
     await _widget.refreshAll();
   }
 
+  /// Toggle used by the widgets: complete a pending task or un-complete a
+  /// completed one, keeping the widget row visible with a checkmark either way.
+  Future<void> toggleTaskCompletion(int taskId) async {
+    final task = await (_db.select(_db.tasks)..where((t) => t.id.equals(taskId)))
+        .getSingleOrNull();
+    if (task == null) return;
+    if (task.isCompleted) {
+      await uncompleteTask(taskId);
+    } else {
+      await completeTask(taskId);
+    }
+  }
+
   /// Re-arms reminders for every incomplete task from today onward. Idempotent:
   /// [_scheduleReminder]/[NotificationService.scheduleTaskReminder] cancel before
   /// scheduling. Used by daily maintenance so reminders don't run dry when the

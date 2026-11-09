@@ -53,15 +53,20 @@ class TazkRemoteViewsFactory(
         R.id.item_text, prefs.getString("$prefix${itemName}_${position}_title", "") ?: "")
     views.setTextViewText(R.id.item_sub, subtitleAt(position))
 
-    // Only today's habits can already be checked; calendar rows list what is
-    // still open, so they always start unchecked.
-    val done =
-        source == TazkRemoteViewsService.SOURCE_TODAY &&
-            isHabit &&
-            prefs.getBoolean("$prefix${itemName}_${position}_done", false)
+    // Completed rows (task or habit, today or a calendar date) stay visible with a
+    // filled checkbox so a tap can toggle completion back and forth in place.
+    val done = prefs.getBoolean("$prefix${itemName}_${position}_done", false)
     views.setImageViewResource(
         R.id.item_check,
         if (done) R.drawable.ic_checkbox_checked else R.drawable.ic_checkbox_unchecked)
+
+    val dark = WidgetTheme.isDark(prefs)
+    views.setTextColor(R.id.item_text, WidgetTheme.text(context, dark))
+    views.setTextColor(R.id.item_sub, WidgetTheme.textMuted(context, dark))
+    views.setInt(
+        R.id.item_check,
+        "setColorFilter",
+        if (done) WidgetTheme.primary(context, dark) else WidgetTheme.label(context, dark))
 
     // A view inside a collection cannot carry its own PendingIntent: the host
     // drops it (developer.android.com/develop/ui/views/appwidgets/collections).

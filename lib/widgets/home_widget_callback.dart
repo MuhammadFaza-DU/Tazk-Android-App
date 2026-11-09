@@ -41,15 +41,15 @@ Future<void> homeWidgetBackgroundCallback(Uri? uri) async {
     switch (host) {
       case 'completetask':
         if (id != null) {
-          await taskRepository.completeTask(id);
+          await taskRepository.toggleTaskCompletion(id);
         }
       case 'completehabit':
         if (id != null) {
-          await habitRepository.completeHabitToday(id);
+          await habitRepository.toggleHabitToday(id);
         }
       case 'calendarcompletetask':
         if (id != null) {
-          await taskRepository.completeTask(id);
+          await taskRepository.toggleTaskCompletion(id);
           await widgetService.updateCalendarSelection(
             visibleMonth: await _calendarVisibleMonth(),
             selectedDate: await _calendarSelectedDate(),
@@ -62,7 +62,7 @@ Future<void> homeWidgetBackgroundCallback(Uri? uri) async {
           final selectedDate = selectedMillis == null
               ? await _calendarSelectedDate()
               : DateTime.fromMillisecondsSinceEpoch(selectedMillis);
-          await habitRepository.completeHabitOnDate(id, selectedDate);
+          await habitRepository.toggleHabitOnDate(id, selectedDate);
           await widgetService.updateCalendarSelection(
             visibleMonth: await _calendarVisibleMonth(),
             selectedDate: selectedDate,

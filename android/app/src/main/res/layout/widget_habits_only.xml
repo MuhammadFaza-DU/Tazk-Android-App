@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Tazk — Habits Hari Ini"
-        android:textColor="#2F6B3D"
+        android:textColor="@color/widget_primary"
         android:textSize="14sp"
         android:textStyle="bold"
         android:paddingBottom="6dp" />

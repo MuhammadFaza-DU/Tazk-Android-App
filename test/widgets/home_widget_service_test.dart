@@ -215,4 +215,48 @@ void main() {
       _writtenRowCount(saved, 'tazk_calendar_task'),
     );
   });
+
+  test('completed tasks stay in the list with a done flag', () async {
+    await insertTask('Pending', hour: 9);
+    final doneId = await insertTask('Done', hour: 10);
+    await (db.update(db.tasks)..where((t) => t.id.equals(doneId)))
+        .write(const TasksCompanion(isCompleted: Value(true)));
+
+    final service = HomeWidgetService(db, settings, gate: _TasksHabitsGate());
+    await service.refreshAll();
+
+    expect(saved['tazk_task_count'], 2);
+    expect(saved['tazk_task_0_title'], 'Pending');
+    expect(saved['tazk_task_0_done'], false);
+    expect(saved['tazk_task_1_title'], 'Done');
+    expect(saved['tazk_task_1_done'], true);
+    expect(saved['tazk_tasks_empty'], isFalse);
+  });
+
+  test('calendar keeps completed tasks and habits with done flags', () async {
+    await insertTask('Task pending', hour: 9);
+    final doneTaskId = await insertTask('Task done', hour: 10);
+    await (db.update(db.tasks)..where((t) => t.id.equals(doneTaskId)))
+        .write(const TasksCompanion(isCompleted: Value(true)));
+    final habitId = await insertHabit('Habit done');
+    await db.into(db.habitLogs).insert(
+          HabitLogsCompanion.insert(
+            habitId: habitId,
+            date: _today(),
+            isCompleted: const Value(true),
+          ),
+        );
+
+    final service = HomeWidgetService(db, settings, gate: _CalendarGate());
+    await service.refreshCalendarWidget();
+
+    expect(saved['tazk_calendar_task_count'], 2);
+    expect(saved['tazk_calendar_task_0_title'], 'Task pending');
+    expect(saved['tazk_calendar_task_0_done'], false);
+    expect(saved['tazk_calendar_task_1_title'], 'Task done');
+    expect(saved['tazk_calendar_task_1_done'], true);
+    expect(saved['tazk_calendar_habit_count'], 1);
+    expect(saved['tazk_calendar_habit_0_title'], 'Habit done');
+    expect(saved['tazk_calendar_habit_0_done'], true);
+  });
 }

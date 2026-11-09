@@ -71,3 +71,6 @@ strix_runs/
 # Local QA evidence (screenshots) — kept out of git on purpose
 docs/verify/
 design-export/
+# Kotlin build cache (Kotlin 2.x / AGP) — generated, never commit
+.kotlin/
+/android/.kotlin//out/

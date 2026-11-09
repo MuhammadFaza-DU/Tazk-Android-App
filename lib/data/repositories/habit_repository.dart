@@ -206,6 +206,23 @@ class HabitRepository {
     await uncompleteHabitOnDate(habitId, DateTime.now());
   }
 
+  /// Toggle used by the widgets: complete today's habit or undo it.
+  Future<void> toggleHabitToday(int habitId) =>
+      toggleHabitOnDate(habitId, DateTime.now());
+
+  /// Toggle used by the widgets: complete a habit for [date] or undo it.
+  Future<void> toggleHabitOnDate(int habitId, DateTime date) async {
+    final targetDate = _dateOnly(date);
+    final log = await (_db.select(_db.habitLogs)
+          ..where((l) => l.habitId.equals(habitId) & l.date.equals(targetDate)))
+        .getSingleOrNull();
+    if (log != null && log.isCompleted) {
+      await uncompleteHabitOnDate(habitId, date);
+    } else {
+      await completeHabitOnDate(habitId, date);
+    }
+  }
+
   DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
   /// Re-arms reminders for every active habit, sliding the non-daily reminder

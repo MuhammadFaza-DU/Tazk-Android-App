@@ -3,7 +3,6 @@ package com.tazk.tazk
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.net.Uri
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
@@ -22,9 +21,6 @@ class TazkCalendarTasksHabitsWidgetProvider : HomeWidgetProvider() {
           RemoteViews(context.packageName, R.layout.widget_calendar_tasks_habits).apply {
             setTextViewText(
                 R.id.calendar_header, widgetData.getString("tazk_calendar_header", "Tazk"))
-            setTextViewText(
-                R.id.calendar_selected_label,
-                widgetData.getString("tazk_calendar_selected_label", ""))
             setOnClickPendingIntent(R.id.calendar_prev, backgroundPending(context, "homeWidget://calendarPreviousWeek", 600001))
             setOnClickPendingIntent(R.id.calendar_next, backgroundPending(context, "homeWidget://calendarNextWeek", 600002))
             setOnClickPendingIntent(
@@ -34,6 +30,7 @@ class TazkCalendarTasksHabitsWidgetProvider : HomeWidgetProvider() {
             bindCalendarDays(context, this, widgetData)
             bindTasksCalendar(context, this, widgetData, widgetId)
             bindHabitsCalendar(context, this, widgetData, widgetId)
+            applyCalendarTheme(context, this, WidgetTheme.isDark(widgetData))
           }
       appWidgetManager.updateAppWidget(widgetId, views)
       appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.widget_tasks_list)
@@ -43,7 +40,7 @@ class TazkCalendarTasksHabitsWidgetProvider : HomeWidgetProvider() {
 }
 
 private fun backgroundPending(context: Context, uriString: String, requestCode: Int): android.app.PendingIntent {
-  val intent = android.content.Intent(context, es.antonborri.home_widget.HomeWidgetBackgroundReceiver::class.java).apply {
+  val intent = android.content.Intent(context, TazkWidgetTapReceiver::class.java).apply {
     data = Uri.parse(uriString)
     action = "es.antonborri.home_widget.action.BACKGROUND"
   }
@@ -85,6 +82,7 @@ private fun bindCalendarDays(
           R.id.calendar_day_5,
           R.id.calendar_day_6)
 
+  val dark = WidgetTheme.isDark(widgetData)
   labelIds.indices.forEach { index ->
     val label = widgetData.getString("tazk_calendar_day_${index}_label", "") ?: ""
     val dow = widgetData.getString("tazk_calendar_day_${index}_dow", "") ?: ""
@@ -96,29 +94,30 @@ private fun bindCalendarDays(
 
     views.setTextViewText(dowIds[index], dow)
     views.setTextViewText(labelIds[index], displayLabel)
-    views.setTextColor(labelIds[index], colorForDay(isToday, isSelected))
-    views.setTextColor(dowIds[index], colorForDow(isSelected))
-    views.setInt(cellIds[index], "setBackgroundResource", backgroundForDay(isToday, isSelected))
+    views.setTextColor(labelIds[index], colorForDay(context, dark, isToday, isSelected))
+    views.setTextColor(dowIds[index], colorForDow(context, dark, isSelected))
+    views.setInt(cellIds[index], "setBackgroundResource", backgroundForDay(dark, isToday, isSelected))
     views.setOnClickPendingIntent(cellIds[index], backgroundPending(context, "homeWidget://calendarSelectDate?millis=$millis", 500000 + index))
   }
 }
 
-private fun colorForDay(isToday: Boolean, isSelected: Boolean): Int {
+private fun colorForDay(context: Context, dark: Boolean, isToday: Boolean, isSelected: Boolean): Int {
   return when {
-    isSelected -> Color.WHITE
-    isToday -> Color.parseColor("#F0A83C")
-    else -> Color.parseColor("#1E2E22")
+    isSelected -> WidgetTheme.onPrimary(context, dark)
+    isToday -> WidgetTheme.honey(context, dark)
+    else -> WidgetTheme.text(context, dark)
   }
 }
 
-private fun colorForDow(isSelected: Boolean): Int {
-  return if (isSelected) Color.WHITE else Color.parseColor("#8A6A45")
+private fun colorForDow(context: Context, dark: Boolean, isSelected: Boolean): Int {
+  return if (isSelected) WidgetTheme.onPrimary(context, dark)
+  else WidgetTheme.textMuted(context, dark)
 }
 
-private fun backgroundForDay(isToday: Boolean, isSelected: Boolean): Int {
+private fun backgroundForDay(dark: Boolean, isToday: Boolean, isSelected: Boolean): Int {
   return when {
-    isSelected -> R.drawable.widget_calendar_day_selected
-    isToday -> R.drawable.widget_calendar_day_today
+    isSelected -> WidgetTheme.daySelected(dark)
+    isToday -> WidgetTheme.dayToday(dark)
     else -> R.drawable.widget_calendar_day_clear
   }
 }

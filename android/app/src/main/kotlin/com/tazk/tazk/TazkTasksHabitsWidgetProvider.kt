@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.widget.RemoteViews
-import es.antonborri.home_widget.HomeWidgetBackgroundReceiver
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 
@@ -28,6 +27,7 @@ class TazkTasksHabitsWidgetProvider : HomeWidgetProvider() {
 
             bindTasksToday(context, this, widgetData, widgetId)
             bindHabitsToday(context, this, widgetData, widgetId)
+            applyTasksHabitsTheme(context, this, WidgetTheme.isDark(widgetData))
           }
       appWidgetManager.updateAppWidget(widgetId, views)
       appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.widget_tasks_list)
@@ -152,7 +152,7 @@ internal fun bindItemList(
  */
 private fun rowClickTemplate(context: Context, requestCode: Int): PendingIntent {
   val intent =
-      Intent(context, HomeWidgetBackgroundReceiver::class.java).apply {
+      Intent(context, TazkWidgetTapReceiver::class.java).apply {
         action = "es.antonborri.home_widget.action.BACKGROUND"
       }
   return PendingIntent.getBroadcast(

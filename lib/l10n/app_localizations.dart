@@ -2227,6 +2227,30 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'selesai'**
   String get searchCompletedLabel;
+
+  /// No description provided for @batteryTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Izinkan Tazk tetap berjalan'**
+  String get batteryTitle;
+
+  /// No description provided for @batteryBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Android menunda pekerjaan app yang lama tidak dibuka, sehingga centang di widget bisa tertahan. Beri pengecualian optimasi baterai agar widget dan pengingat tetap tepat waktu.'**
+  String get batteryBody;
+
+  /// No description provided for @batteryAllow.
+  ///
+  /// In id, this message translates to:
+  /// **'Izinkan'**
+  String get batteryAllow;
+
+  /// No description provided for @batteryLater.
+  ///
+  /// In id, this message translates to:
+  /// **'Nanti saja'**
+  String get batteryLater;
 }
 
 class _AppLocalizationsDelegate

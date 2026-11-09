@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <!-- Lets the midnight background job hold the CPU awake long enough to refresh. -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- Lets the app ask once for an exemption from battery optimisation so
+         widget taps and reminders are not deferred while it sits idle. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <application
         android:label="Tazk"
         android:name="${applicationName}"
@@ -132,15 +135,16 @@
             </intent-filter>
         </receiver>
 
-        <!-- Lets widget checkbox taps run Dart code in the background (home_widget plugin). -->
-        <receiver android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
-            android:exported="true">
+        <!-- Widget taps run here instead of the home_widget plugin's
+             JobIntentService: JobScheduler holds back jobs for an idle app, which
+             left taps frozen until the app was reopened (docs/LESSONS.md L-005).
+             A receiver gets a guaranteed execution window, so the work always
+             runs and the widget never silently stops responding. -->
+        <receiver android:name=".TazkWidgetTapReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="es.antonborri.home_widget.action.BACKGROUND" />
             </intent-filter>
         </receiver>
-        <service android:name="es.antonborri.home_widget.HomeWidgetBackgroundService"
-            android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

@@ -3,7 +3,8 @@
     android:id="@+id/widget_empty_text"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:gravity="top|start"
+    android:paddingTop="4dp"
     android:text="Tidak ada item"
-    android:textColor="#6A6659"
+    android:textColor="@color/widget_text_muted"
     android:textSize="12sp" />

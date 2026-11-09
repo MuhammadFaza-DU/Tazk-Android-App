@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../database/database.dart';
 import '../models/enums.dart';
+import '../../widgets/home_widget_service.dart';
 
 class SettingsRepository {
   SettingsRepository(this._db);
@@ -38,6 +39,9 @@ class SettingsRepository {
     final settings = await ensureSettings();
     await (_db.update(_db.appSettings)..where((s) => s.id.equals(settings.id)))
         .write(AppSettingsCompanion(themeMode: Value(themeMode)));
+    // Homescreen widgets follow the APP theme (they cannot read the DB), so a
+    // theme change must push the new tazk_widget_dark immediately.
+    await HomeWidgetService(_db, this).refreshAll();
   }
 
   Future<void> updateLanguage(AppLanguage language) async {

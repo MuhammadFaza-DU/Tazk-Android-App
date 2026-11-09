@@ -129,4 +129,24 @@ void main() {
     ]);
     expect(duplicateSubtasks.every((subtask) => !subtask.isCompleted), isTrue);
   });
+
+  test('toggleTaskCompletion flips a task complete then back to pending',
+      () async {
+    final taskId = await tasks.createTask(
+      title: 'Toggle task',
+      date: DateTime(2026, 7, 11),
+      priority: TaskPriority.medium,
+    );
+
+    await tasks.toggleTaskCompletion(taskId);
+    var task =
+        await (db.select(db.tasks)..where((row) => row.id.equals(taskId)))
+            .getSingle();
+    expect(task.isCompleted, isTrue, reason: 'pending -> complete');
+
+    await tasks.toggleTaskCompletion(taskId);
+    task = await (db.select(db.tasks)..where((row) => row.id.equals(taskId)))
+        .getSingle();
+    expect(task.isCompleted, isFalse, reason: 'complete -> pending');
+  });
 }

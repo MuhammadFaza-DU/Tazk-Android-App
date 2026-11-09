@@ -1177,4 +1177,17 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get searchCompletedLabel => 'selesai';
+
+  @override
+  String get batteryTitle => 'Izinkan Tazk tetap berjalan';
+
+  @override
+  String get batteryBody =>
+      'Android menunda pekerjaan app yang lama tidak dibuka, sehingga centang di widget bisa tertahan. Beri pengecualian optimasi baterai agar widget dan pengingat tetap tepat waktu.';
+
+  @override
+  String get batteryAllow => 'Izinkan';
+
+  @override
+  String get batteryLater => 'Nanti saja';
 }

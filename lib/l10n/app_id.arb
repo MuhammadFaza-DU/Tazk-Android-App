@@ -540,5 +540,9 @@
   "searchClearTooltip": "Hapus pencarian",
   "searchTypeTask": "Task",
   "searchTypeHabit": "Habit",
-  "searchCompletedLabel": "selesai"
+  "searchCompletedLabel": "selesai",
+  "batteryTitle": "Izinkan Tazk tetap berjalan",
+  "batteryBody": "Android menunda pekerjaan app yang lama tidak dibuka, sehingga centang di widget bisa tertahan. Beri pengecualian optimasi baterai agar widget dan pengingat tetap tepat waktu.",
+  "batteryAllow": "Izinkan",
+  "batteryLater": "Nanti saja"
 }

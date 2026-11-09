@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Light theme widget palette, mapped from DESIGN.md tokens (Sage & Sand).
+     Dark values live in values-night/colors.xml (Dusk Forest). -->
+<resources>
+    <color name="widget_bg">#FBF9F4</color>
+    <color name="widget_primary">#4A5A44</color>
+    <color name="widget_label">#C97B5A</color>
+    <color name="widget_text">#26251F</color>
+    <color name="widget_text_muted">#6A6659</color>
+    <color name="widget_honey">#D69A3C</color>
+    <color name="widget_honey_container">#F6E4C2</color>
+    <color name="widget_on_primary">#FBF9F4</color>
+    <color name="widget_border">#E2DACB</color>
+</resources>

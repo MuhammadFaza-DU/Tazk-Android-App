@@ -18,16 +18,14 @@ import 'providers/notification_permission_provider.dart';
 import 'providers/repository_providers.dart';
 import 'providers/settings_providers.dart';
 import 'providers/task_providers.dart';
-import 'widgets/home_widget_callback.dart';
+import 'widgets/widget_tap_entry.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // Best-effort: lets homescreen widget checkboxes complete tasks/habits
-  // even while the app isn't running. No-op (and safe) if the platform
-  // channel isn't available, e.g. under `flutter test`.
-  HomeWidget.registerInteractivityCallback(
-    homeWidgetBackgroundCallback,
-  ).catchError((_) => null);
+  // Stores the entry-point handle that the native widget-tap receiver uses to
+  // run a tap without the app being open. Best effort: a missing platform
+  // channel (e.g. under `flutter test`) must never block startup.
+  registerWidgetTapHandle().catchError((Object _) {});
   runApp(const ProviderScope(child: TazkApp()));
   // Arms the native midnight alarm so the widgets and reminders roll over to the
   // new day even when the app is closed. Deferred until after the first frame

@@ -170,6 +170,9 @@ Tambahan kualitas: kontras AA (4.5:1 body / 3:1 large) light+dark; tap target �
 - Riverpod 2.6 (jangan naik ke 3) · Drift + SQLite (migrasi terkontrol, jangan ganti ORM) · tanpa `freezed`/`json_serializable`.
 - Struktur modular `lib/` → `core/`, `data/`, `features/`, `providers/`, `notifications/`, `background/`, `widgets/`, `l10n/`.
 - Verifikasi Dart/Flutter pakai `dart analyze` + `flutter test` (LSP tidak jalan di V2).
+- **Build APK dilakukan di LAPTOP** (`D:\Progamming\Project-SourceCode\Aplikasi\Tazk`,
+  `ANDROID_HOME=D:\Android\Sdk`). Terukur 2026-11-09: laptop **149 s** vs server
+  **875 s** (pernah 1903 s). Server hanya arsip — lihat `docs/LESSONS.md` L-011.
 - Release build: `isMinifyEnabled` + `isShrinkResources` + `--split-per-abi` (APK turun dari 176 MB).
 - Commit message konvensional (`feat:`, `fix:`, `docs:`, `refactor:`); tag `stable-YYYY-MM-DD-vN`.
 
@@ -227,3 +230,41 @@ Tambahan kualitas: kontras AA (4.5:1 body / 3:1 large) light+dark; tap target �
 5. **Dilarang:** memakai aset v1 (`archive/v1`), menempel gambar sebagai pengganti komposisi, mengarang layout saat board tersedia, atau menyebut "sesuai design" tanpa screenshot pembanding.
 6. **Kalau akses kanvas gagal** (Pen tidak terbuka, tool MCP error): **minta owner membukakan / export board**. Menunggu izin ≠ izin jalan tanpa fidelity.
 7. Setiap deviasi dicatat di `docs/STATUS.md` dengan status **diperbaiki** atau **ditunda + alasan** — tidak boleh hilang.
+
+
+---
+
+## 12. Ledger Kesalahan (WAJIB — docs/LESSONS.md)
+
+1. **Setiap bug, build gagal, klaim salah, atau salah paham requirement wajib
+   dicatat** di `docs/LESSONS.md` dengan format:
+   *Salah → Bukti → Dampak → Aturan baru → Verifikasi*. Tanpa entri, kerja
+   dianggap belum selesai.
+2. **Sebelum klaim selesai**, cek dulu: apakah pelajaran dari bug sebelumnya
+   (L-00x) sudah diterapkan pada perubahan ini? Kalau belum, belum selesai.
+3. **Aturan khusus widget** (dari L-001):
+   - Layout widget hanya boleh memakai view yang didukung RemoteViews —
+     `<View>`/`<Space>`/custom view **dilarang** (jalankan guard tag otomatis).
+   - Setelah install, bukti wajib: `adb logcat` **tanpa** `inflate error`,
+     `ActionException`, dan screenshot home screen. `flutter analyze` + build
+     sukses **tidak** membuktikan widget valid.
+4. **Aturan khusus pekerjaan background** (dari L-002/L-003/L-005):
+   - Uji pada kondisi gagal sebenarnya: app idle ≥ beberapa menit, app di-kill,
+     HP reboot, layar mati. "Jalan saat app baru dibuka" **bukan** bukti.
+   - Jangan andalkan JobScheduler untuk pekerjaan yang harus pasti jalan; buktikan
+     dengan `dumpsys jobscheduler` + `dumpsys deviceidle whitelist`.
+   - Root cause dulu, tambal kemudian. Dilarang menambal tanpa bukti dari logcat.
+5. **Tes vs realita:** kalau tes bertentangan dengan perilaku yang sudah
+   diverifikasi benar di perangkat, perbaiki tes agar mengunci kontrak baru —
+   jangan melonggarkan asersi (L-004).
+6. **Lokasi build (dari L-011 — WAJIB):**
+   - **Build & iterasi dilakukan di LAPTOP**, bukan di `resserver`.
+     Terukur: `assembleRelease` laptop **149 s** vs server **875 s** (pernah 1903 s).
+   - Server = arsip/backup + pekerjaan yang memang butuh Linux. Kalau mau
+     mendelegasikan build ke server, **tunjukkan angka** (core/`uptime`/jam build)
+     dulu; jangan berasumsi.
+   - Sinkronisasi kode murah: `tar` + `scp` + verifikasi SHA256 ≈ 1 menit.
+     "Kode terbaru ada di server" **bukan** alasan untuk build di server.
+7. **Jalur background wajib berisik (dari L-009):** setiap `catch` di jalur
+   background/webhook/receiver **harus** menulis `Log.e`/`debugPrint` yang jelas.
+   Kegagalan senyap membuat debugging buta dan memancing tambalan asal-asalan.

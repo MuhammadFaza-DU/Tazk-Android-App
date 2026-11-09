@@ -24,6 +24,7 @@ class TazkHabitsOnlyWidgetProvider : HomeWidgetProvider() {
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java))
 
             bindHabitsToday(context, this, widgetData, widgetId)
+            applyHabitsOnlyTheme(context, this, WidgetTheme.isDark(widgetData))
           }
       appWidgetManager.updateAppWidget(widgetId, views)
       appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.widget_habits_list)

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Keep resources that are referenced only from Dart as runtime strings so the
+  release resource shrinker (isShrinkResources = true) does not strip them.
+  `ic_notification` is used by AndroidInitializationSettings('@drawable/ic_notification')
+  in lib/notifications/notification_service.dart — the shrinker cannot see that
+  string reference, so without this the notification init fails in release.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_notification" />

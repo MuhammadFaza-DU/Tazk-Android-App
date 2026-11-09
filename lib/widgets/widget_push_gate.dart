@@ -42,7 +42,15 @@ class WidgetPushGate {
           // the background isolate, or an unmocked channel under flutter_test)
           // must not stall the push forever — fall back to "push everything".
           .timeout(_channelTimeout);
-      return raw?.toSet() ?? const <String>{};
+      // Background isolates have no handler for the app channel, so the call
+      // can resolve to null/empty instead of throwing. Treat "no answer" as
+      // "unknown" and push every provider: skipping the push here is what made
+      // a widget tap update the database yet leave the widget visually stale
+      // until the app was reopened.
+      if (raw == null || raw.isEmpty) {
+        return Set<String>.of(allProviderNames);
+      }
+      return raw.toSet();
     } catch (_) {
       return Set<String>.of(allProviderNames);
     }
