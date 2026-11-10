@@ -36,7 +36,7 @@ Tree bersih. **Belum di-push** (64+ commit lokal).
 | Landing | Light Sage & Sand **+ dark toggle**, bilingual ID/EN, tanpa board kanvas |
 | Ritme | Lapor per wave, lanjut otomatis kecuali ada keputusan baru |
 
-**Langkah berikutnya (mulai dari sini):** **Wave L + W0–W3 + build W4 TUNTAS** → tinggal **install ke HP** (device belum tersambung) → **owner jalankan skenario + kirim screenshot**. Setelah itu: T16 (bump versi, rilis v2.0, push atas izin owner).
+**Langkah berikutnya (mulai dari sini):** **Wave L + W0–W3 + W4 TUNTAS & TERVERIFIKASI DI HP** → tinggal **T16** (bump versi final + isi APK/sha256 di landing + rilis v2.0). Push & scan Strix menunggu keputusan owner.
 
 **Landing page — kondisi sekarang (terverifikasi, bukan klaim):**
 - Kode: `landing/` (Astro 7, static). 4 rute: `/` (ID), `/en/` (EN), `/privasi`, `/en/privacy`.
@@ -70,6 +70,7 @@ Tree bersih. **Belum di-push** (64+ commit lokal).
 - **Rekomendasi lanjut:** **T13 dulu** (hardening + a11y + isu tertunda), lalu T12 → T14 → T11 → T15 → T16.
 
 ## Log Perubahan (terbaru duluan)
+- 2026-11-10 (W4 TERVERIFIKASI DI PERANGKAT) — **Owner menjalankan 5 skenario W4 di Galaxy A52 (versionCode 4037) — SEMUA LOLOS.** A cek pembaruan → "Kamu pakai versi terbaru" · B profil "Bergabung…" + label "Terkunci" · C level-up celebration · D widget (chrome Calendar 4×2, teks ≥9sp, tap, TalkBack) · E regresi (refund XP hapus task selesai, cancel notifikasi fokus). Smoke test PM: install `Success`, app jalan, **logcat tanpa FATAL/Exception**, screenshot `docs/artifacts/w4_home_verify.png` (data owner utuh). **Catatan versionCode:** skema = **2000 + buildNumber** (terverifikasi: `+5`→2005, `--build-number=2037`→4037). HP kini ber-**4037** → **rilis final wajib buildNumber ≥ 2038** (atau uninstall dulu). `pubspec` tetap `2.0.0+5` (belum diubah). — *(commit)*
 - 2026-11-10 (W4 build) — **Release APK terbangun (3 ABI, split-per-abi + minify + shrink).** arm64-v8a **33,1 MB** · armeabi-v7a 31,0 MB · x86_64 34,5 MB (dari 176 MB). Catatan: "3 varian widget" pada plan tidak punya spesifikasi & widget sudah final lewat T8 (terverifikasi v2036) + T12.2 + T13.5 — tidak dibangun 3 kandidat. **Tunggu:** HP belum tersambung → install + owner jalankan skenario & pilih. — *(commit)*
 - 2026-11-10 (W3) — **W3 bug audit selesai (T13.1–T13.7).** (a) `task_repository`: hapus dead `setSubtaskCompleted`; `deleteTask` refund XP + hapus subtask eksplisit (satu transaksi). (b) widget: `setContentDescription` (string `widget_mark_done/undone`) untuk a11y; Calendar 4×2 chrome dipangkas (header 20dp, go_to_app 16dp, padding 4dp, chrome ≈74dp). (c) notifikasi fokus: toggle off membatalkan notifikasi terjadwal, on menjadwalkan ulang. (d) DB: `_openConnection` hardened (retry sekali + quarantin) + `runZonedGuarded` di `main.dart`. (e) **backup repo diperbaiki:** kolom schema-v8 (`UserProfile.createdAt`, `AppSettings.checkUpdates`/`skippedUpdateVersion`) kini ikut di-round-trip (sebelumnya hilang saat restore — bug data-loss, sumber test flaky). (f) dokumen dikoreksi (T13.7) + L-017. **`dart analyze` 0 · `flutter test` 590/590.** — *(commit)*
 - 2026-11-10 (W2) — **W2 paralel selesai (T11.2 + T12.2 + T12.3).** (a) **T11.2** cek pembaruan manual: `updateCheckPref` + `UpdateController` (AsyncNotifier, anti-injection warisan T11.1) + `UpdateCheckRow` (baris aksi tanpa chevron; hasil sebaris: loading / terbaru / tersedia+Unduh / gagal+Coba lagi) dipasang di grup LAINNYA. (b) **T12.2** polish UI widget: 8 layout + `WidgetTheme.divider()` (border 40% alpha); guard tag RemoteViews + minHeight 48 + textSize ≥9sp (kontrak test 4). (c) **T12.3** `showLevelCelebration` + label "Terkunci/Terbuka" di `_CollectionTile` + trigger level-up di Home. **2 penyesuaian PM:** empty-state gravity kembali `top|start` (keputusan owner 2026-11-09, bukan "center"), dan test board settings disesuaikan (10 petak ikon, 9 chevron — baris cek pembaruan tanpa chevron, sesuai L-004). **`dart analyze` 0 · `flutter test` 577/577.** — *(commit)*
@@ -466,11 +467,11 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 | T9 Notifikasi | ✅ selesai | **T9.1** schema v7 `notifyFocusSession`; **T9.2** 5 toggle judul+subjudul (board 21) + baris Focus di Pengaturan + gate notifikasi selesai sesi di `start`/`resume`. 492 test |
 | T10 Backup/restore | ✅ selesai (offline) | **T10.1** `BackupRepository` JSON + SHA-256 kanonik + restore atomik + guard singleton; **T10.2** layar Cadangkan & pulihkan + grup DATA (`share_plus` + `file_selector`). Google Drive **tidak masuk v2.0** (keputusan owner 2026-11-10); pengingat backup berkala → T13. 515 test |
 | T11 Cek update | ⬜ belum | Butuh izin **INTERNET** + `version.json` di landing page (T15). Saat dibangun, teks privasi wajib direvisi agar jujur menyebut satu request keluar |
-| T12 Gamifikasi polish | ⬜ belum | |
-| T13 Bug audit | ⬜ belum | |
-| T14 Ikon & logo | 🟡 sebagian | Maskot & logo ada; **ikon app persegi belum di-generate** |
+| T12 Gamifikasi polish | ✅ selesai (W2) | Profil "Bergabung X bulan lalu" + freeze/streak, level-up celebration, label "Terkunci/Terbuka" di kosmetik, polish UI widget |
+| T13 Bug audit | ✅ selesai (W3) | dead code `setSubtaskCompleted` dihapus · `deleteTask` refund XP + hapus subtask · a11y content-desc widget · Calendar 4×2 chrome dipangkas · cancel notifikasi fokus · hardening buka DB + `runZonedGuarded` · **backup round-trip schema v8 diperbaiki** |
+| T14 Ikon & logo | ✅ selesai (W1) | Monochrome icon (siluet putih dari alpha foreground) + guard test |
 | T15 Landing page | 🟢 **deploy selesai** | Live publik `https://tazk-manager-mfdu.vercel.app`; sisa: isi APK + sha256 di `version.json` saat rilis (T16) |
-| T16 Docs final + rilis | ⬜ belum | |
+| T16 Docs final + rilis | ⬜ belum | Bump versi (buildNumber ≥ 2038), APK+sha256 ke landing, tag v2.0, push |
 
 ### Isu terbuka yang harus diingat
 
@@ -486,7 +487,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
    | 03 Habits | ✅ sesuai | ringkasan `primaryContainer` + badge persen, kartu per item + streak + menit |
    | 04 Kalender | ✅ sesuai | grid kartu r24, pill hari terpilih 44×40, dot honey, panel harian kartu-per-item; label "Habits (harian)" **dihapus** |
    | 05 Pomodoro | ✅ sesuai | cakram 261 + cincin honey, chip durasi 15/25/45/60, stop persegi. Input durasi bebas TETAP ada (ketuk angka → sheet 1–180 menit); nilai chip bisa diubah via tekan lama |
-   | 06 Profil | ✅ sesuai | kartu maskot + **Level sekali** (duplikat dihapus) + 3 stat tile + badge/kosmetik kartu kotak. Deviasi: "Bergabung X bulan lalu" tidak bisa (tabel tanpa `createdAt`), "tugas selesai" → "hari ini" |
+   | 06 Profil | ✅ sesuai | kartu maskot + **Level sekali** (duplikat dihapus) + 3 stat tile + badge/kosmetik kartu kotak. **"Bergabung X bulan lalu" sudah ada** (W0.1 schema v8 `createdAt` + W1 `joinedLabel`); blok freeze/streak tampil bila `freezeCount > 0`. Deviasi: "tugas selesai" → "hari ini" |
    | 08 Pengaturan | ✅ sesuai | grup + ListRow + chevron + segmented. Deviasi: grup DATA (backup/ekspor) belum ada (T10), label "PEMBERITAHUAN" belum ada key |
    | AppScaffold | ✅ sesuai | back **lingkaran** 40dp (board 37) `canvas` + border, judul Fredoka 24 rata kiri, aksi debug dipindah ke sheet dev-only |
    | 09 Onboarding | ✅ sesuai | maskot `ClipOval` 168dp, judul 26, dots 3 halaman, field+CTA; overflow keyboard diperbaiki (scrollable) |
