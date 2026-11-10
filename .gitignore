@@ -74,3 +74,6 @@ design-export/
 # Kotlin build cache (Kotlin 2.x / AGP) — generated, never commit
 .kotlin/
 /android/.kotlin//out/
+
+# Strix pentest output (never commit scan results)
+strix_runs/
