@@ -23,5 +23,9 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# release artifacts: uploaded to Vercel at deploy time, never committed
+# (a 54 MB binary would bloat git history permanently)
+public/downloads/*.apk
+
 .vercel
 .env*

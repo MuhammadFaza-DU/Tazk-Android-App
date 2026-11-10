@@ -342,3 +342,16 @@
 
 ---
 
+## L-019 · `Set-Content -NoNewline` merusak `pubspec.yaml` jadi satu baris
+- **Tanggal:** 2026-11-10
+- **Salah:** menaikkan versi dengan `(Get-Content pubspec.yaml) -replace ... | Set-Content pubspec.yaml -NoNewline`. `-NoNewline` **membuang semua pemisah baris** hasil pipeline, sehingga 137 baris `pubspec.yaml` runtuh menjadi **1 baris** (137 baris terhapus). File rusak total, bukan hanya baris versi.
+- **Bukti:** `(Get-Content pubspec.yaml).Count` → **1**; `git diff --stat` → `138 +----...` (137 deletions). Setelah `git checkout -- pubspec.yaml`, kembali 137 baris.
+- **Dampak:** kalau tidak tertangkap, build/`pub get` gagal atau lebih buruk: YAML tetap valid sebagai satu baris panjang sehingga bisa lolos dan merusak konfigurasi lain secara senyap. Waktu terbuang + risiko pada file konfigurasi kritis.
+- **Aturan baru:**
+  1. **Jangan pernah menulis ulang file utuh dengan shell** (`Set-Content`/`Out-File`/`>`). Untuk perubahan satu baris, pakai alat `edit` (find & replace eksak) yang mempertahankan sisa file.
+  2. **Jangan pakai `-NoNewline` pada file multi-baris.** Itu untuk output satu baris, bukan untuk file konfigurasi.
+  3. **Setelah menyentuh file konfigurasi kritis** (`pubspec.yaml`, `build.gradle*`, `AndroidManifest.xml`, `*.arb`): segera cek `(Get-Content <file>).Count` dan `git diff --stat`. Diff harus sebanding dengan perubahan yang dimaksud; diff yang menghapus ratusan baris = berhenti dan restore.
+- **Verifikasi:** `pubspec.yaml` 137 baris, `version: 2.0.0+1`, `git diff --stat` = `1 insertion(+), 1 deletion(-)`.
+
+---
+

@@ -1,5 +1,5 @@
 {
-  "base": "http://localhost:4323",
+  "base": "http://localhost:4322",
   "contrast": {
     "light": [
       {
@@ -172,7 +172,7 @@
     "cardTransitionDuration": "0s"
   },
   "jsOff": {
-    "htmlBytes": 17886,
+    "htmlBytes": 18025,
     "containsHeadline": true,
     "containsAllSectionTitles": true
   },
