@@ -1,0 +1,14 @@
+---
+interface Props {
+  chips: string[];
+}
+const { chips } = Astro.props;
+---
+
+<ul class="tk-chips" aria-label="Tazk">
+  {
+    chips.map((chip) => (
+      <li class="tk-chip">{chip}</li>
+    ))
+  }
+</ul>

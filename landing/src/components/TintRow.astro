@@ -1,0 +1,18 @@
+---
+interface Props {
+  items: { title: string; body: string }[];
+}
+const { items } = Astro.props;
+const tints = ["tk-tint--primary", "tk-tint--honey", "tk-tint--clay"];
+---
+
+<div class="tk-grid tk-grid--3">
+  {
+    items.map((item, i) => (
+      <article class:list={["tk-tint", tints[i % tints.length]]} data-reveal>
+        <h3>{item.title}</h3>
+        <p>{item.body}</p>
+      </article>
+    ))
+  }
+</div>

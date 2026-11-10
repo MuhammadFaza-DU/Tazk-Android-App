@@ -1,0 +1,199 @@
+{
+  "contrast": {
+    "light": [
+      {
+        "pair": "ink/canvas",
+        "ratio": 13.62,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/surface",
+        "ratio": 14.6,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "inkMuted/canvas",
+        "ratio": 5.09,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "inkMuted/surface",
+        "ratio": 5.46,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "primary/canvas(link)",
+        "ratio": 6.56,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "onPrimary/primary(btn)",
+        "ratio": 7.03,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "onPrimaryMuted/primary(downloadLead)",
+        "ratio": 5.65,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/primaryContainer(tint)",
+        "ratio": 11.73,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/honeyContainer(tint)",
+        "ratio": 12.29,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/clayContainer(tint)",
+        "ratio": 11.66,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/surfaceAlt",
+        "ratio": 12.47,
+        "bodyAA": true,
+        "largeAA": true
+      }
+    ],
+    "dark": [
+      {
+        "pair": "ink/canvas",
+        "ratio": 15.32,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/surface",
+        "ratio": 14.16,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "inkMuted/canvas",
+        "ratio": 7.7,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "inkMuted/surface",
+        "ratio": 7.11,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "primary/canvas(link)",
+        "ratio": 11.38,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "onPrimary/primary(btn)",
+        "ratio": 11.38,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "onPrimaryMuted/primary(downloadLead)",
+        "ratio": 8.26,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/primaryContainer(tint)",
+        "ratio": 11.12,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/honeyContainer(tint)",
+        "ratio": 10.89,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/clayContainer(tint)",
+        "ratio": 12.21,
+        "bodyAA": true,
+        "largeAA": true
+      },
+      {
+        "pair": "ink/surfaceAlt",
+        "ratio": 12.61,
+        "bodyAA": true,
+        "largeAA": true
+      }
+    ]
+  },
+  "responsive": {
+    "w320": {
+      "iw": 320,
+      "sw": 320,
+      "cw": 320,
+      "overflow": false
+    },
+    "w390": {
+      "iw": 390,
+      "sw": 390,
+      "cw": 390,
+      "overflow": false
+    },
+    "w768": {
+      "iw": 768,
+      "sw": 768,
+      "cw": 768,
+      "overflow": false
+    },
+    "w1024": {
+      "iw": 1024,
+      "sw": 1024,
+      "cw": 1024,
+      "overflow": false
+    },
+    "w1440": {
+      "iw": 1440,
+      "sw": 1440,
+      "cw": 1440,
+      "overflow": false
+    }
+  },
+  "reducedMotion": {
+    "runningAnimations": 0,
+    "revealCount": 21,
+    "allRevealsVisible": true,
+    "cardTransitionDuration": "0s"
+  },
+  "jsOff": {
+    "htmlBytes": 17164,
+    "containsHeadline": true,
+    "h1Text": "Selesai lebih tenang.",
+    "containsAllSectionTitles": true
+  },
+  "weight": {
+    "count": 7,
+    "encodedKB": 135.4,
+    "transferKB": 0,
+    "byInitiatorKB": {
+      "link": 88.4,
+      "img": 35,
+      "css": 9.6,
+      "other": 2.5
+    }
+  },
+  "dark": {
+    "bg": "rgb(15, 26, 20)",
+    "color": "rgb(232, 240, 231)"
+  }
+}

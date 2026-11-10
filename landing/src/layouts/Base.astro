@@ -1,0 +1,148 @@
+---
+import "../styles/tokens.css";
+import type { Lang } from "../i18n";
+import { dict } from "../i18n";
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+}
+const { lang } = Astro.props;
+const t = dict[lang];
+const title = Astro.props.title ?? t.metaTitle;
+const description = Astro.props.description ?? t.metaDescription;
+---
+
+<!doctype html>
+<html lang={lang} data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F4F1EA" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/Fredoka-Variable.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/PlusJakartaSans-Regular.woff2"
+      crossorigin
+    />
+    <script is:inline>
+      (function () {
+        var theme = "light";
+        try {
+          if (localStorage.getItem("tazk-theme") === "dark") theme = "dark";
+        } catch (e) {}
+        document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.classList.add("js");
+        // Default language follows the browser on the default (id) route only.
+        var current = document.documentElement.lang;
+        if (current === "id") {
+          var stored = null;
+          try {
+            stored = localStorage.getItem("tazk-lang");
+          } catch (e) {}
+          var preferred = stored;
+          if (!preferred) {
+            var nav = (navigator.language || "id").toLowerCase();
+            preferred = nav.indexOf("en") === 0 ? "en" : "id";
+          }
+          if (preferred === "en") {
+            location.replace("/en/");
+          }
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="tk-skip" href="#main">{t.skip}</a>
+    <slot />
+    <script is:inline>
+      (function () {
+        // Reveal on scroll (content stays visible without JS because CSS gates on .js)
+        var els = document.querySelectorAll("[data-reveal]");
+        if ("IntersectionObserver" in window) {
+          var io = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (en) {
+                if (en.isIntersecting) {
+                  en.target.classList.add("is-visible");
+                  io.unobserve(en.target);
+                }
+              });
+            },
+            { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
+          );
+          els.forEach(function (el, i) {
+            if (!el.style.getPropertyValue("--i")) {
+              el.style.setProperty("--i", String(i % 5));
+            }
+            io.observe(el);
+          });
+        } else {
+          els.forEach(function (el) {
+            el.classList.add("is-visible");
+          });
+        }
+
+        // Header background after scroll
+        var header = document.querySelector(".tk-header");
+        if (header) {
+          var onScroll = function () {
+            var scrolled = window.scrollY > 24;
+            if ((header.getAttribute("data-scrolled") === "true") !== scrolled) {
+              header.setAttribute("data-scrolled", scrolled ? "true" : "false");
+            }
+          };
+          window.addEventListener("scroll", onScroll, { passive: true });
+          onScroll();
+        }
+
+        // Theme toggle
+        document.querySelectorAll("[data-theme-toggle]").forEach(function (btn) {
+          var sync = function () {
+            var dark =
+              document.documentElement.getAttribute("data-theme") === "dark";
+            btn.setAttribute("aria-pressed", dark ? "true" : "false");
+          };
+          sync();
+          btn.addEventListener("click", function () {
+            var dark =
+              document.documentElement.getAttribute("data-theme") === "dark";
+            var next = dark ? "light" : "dark";
+            document.documentElement.setAttribute("data-theme", next);
+            try {
+              localStorage.setItem("tazk-theme", next);
+            } catch (e) {}
+            sync();
+          });
+        });
+
+        // Remember explicit language choice before navigating
+        document.querySelectorAll("[data-setlang]").forEach(function (a) {
+          a.addEventListener("click", function () {
+            try {
+              localStorage.setItem("tazk-lang", a.getAttribute("data-setlang"));
+            } catch (e) {}
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

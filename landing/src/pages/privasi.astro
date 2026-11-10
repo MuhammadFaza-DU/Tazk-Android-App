@@ -1,0 +1,78 @@
+---
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Base
+  lang="id"
+  title="Kebijakan Privasi · Tazk"
+  description="Cara Tazk menangani datamu: semuanya tersimpan di perangkat, tanpa akun, tanpa unggahan otomatis."
+>
+  <Header lang="id" root="/" />
+  <main id="main" class="tk-container tk-page tk-prose">
+    <h1 class="tk-h2">Kebijakan Privasi</h1>
+    <time datetime="2026-11">Terakhir diperbarui: November 2026</time>
+
+    <p>
+      Tazk dibuat agar datamu tetap di perangkatmu. Halaman ini menjelaskan apa
+      yang disimpan, apa yang tidak, dan kapan aplikasi menyentuh jaringan.
+    </p>
+
+    <h2>Data yang disimpan</h2>
+    <p>
+      Tugas, habit, subtask, riwayat sesi fokus, XP, dan lencana disimpan di
+      basis data lokal di perangkatmu. Tidak ada akun, dan tidak ada salinan di
+      server kami.
+    </p>
+
+    <h2>Jaringan</h2>
+    <p>
+      Pemakaian harian berjalan tanpa internet. Satu-satunya koneksi keluar
+      adalah tombol <strong>Periksa pembaruan</strong> di Pengaturan: saat kamu
+      menekannya, aplikasi mengambil satu berkas JSON dari halaman ini untuk
+      membandingkan versi. Kamu yang memicu, dan tidak ada data pribadimu yang
+      dikirim.
+    </p>
+
+    <h2>Izin yang mungkin diminta</h2>
+    <ul>
+      <li>
+        <strong>Notifikasi</strong>, untuk pengingat tugas, habit, dan sesi
+        fokus yang kamu jadwalkan sendiri.
+      </li>
+      <li>
+        <strong>Widget layar utama</strong>, agar kamu bisa mencentang tanpa
+        membuka aplikasi.
+      </li>
+      <li>
+        <strong>Pengecualian batas baterai</strong> (opsional), bila Android
+        membatasi aplikasi di latar belakang sehingga widget berhenti
+        memperbarui. Kamu boleh menolaknya.
+      </li>
+      <li>
+        <strong>Pemilih berkas</strong>, hanya saat kamu mengekspor atau
+        mengimpor cadangan JSON.
+      </li>
+    </ul>
+
+    <h2>Lokasi</h2>
+    <p>
+      Fitur lokasi pada tugas membuka aplikasi Maps lewat tautan. Tazk tidak
+      membaca GPS dan tidak menyimpan lokasimu.
+    </p>
+
+    <h2>Tanpa iklan dan tanpa analitik</h2>
+    <p>
+      Tidak ada iklan, tidak ada pelacak, dan tidak ada analitik pihak ketiga
+      di dalam aplikasi.
+    </p>
+
+    <h2>Cadangan dan pemulihan</h2>
+    <p>
+      Kamu bisa mengekspor seluruh data ke berkas JSON kapan saja, dan
+      mengimpornya kembali di perangkat lain. Berkas itu sepenuhnya milikmu.
+    </p>
+  </main>
+  <Footer lang="id" root="/" />
+</Base>

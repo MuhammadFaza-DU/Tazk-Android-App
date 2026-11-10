@@ -1,0 +1,74 @@
+---
+import type { Lang } from "../i18n";
+import { dict } from "../i18n";
+import { sunSvg, moonSvg } from "../lib/icons";
+
+interface Props {
+  lang: Lang;
+  root?: string;
+}
+const { lang, root = "" } = Astro.props;
+const t = dict[lang];
+const homeHref = lang === "en" ? "/en/" : "/";
+const navLabel = lang === "id" ? "Navigasi utama" : "Main navigation";
+---
+
+<header class="tk-header" data-scrolled="false">
+  <div class="tk-container tk-header__inner">
+    <a class="tk-brand" href={homeHref} aria-label="Tazk">
+      <span>Tazk</span>
+    </a>
+    <nav class="tk-nav" aria-label={navLabel}>
+      {
+        t.nav.map((item) => (
+          <a href={root + item.href}>{item.label}</a>
+        ))
+      }
+    </nav>
+    <div class="tk-header__actions">
+      <div class="tk-lang" role="group" aria-label={t.langSwitch}>
+        <a href="/" data-setlang="id" aria-current={lang === "id" ? "true" : "false"}
+          >ID</a
+        >
+        <a
+          href="/en/"
+          data-setlang="en"
+          aria-current={lang === "en" ? "true" : "false"}>EN</a
+        >
+      </div>
+      <button
+        class="tk-icon-btn"
+        type="button"
+        data-theme-toggle
+        aria-label={t.themeToggle}
+        aria-pressed="false"
+      >
+        <svg
+          class="tk-theme-icon tk-theme-sun"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          set:html={sunSvg}
+        />
+        <svg
+          class="tk-theme-icon tk-theme-moon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          set:html={moonSvg}
+        />
+      </button>
+      <a class="tk-btn tk-btn--ghost tk-header__cta" href={root + "#unduh"}
+        >{t.ctaDownload}</a
+      >
+    </div>
+  </div>
+</header>

@@ -1,0 +1,20 @@
+---
+interface Props {
+  items: { title: string; body: string }[];
+}
+const { items } = Astro.props;
+---
+
+<ol class="tk-steps">
+  {
+    items.map((item, i) => (
+      <li class="tk-step" data-reveal>
+        <span class="tk-step__num" aria-hidden="true">
+          {String(i + 1).padStart(2, "0")}
+        </span>
+        <h3>{item.title}</h3>
+        <p class="tk-body">{item.body}</p>
+      </li>
+    ))
+  }
+</ol>

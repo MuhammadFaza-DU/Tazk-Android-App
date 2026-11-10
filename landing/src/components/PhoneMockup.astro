@@ -1,0 +1,47 @@
+---
+interface Props {
+  img: string;
+  label?: string;
+  sub?: string;
+  second?: boolean;
+  priority?: boolean;
+  width?: number;
+  height?: number;
+}
+const {
+  img,
+  label,
+  sub,
+  second = false,
+  priority = false,
+  width = 720,
+  height = 960,
+} = Astro.props;
+
+const hasVariants = /-\d+\.webp$/.test(img);
+const variant = (v: number) => img.replace(/-\d+\.webp$/, `-${v}.webp`);
+const srcset = hasVariants
+  ? `${variant(480)} 480w, ${variant(720)} 720w, ${variant(1080)} 1080w`
+  : undefined;
+---
+
+<figure
+  class:list={["tk-phone", second && "tk-phone--second"]}
+  style={`--mascot:url(${img})`}
+>
+  <div class="tk-phone__screen">
+    <img
+      src={img}
+      srcset={srcset}
+      sizes="(min-width: 1024px) 300px, 62vw"
+      width={width}
+      height={height}
+      alt=""
+      decoding="async"
+      loading={priority ? "eager" : "lazy"}
+      fetchpriority={priority ? "high" : "auto"}
+    />
+    {label && <span class="tk-phone__label">{label}</span>}
+    {sub && <span class="tk-phone__sub">{sub}</span>}
+  </div>
+</figure>

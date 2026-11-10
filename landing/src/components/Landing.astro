@@ -1,0 +1,124 @@
+---
+import { existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import path from "node:path";
+import type { Lang } from "../i18n";
+import { dict } from "../i18n";
+import Header from "./Header.astro";
+import Hero from "./Hero.astro";
+import FeatureCard from "./FeatureCard.astro";
+import TintRow from "./TintRow.astro";
+import Steps from "./Steps.astro";
+import Faq from "./Faq.astro";
+import Footer from "./Footer.astro";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = dict[lang];
+
+const apkPath = path.join(process.cwd(), "public", "downloads", "tazk.apk");
+const apkReady = existsSync(apkPath);
+let sha256 = "";
+if (apkReady) {
+  sha256 = createHash("sha256").update(readFileSync(apkPath)).digest("hex");
+}
+---
+
+<Header lang={lang} />
+<main id="main">
+  <Hero lang={lang} />
+
+  <section
+    class="tk-container tk-section--tight"
+    aria-labelledby="proofs-title"
+  >
+    <h2 class="tk-h3" id="proofs-title" data-reveal>{t.proofs.title}</h2>
+    <div class="tk-proof" style="margin-top:22px">
+      {
+        t.proofs.items.map((item) => (
+          <div class="tk-proof__item" data-reveal>
+            <p class="tk-proof__title">{item.title}</p>
+            <p class="tk-body">{item.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="tk-container tk-section" id="fitur" aria-labelledby="fitur-title">
+    <div class="tk-section__head" data-reveal>
+      <p class="tk-eyebrow">{t.features.eyebrow}</p>
+      <h2 class="tk-h2" id="fitur-title">{t.features.title}</h2>
+      <p class="tk-section__lead">{t.features.lead}</p>
+    </div>
+    <div class="tk-grid tk-grid--3">
+      {
+        t.features.items.map((f) => (
+          <FeatureCard title={f.title} body={f.body} icon={f.icon} />
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="tk-container tk-section" aria-labelledby="tints-title">
+    <div class="tk-section__head tk-section__head--center" data-reveal>
+      <p class="tk-eyebrow">{t.tints.eyebrow}</p>
+      <h2 class="tk-h2" id="tints-title">{t.tints.title}</h2>
+    </div>
+    <TintRow items={t.tints.items} />
+  </section>
+
+  <section
+    class="tk-container tk-section"
+    id="cara-pakai"
+    aria-labelledby="steps-title"
+  >
+    <div class="tk-section__head" data-reveal>
+      <p class="tk-eyebrow">{t.steps.eyebrow}</p>
+      <h2 class="tk-h2" id="steps-title">{t.steps.title}</h2>
+      <p class="tk-section__lead">{t.steps.lead}</p>
+    </div>
+    <Steps items={t.steps.items} />
+  </section>
+
+  <section class="tk-container tk-section" id="faq" aria-labelledby="faq-title">
+    <div class="tk-section__head tk-section__head--center" data-reveal>
+      <p class="tk-eyebrow">{t.faq.eyebrow}</p>
+      <h2 class="tk-h2" id="faq-title">{t.faq.title}</h2>
+      <p class="tk-section__lead">{t.faq.lead}</p>
+    </div>
+    <Faq items={t.faq.items} />
+  </section>
+
+  <section class="tk-container tk-section" id="unduh" aria-labelledby="unduh-title">
+    <div class="tk-download" data-reveal>
+      <h2 class="tk-h2" id="unduh-title">{t.download.title}</h2>
+      <p class="tk-download__lead">{t.download.lead}</p>
+      {
+        apkReady ? (
+          <>
+            <div class="tk-download__actions">
+              <a
+                class="tk-btn tk-btn--onprimary"
+                href="/downloads/tazk.apk"
+                download
+              >
+                {t.download.cta}
+              </a>
+            </div>
+            {sha256 && (
+              <p class="tk-download__note">
+                {t.download.checksumLabel}: <code>{sha256}</code>
+              </p>
+            )}
+          </>
+        ) : (
+          <p class="tk-download__note">{t.download.apkNote}</p>
+        )
+      }
+    </div>
+  </section>
+</main>
+<Footer lang={lang} />

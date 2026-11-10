@@ -1,0 +1,39 @@
+---
+import type { Lang } from "../i18n";
+import { dict } from "../i18n";
+
+interface Props {
+  lang: Lang;
+  root?: string;
+}
+const { lang, root = "" } = Astro.props;
+const t = dict[lang];
+const homeHref = lang === "en" ? "/en/" : "/";
+const footerNav = lang === "id" ? "Tautan footer" : "Footer links";
+---
+
+<footer class="tk-footer">
+  <div class="tk-container">
+    <div class="tk-footer__inner">
+      <div>
+        <a class="tk-brand" href={homeHref} aria-label="Tazk">
+          <span>Tazk</span>
+        </a>
+        <p class="tk-footer__tagline">{t.footer.tagline}</p>
+      </div>
+      <nav class="tk-footer__links" aria-label={footerNav}>
+        {
+          t.footer.links.map((item) => (
+            <a href={item.href.startsWith("/") ? item.href : root + item.href}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+    <div class="tk-footer__bottom">
+      <span>{t.footer.copyright}</span>
+      <span>{t.footer.madeWith}</span>
+    </div>
+  </div>
+</footer>

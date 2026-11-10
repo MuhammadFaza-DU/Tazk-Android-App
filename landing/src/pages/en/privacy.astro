@@ -1,0 +1,77 @@
+---
+import Base from "../../layouts/Base.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<Base
+  lang="en"
+  title="Privacy Policy · Tazk"
+  description="How Tazk handles your data: everything stays on your device, no account, and no automatic upload."
+>
+  <Header lang="en" root="/en/" />
+  <main id="main" class="tk-container tk-page tk-prose">
+    <h1 class="tk-h2">Privacy Policy</h1>
+    <time datetime="2026-11">Last updated: November 2026</time>
+
+    <p>
+      Tazk is built so your data stays on your device. This page explains what
+      is stored, what is not, and when the app touches the network.
+    </p>
+
+    <h2>What is stored</h2>
+    <p>
+      Tasks, habits, subtasks, focus session history, XP, and badges live in a
+      local database on your device. There is no account, and there is no copy
+      on our servers.
+    </p>
+
+    <h2>Network</h2>
+    <p>
+      Daily use works without internet. The only outgoing connection is the
+      <strong>Check for updates</strong> button in Settings: when you press it,
+      the app fetches a single JSON file from this page to compare versions.
+      You trigger it, and none of your personal data is sent.
+    </p>
+
+    <h2>Permissions it may ask for</h2>
+    <ul>
+      <li>
+        <strong>Notifications</strong>, for task, habit, and focus reminders you
+        schedule yourself.
+      </li>
+      <li>
+        <strong>Home-screen widget</strong>, so you can check items without
+        opening the app.
+      </li>
+      <li>
+        <strong>Battery optimization exemption</strong> (optional), when Android
+        restricts background apps and the widget stops updating. You may
+        decline it.
+      </li>
+      <li>
+        <strong>File picker</strong>, only when you export or import a JSON
+        backup.
+      </li>
+    </ul>
+
+    <h2>Location</h2>
+    <p>
+      The place feature on a task opens Maps through a link. Tazk does not read
+      GPS and does not store your location.
+    </p>
+
+    <h2>No ads and no analytics</h2>
+    <p>
+      There are no ads, no trackers, and no third-party analytics inside the
+      app.
+    </p>
+
+    <h2>Backup and restore</h2>
+    <p>
+      You can export all data to a JSON file at any time and import it back on
+      another device. That file belongs entirely to you.
+    </p>
+  </main>
+  <Footer lang="en" root="/en/" />
+</Base>

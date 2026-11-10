@@ -1,0 +1,41 @@
+---
+import { chevronDownSvg } from "../lib/icons";
+
+interface Props {
+  href: string;
+  label: string;
+  segHref?: string;
+  segLabel?: string;
+}
+const { href, label, segHref, segLabel } = Astro.props;
+---
+
+{
+  segHref ? (
+    <span class="tk-split">
+      <a class="tk-split__main" href={href}>
+        {label}
+      </a>
+      <a
+        class="tk-split__seg"
+        href={segHref}
+        aria-label={segLabel ?? label}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          set:html={chevronDownSvg}
+        />
+      </a>
+    </span>
+  ) : (
+    <a class="tk-btn tk-split__single" href={href} style="background:var(--tk-primary);color:var(--tk-on-primary)">
+      {label}
+    </a>
+  )
+}
