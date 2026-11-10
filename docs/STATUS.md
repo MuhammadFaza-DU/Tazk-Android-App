@@ -16,6 +16,8 @@ Tree bersih. **Belum di-push** (64+ commit lokal).
 3. **Design system landing** diukur dari **render** (`docs/design/2026-11-10-landing-design-reference.md`) + design system Tazk (`docs/design/2026-11-10-landing-design-system.md`): token light+dark, tipografi responsif, 10 komponen, motion, 8 section, copy deck ID/EN, anggaran ≤900 KB.
 4. **Aset web** di `assets/landing/` — 11 WebP, **178 KB** (asal ±4,9 MB).
 5. **Plan eksekusi** ditulis: `docs/superpowers/plans/2026-11-10-t14-t11-t12-t13-app-stages.md` (**folder ini gitignored** — plan hanya ada di mesin ini, bukan di repo).
+6. **Landing page Wave L SELESAI** (`landing/`, Astro 7) — 4 rute, bilingual, light/dark, 8 section, gate reproducible `npm run check:gates` → exit 0. Lihat bagian **"Landing page — IMPLEMENTASI"**. Sisa: deploy.
+7. **Ledger kini 15 entri** (L-001…L-015); L-014 & L-015 dari sesi landing.
 
 **Keputusan owner yang MENGIKAT (jangan ditanya ulang):**
 | Topik | Nilai |
@@ -34,10 +36,17 @@ Tree bersih. **Belum di-push** (64+ commit lokal).
 | Landing | Light Sage & Sand **+ dark toggle**, bilingual ID/EN, tanpa board kanvas |
 | Ritme | Lapor per wave, lanjut otomatis kecuali ada keputusan baru |
 
-**Langkah berikutnya (mulai dari sini):** **L.4 deploy** (butuh `vercel login` owner) → lalu **W0** (schema v8 + INTERNET + token `title` 24 + batch l10n). Wave L.1–L.3 + L.5 sudah selesai & terverifikasi.
+**Langkah berikutnya (mulai dari sini):** **Wave L TUNTAS (termasuk L.4 deploy)** → lanjut **W0** (schema v8 + INTERNET + token `title` 24 + batch l10n), lalu W1–W3 paralel (T11/T12/T13/T14), W4 build & uji HP.
+
+**Landing page — kondisi sekarang (terverifikasi, bukan klaim):**
+- Kode: `landing/` (Astro 7, static). 4 rute: `/` (ID), `/en/` (EN), `/privasi`, `/en/privacy`.
+- Perintah: `npm run dev` · `npm run build` · `npm run preview` · `npm run check:i18n` · `npm run check:gates`.
+- Gate reproducible: `landing/scripts/gates.mjs` → **exit 0 "All gates passed"** (kontras AA light+dark, 0 overflow 320–1440, reduced-motion 0 animasi, JS-off copy terbaca, berat ≤900 KB, dark token benar) + menulis screenshot ke `docs/artifacts/`.
+- Bukti visual: `docs/artifacts/landing-id-{390,768,980,1440}.png`, `landing-dark-{390,1440}.png`, `landing-js-off-390.png`, `landing-gates.json`.
+- Belum: Lighthouse/field metrics, uji perangkat asli. (Deploy **selesai** — lihat log 2026-11-10 (deploy).)
 
 **Blocker/izin yang sudah diketahui:**
-- **Deploy Vercel BLOCKED** — `vercel` CLI 59.10.0 terpasang tetapi token tidak valid (`vercel login`). Landing sudah build + lolos gate; menunggu owner login untuk `vercel --prod`.
+- ~~Deploy Vercel BLOCKED~~ **SELESAI 2026-11-10** — project `tazk-manager`, produksi `tazk-manager-mfdu.vercel.app`, publik (proteksi dimatikan).
 - APK belum ada → tombol unduh L.4 ke `#unduh` + catatan "APK segera hadir" (jangan tautan mati).
 - Push ke GitHub **belum diizinkan**.
 - Di luar scope saat ini: isu **#12** (kontras chart), landing APK final, pengingat backup (masuk T13).
@@ -61,7 +70,9 @@ Tree bersih. **Belum di-push** (64+ commit lokal).
 - **Rekomendasi lanjut:** **T13 dulu** (hardening + a11y + isu tertunda), lalu T12 → T14 → T11 → T15 → T16.
 
 ## Log Perubahan (terbaru duluan)
-- 2026-11-10 (lanjutan 3) — **Wave L landing page dibangun & lolos semua gate (kecuali deploy).** Astro 7 di `landing/`: token dari `DESIGN.md` (light Sage & Sand + dark Dusk Forest), font di-subset ke **WOFF2 latin 81 KB** (dari 279 KB TTF), 11 komponen + 8 section (hero → 3 bukti → 6 fitur → 3 tint → 3 langkah → 6 FAQ → unduh → footer), bilingual ID/EN lewat route `/` & `/en/` + toggle + **deteksi bahasa browser**, halaman privasi jujur `/privasi` & `/en/privacy`, `version.json` + `vercel.json`. **Bukti terukur** (Playwright/Chrome, `docs/artifacts/landing-gates.json`): kontras AA **semua pasangan** light+dark lolos (terendah 5,09), **tanpa scroll horizontal 320–1440**, reduced-motion **0 animasi** (21 reveal tetap terlihat), JS-off semua copy terbaca, berat **135,4 KB** (≤900), dark `#0F1A14`/`#E8F0E7`. Screenshot `docs/artifacts/landing-*`. **BELUM deploy** — Vercel CLI token tidak valid, butuh `vercel login` owner. — *(belum commit)*
+- 2026-11-10 (deploy) — **Wave L.4 SELESAI: landing TAYANG PUBLIK di `https://tazk-manager-mfdu.vercel.app`.** Project Vercel dibuat (`tazk` → rename `tazk-manager`; Git `MuhammadFaza-DU/Tazk-Android-App` terhubung), Deployment Protection `ssoProtection=all_except_custom_domains` **dimatikan via API** (PATCH `ssoProtection:null`), `version.json` menunjuk `downloadUrl: https://tazk-manager-mfdu.vercel.app/downloads/tazk.apk`. **Terverifikasi curl:** `/version.json` → `application/json` 200; `/`, `/en/`, `/privasi/`, `/en/privacy/` → 200 publik. Catatan: `tazk.vercel.app` & `tazk-manager.vercel.app` sudah dipakai akun lain → domain final pakai suffix scope `-mfdu`. URL ini dipakai T11 `kUpdateManifestUrl`. Pelajaran **L-016** dicatat. — *(belum commit)*
+- 2026-11-10 (lanjutan 4) — **Landing page disempurnakan + gate dibuat reproducible + 2 pelajaran dicatat.** (a) Mockup HP diubah dari kotak putih/hitam menjadi **device sungguhan** (bezel grafit, dynamic island, tombol samping, kilau kaca, bayangan berlapis; gambar maskot radius 22px). (b) Kartu 3-prinsip diubah dari `auto-fit` (yang menghasilkan **2+1 canggung**) menjadi **1 kolom → 3 kolom** pada 900px. (c) `landing/scripts/gates.mjs` dipindah dari folder temp ke repo + `npm run check:gates` → **exit 0 "All gates passed"** dan menulis `landing-gates.json` + screenshot; `playwright-core` jadi devDependency (memakai Chrome terpasang, tanpa unduh browser). (d) **L-014** (mengklaim screenshot tersimpan padahal file tidak ada / berisi bahasa lain / tertangkap di tengah animasi) dan **L-015** (overflow 47px di 320px akibat specificity `.tk-btn` mengalahkan `.tk-header__cta`) masuk `docs/LESSONS.md`. (e) Server pratinjau lokal dimatikan (port 4322 & 4323 bebas, terverifikasi). — *(belum commit)*
+- 2026-11-10 (lanjutan 3) — **Wave L landing page dibangun & lolos semua gate (kecuali deploy).** Astro 7 di `landing/`: token dari `DESIGN.md` (light Sage & Sand + dark Dusk Forest), font di-subset ke **WOFF2 latin 81 KB** (dari 279 KB TTF), 11 komponen + 8 section (hero → 3 bukti → 6 fitur → 3 tint → 3 langkah → 6 FAQ → unduh → footer), bilingual ID/EN lewat route `/` & `/en/` + toggle + **deteksi bahasa browser**, halaman privasi jujur `/privasi` & `/en/privacy`, `version.json` + `vercel.json`. **Bukti terukur** (Playwright/Chrome, `docs/artifacts/landing-gates.json`): kontras AA **semua pasangan** light+dark lolos (terendah 5,09), **tanpa scroll horizontal 320–1440**, reduced-motion **0 animasi** (21 reveal tetap terlihat), JS-off semua copy terbaca, berat **±156 KB** (≤900), dark `#0F1A14`/`#E8F0E7`. Screenshot `docs/artifacts/landing-*`. **BELUM deploy** — Vercel CLI token tidak valid, butuh `vercel login` owner. — *(belum commit)*
 - 2026-11-10 (lanjutan 2) — **Design system landing page Tazk v1 + aset web diproduksi.** `docs/design/2026-11-10-landing-design-system.md`: token light+dark dari `DESIGN.md` (canvas **#F4F1EA**, surface #FBF9F4 — koreksi dari catatan lama), skala tipografi responsif, spacing, **10 spesifikasi komponen**, motion Tazk (reveal 320ms/stagger 40ms, hover 150ms, reduced-motion), arsitektur konten + **copy deck ID/EN**, anggaran berat ≤900 KB, dan 6 gerbang verifikasi. Aset: `assets/landing/` — 11 file WebP dari maskot & logo, total **178 KB** (asal ±4,9 MB; `otter-sprout` 1.475 KB → 21 KB @720w). Referensi openbot diukur ulang di **390/768/1440** (h1 48/61,44/104px, gutter 16/30,7/48, total halaman 1.214 KB termasuk 433 KB WebP bentuk) dan 3 klaim lama dikoreksi (Inter Variable, easing hover `.23,1,.32,1`, ada aset raster). Catatan: PNG maskot **tanpa alpha** → belum bisa jadi stiker; perlu ekspor alpha dari owner bila diinginkan. — *(belum commit)*
 - 2026-11-10 (lanjutan) — **L-013 dicatat** di `docs/LESSONS.md`: mengklaim "sudah membedah sampai motion" padahal hanya membaca CSS bundle; font & easing salah; aset belum dihitung (dampak: dokumen desain tidak terpakai, satu putaran terbuang). Aturan baru: untuk situs web wajib **render dulu** (computed style/getAnimations/screenshot), token CSS bukan bukti pemakaian, dan klaim cakupan harus menyebut metode + batasnya. — *(belum commit)*
 - 2026-11-10 (lanjutan) — **Design reference landing page diukur dari render, bukan CSS saja.** `docs/design/2026-11-10-landing-design-reference.md` ditulis ulang berbasis browser: struktur 10 section + koordinat/tinggi, tipografi terukur (**Inter Variable**, h1 64–80px weight 500, tracking −0.065em, body 17/1.55 kolom 720px), warna menurut frekuensi pemakaian, 9 komponen khas (split download button, mascot-di-judul, mockup app, kartu pastel), **motion terukur** (hero-in 500ms, header 240ms, marquee 36s, reveal 500ms+stagger 40ms, hover 120–200ms `cubic-bezier(.23,1,.32,1)`), dan **strategi aset** (198 SVG, 0 video, 2 raster kecil, art = CSS gradient). Dua klaim versi pertama dikoreksi: font bukan system, easing hover beda dari reveal. Belum diukur: Lighthouse, perilaku HP asli. Landing page belum diimplementasikan — menunggu arah desain owner. — *(belum commit)*
@@ -298,7 +309,7 @@ Tag stabil sebelumnya: `stable-2026-10-30-v1`, `stable-2026-10-29-v1`, `stable-2
 
 ### Landing page — design system (2026-11-10)
 
-Belum diimplementasikan (menunggu arah owner), tetapi **fondasinya sudah berbasis ukur**:
+**Fondasi (diukur, bukan dikira):**
 
 | Bukti | Angka |
 |---|---|
@@ -306,7 +317,39 @@ Belum diimplementasikan (menunggu arah owner), tetapi **fondasinya sudah berbasi
 | Berat referensi | **1.214 KB** (CSS 49 · font 47 · WebP bentuk 433 · JS ±115) |
 | Motion referensi | reveal 500ms + stagger 40ms · hover 160ms warna / 120–200ms transform `(.23,1,.32,1)` · header 240ms |
 | Aset Tazk diproduksi | `otter-sprout` 1.475 → **21 KB** @720w; 11 file total **178 KB** |
-| Batasan tercatat | PNG maskot **tanpa alpha** (24bpp) → butuh ekspor PNG-32 dari owner untuk stok transparan |
+| Batasan tercatat | PNG maskot **tanpa alpha** (24bpp; SVG hanya pembungkus raster ber-alpha penuh) |
+
+### Landing page — IMPLEMENTASI (2026-11-10, Wave L)
+
+**Status: selesai & lolos gate, kecuali deploy.** Kode di `landing/` (Astro 7, static).
+
+| Aspek | Nilai terukur |
+|---|---|
+| Rute | `/` (ID), `/en/` (EN), `/privasi`, `/en/privacy` — 4 halaman, build ±0,5 s |
+| Token | Semua dari `DESIGN.md` (Sage & Sand + Dusk Forest). **Tidak ada hex baru** |
+| Font | WOFF2 subset latin — Fredoka 62,5 KB + PJS 9,2/9,6 KB = **81 KB** (dari 279 KB TTF) |
+| Kontras AA | **Semua pasangan lolos** light+dark — minimum **5,09** (light) / **7,11** (dark) |
+| Overflow horizontal | **0** di 320 / 390 / 768 / 1024 / 1440 |
+| Reduced-motion | **0 animasi**; 21 elemen reveal tetap terlihat |
+| JS dimatikan | H1 + semua judul section tetap ada di HTML (konten tidak disembunyikan) |
+| Berat halaman | **±156 KB** (≤900 KB) |
+| Maskot | Tanpa alpha → ditempatkan dalam kartu + *blurred backdrop* dari gambar yang sama (tanpa seam, tanpa hex baru) |
+| Mockup HP | Device CSS: bezel grafit, dynamic island, tombol samping, kilau kaca, bayangan berlapis; gambar maskot radius 22px |
+
+**Perintah:** `npm run dev` · `npm run build` · `npm run preview` · `npm run check:i18n` · `npm run check:gates`.
+
+**Gate reproducible:** `landing/scripts/gates.mjs` (Playwright-core + Chrome terpasang, tanpa unduh browser) → **exit 0 "All gates passed"**, menulis `docs/artifacts/landing-gates.json` + screenshot. Jalankan dengan server statis: `python -m http.server 4322 --directory dist` lalu `BASE=http://localhost:4322 npm run check:gates`.
+
+**Deviasi dari plan (disengaja, beralasan):**
+1. **Bahasa berbasis rute** (`/`, `/en/`) + toggle, bukan "tanpa reload" → satu `<h1>` di DOM (a11y), URL bisa dibagikan; default **ikut bahasa browser**, pilihan manual disimpan (`tazk-lang`).
+2. **FAQ pakai `<details>`** native + animasi opacity/translate, bukan `grid-template-rows` → tetap jalan tanpa JS.
+3. **Footer** bukan template 4-kolom; hanya tautan yang benar-benar ada (antislop R-05/R-24).
+4. **Hero eyebrow dihapus**, ikon fitur **polos 22px** (bukan tile 40px) → menghapus pola slop.
+5. **Tint grid 1 kolom → 3 kolom** pada 900px (bukan `auto-fit` yang menghasilkan 2+1).
+
+**Sisa temuan `impeccable detect` (exit 2, sengaja di-waive):** `cream-palette` + `overused-font` = identitas owner dari `DESIGN.md` (Sage & Sand, Plus Jakarta Sans); `cramped-padding` = padding nyata 14–64px; `aphoristic-cadence` = ritme copy proofs.
+
+**Belum:** deploy Vercel (token invalid, butuh `vercel login`), Lighthouse/field metrics, uji perangkat asli.
 
 ### Arsip v1
 
@@ -421,7 +464,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 | T12 Gamifikasi polish | ⬜ belum | |
 | T13 Bug audit | ⬜ belum | |
 | T14 Ikon & logo | 🟡 sebagian | Maskot & logo ada; **ikon app persegi belum di-generate** |
-| T15 Landing page | ⬜ belum | Rencana: Astro + Vercel |
+| T15 Landing page | 🟢 **deploy selesai** | Live publik `https://tazk-manager-mfdu.vercel.app`; sisa: isi APK + sha256 di `version.json` saat rilis (T16) |
 | T16 Docs final + rilis | ⬜ belum | |
 
 ### Isu terbuka yang harus diingat
@@ -571,7 +614,7 @@ Sisa tahap (detail lengkap di "Status 16 tahap" di atas):
 | **T12** | Gamifikasi polish | badge/kosmetik/celebration/visual XP |
 | **T13** | Bug audit & hardening | `setSubtaskCompleted` mati, a11y widget, `deleteTask` refund XP, hardening DB, minor lain |
 | **T14** | Ikon app persegi | adaptive icon (maskot & wordmark sudah ada) |
-| **T15** | Landing page | Astro + Vercel + distribusi APK |
+| **T15** | Landing page | ~~Astro + Vercel + distribusi APK~~ ✅ deploy live `tazk-manager-mfdu.vercel.app`; sisa APK+sha256 (T16) |
 | **T16** | Docs final + rilis | bump versi, release build, tag **v2.0** |
 
 Isu terbuka: **#15** widget Calendar 4×2 sempit (bisa dinaikkan default),

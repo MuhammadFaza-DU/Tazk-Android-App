@@ -210,7 +210,7 @@ Tambahan kualitas: kontras AA (4.5:1 body / 3:1 large) light+dark; tap target �
 | T12 | Gamifikasi polish | ⬜ belum |
 | T13 | Bug audit & hardening | ⬜ belum |
 | T14 | Ikon/logo + aset | 🟡 sebagian |
-| **T15** | **Landing page Astro + distribusi** | ⬜ belum |
+| **T15** | **Landing page Astro + distribusi** | 🟢 deploy selesai — live `tazk-manager-mfdu.vercel.app`; sisa APK+sha256 (T16) |
 | T16 | Docs final + rilis v2.0 | ⬜ belum |
 
 > Sumber kebenaran status terkini: `docs/STATUS.md` (bukan tabel di atas — tabel ini ringkasan).

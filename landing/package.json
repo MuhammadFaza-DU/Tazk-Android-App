@@ -10,9 +10,13 @@
     "build": "astro build",
     "preview": "astro preview",
     "check:i18n": "node scripts/check-i18n.mjs",
+    "check:gates": "node scripts/gates.mjs",
     "astro": "astro"
   },
   "dependencies": {
     "astro": "^7.4.8"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.65.0"
   }
 }

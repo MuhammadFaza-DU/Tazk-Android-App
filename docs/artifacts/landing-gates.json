@@ -1,4 +1,5 @@
 {
+  "base": "http://localhost:4323",
   "contrast": {
     "light": [
       {
@@ -141,31 +142,26 @@
     "w320": {
       "iw": 320,
       "sw": 320,
-      "cw": 320,
       "overflow": false
     },
     "w390": {
       "iw": 390,
       "sw": 390,
-      "cw": 390,
       "overflow": false
     },
     "w768": {
       "iw": 768,
       "sw": 768,
-      "cw": 768,
       "overflow": false
     },
     "w1024": {
       "iw": 1024,
       "sw": 1024,
-      "cw": 1024,
       "overflow": false
     },
     "w1440": {
       "iw": 1440,
       "sw": 1440,
-      "cw": 1440,
       "overflow": false
     }
   },
@@ -178,13 +174,11 @@
   "jsOff": {
     "htmlBytes": 17886,
     "containsHeadline": true,
-    "h1Text": "Selesai lebih tenang.",
     "containsAllSectionTitles": true
   },
   "weight": {
     "count": 9,
     "encodedKB": 156.9,
-    "transferKB": 0.3,
     "byInitiatorKB": {
       "link": 89.4,
       "img": 20.6,
@@ -195,5 +189,6 @@
   "dark": {
     "bg": "rgb(15, 26, 20)",
     "color": "rgb(232, 240, 231)"
-  }
+  },
+  "failures": []
 }

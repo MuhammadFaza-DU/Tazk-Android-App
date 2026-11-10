@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "downloadUrl": "https://tazk.vercel.app/downloads/tazk.apk",
+  "downloadUrl": "https://tazk-manager-mfdu.vercel.app/downloads/tazk.apk",
   "notes": "Rilis v2.0: redesign antarmuka, widget yang andal, statistik dari data nyata, backup JSON offline, dan pemeriksaan pembaruan manual.",
   "sha256": ""
 }

@@ -275,3 +275,46 @@
 
 ---
 
+## L-014 · Mengklaim "screenshot tersimpan" padahal file tidak ada / menampilkan hal yang salah
+- **Tanggal:** 2026-11-10
+- **Salah:** tiga kali dalam satu sesi (landing page Wave L):
+  1. Melaporkan screenshot `1440` "tersimpan" padahal Chrome headless gagal senyap (`--blink-settings=scriptEnabled=false` tidak valid) → hanya file `dark-800` yang benar-benar ada.
+  2. Screenshot berlabel **ID** ternyata berisi **teks Inggris**, karena Playwright default-locale `en-US` sehingga `/` me-redirect ke `/en/` (perilaku yang *aku sendiri* bangun). Aku baru tahu setelah melihat gambarnya.
+  3. Gambar pertama tampak "banyak section kosong" — bukan bug layout, melainkan `addStyleTag` hanya memaksa `opacity:1` sementara `transition` 320 ms + delay stagger masih berjalan, jadi tertangkap di tengah animasi.
+- **Bukti:** `Get-ChildItem docs\artifacts\landing-*.png` hanya memuat 1 file setelah batch pertama; screenshot 1440 yang berhasil memuat judul `Selesai lebih tenang.` vs label ID; section kosong hilang setelah `transition:none!important` + `waitForTimeout(250)`.
+- **Dampak:** hampir melaporkan bukti visual yang tidak ada dan menuduh CSS sendiri rusak. Kalau owner tidak menunjuk gambar HP, aku juga melewatkan cacat nyata (frame HP rata + grid 2+1).
+- **Aturan baru:**
+  1. **Klaim "file tersimpan" wajib disertai cek keberadaan file** (`Test-Path` / list dir) di langkah yang sama. Tool yang gagal senyap harus diperlakukan gagal.
+  2. **Screenshot harus dibuka dan dilihat** sebelum dijadikan bukti; kalau tidak dilihat, sebut "belum kuperiksa isinya".
+  3. **Verifikasi screenshot wajib memaksa keadaan akhir**: `transition:none`, `animation:none`, `[data-reveal]{opacity:1}`, lalu tunggu 1 frame.
+  4. **Uji halaman ber-multibahasa dengan locale eksplisit** (`locale: "id-ID"`), karena logika redirect bahasa bisa membuat "bukti" menampilkan bahasa lain.
+- **Verifikasi:** `landing/scripts/gates.mjs` sekarang menulis screenshot dengan locale eksplisit + mematikan transisi, dan mengembalikan **exit 0/1** (bukan sekadar mencetak JSON).
+
+---
+
+## L-015 · Overflow horizontal 47px di 320px karena specificity CSS, bukan karena layout
+- **Tanggal:** 2026-11-10
+- **Salah:** tombol CTA header (`display:none` di bawah 900px) tetap tampil di 320px sehingga halaman bisa di-scroll horizontal. Penyebabnya **urutan + specificity**: `.tk-btn` (2 kelas, didefinisikan **sesudah**) mengalahkan `.tk-header__cta` (1 kelas), jadi `display:none` kalah.
+- **Bukti:** iframe 320px → `documentElement.scrollWidth` **367** vs `innerWidth` **320**; penyebab teridentifikasi dengan memindai `getBoundingClientRect().right > innerWidth` → `.tk-header__cta` `right: 394`. Setelah `.tk-btn.tk-header__cta` (2 kelas) dipakai, 320–1440 semuanya **0 overflow**.
+- **Dampak:** satu-satunya gate yang gagal pada build pertama; kalau lolos, pengguna HP kecil akan melihat halaman bergeser ke samping.
+- **Aturan baru:**
+  1. **Jangan menyimpulkan "responsif" dari melihat 390px.** Ukur `scrollWidth <= innerWidth` di **320** juga, karena di situlah kebocoran paling sering muncul.
+  2. **Utility class yang dipakai ulang (`.tk-btn`) jangan diberi override tampilan oleh kelas tunggal**; naikkan specificity (`.tk-btn.tk-header__cta`) atau pakai layer CSS.
+  3. Kalau ada overflow, **cari elemennya** dengan memindai `right > innerWidth`, jangan menebak dari CSS.
+- **Verifikasi:** `npm run check:gates` → `All gates passed` (exit 0), 320/390/768/1024/1440 semua `overflow: false`.
+
+---
+
+## L-016 · Deploy Vercel: domain `<nama>.vercel.app` tidak otomatis jadi milik kita + proteksi default ON
+- **Tanggal:** 2026-11-10
+- **Salah:** (1) mengira `version.json` yang menunjuk `tazk.vercel.app` sudah benar, padahal domain itu milik **akun lain**; (2) setelah deploy, menganggap landing sudah tayang padahal `curl /version.json` mengembalikan **halaman "Log in to Vercel"**. Baru sadar saat mem-verifikasi, bukan saat menulis.
+- **Bukti:** `curl https://tazk.vercel.app/version.json` → HTML React `main.8202c31d.js` ("Collaborative Task Management", project orang lain). `vercel alias set ... tazk-manager.vercel.app` → **"already in use"**. API project: `ssoProtection = {"deploymentType":"all_except_custom_domains"}` → login wall untuk semua `*.vercel.app`. `curl` deployment-URL sebelum PATCH → halaman login Vercel; sesudah PATCH → `application/json` 200.
+- **Dampak:** butuh 4 putaran (domain + proteksi + token) sebelum landing benar-benar publik; kalau lolos, app T11 akan fetch `version.json` dan dapat HTML login, bukannya JSON.
+- **Aturan baru:**
+  1. **Production domain project Vercel (plan hobby) = `<nama>-<scope>.vercel.app`** (mis. `tazk-manager-mfdu.vercel.app`). `<nama>.vercel.app` **TIDAK otomatis** jadi milik kita — cek dulu dengan `vercel alias set` / curl sebelum memakainya di `version.json`.
+  2. **Project baru via `vercel link` punya `ssoProtection.deploymentType="all_except_custom_domains"` (default ON)** → semua `*.vercel.app` di balik login. Matikan lewat API: `PATCH /v9/projects/{id}` body `{"ssoProtection": null}`. Bukti wajib: `curl <domain>/version.json` → `Content-Type: application/json` (bukan HTML).
+  3. **Token CLI Vercel disimpan di `%APPDATA%\xdg.data\com.vercel.cli\auth.json`** (bukan `~/.vercel/auth.json` yang kosong). Untuk API, baca dari situ; jangan echo tokennya.
+- **Verifikasi:** `curl https://tazk-manager-mfdu.vercel.app/version.json` → `application/json` berisi `downloadUrl: https://tazk-manager-mfdu.vercel.app/downloads/tazk.apk`; `/`, `/en/`, `/privasi/`, `/en/privacy/` semua HTTP 200 publik.
+
+---
+
