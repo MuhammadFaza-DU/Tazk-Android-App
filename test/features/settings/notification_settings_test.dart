@@ -8,6 +8,7 @@ import 'package:tazk/core/theme/app_theme.dart';
 import 'package:tazk/core/widgets/list_row.dart';
 import 'package:tazk/data/database/database.dart';
 import 'package:tazk/data/repositories/settings_repository.dart';
+import 'package:tazk/features/pomodoro/pomodoro_controller.dart';
 import 'package:tazk/features/settings/notification_settings_screen.dart';
 import 'package:tazk/l10n/app_localizations.dart';
 import 'package:tazk/providers/database_provider.dart';
@@ -29,14 +30,21 @@ void main() {
     await db.close();
   });
 
-  Future<void> pumpScreen(WidgetTester tester, {double height = 900}) async {
+  Future<void> pumpScreen(
+    WidgetTester tester, {
+    double height = 900,
+    List<Override> extraOverrides = const [],
+  }) async {
     tester.view.physicalSize = Size(390 * 3, height * 3);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [appDatabaseProvider.overrideWithValue(db)],
+        overrides: [
+          appDatabaseProvider.overrideWithValue(db),
+          ...extraOverrides,
+        ],
         child: MaterialApp(
           locale: const Locale('id'),
           theme: AppTheme.light,
@@ -186,6 +194,28 @@ void main() {
       final size = tester.getSize(find.widgetWithText(ListRow, title));
       expect(size.height, greaterThanOrEqualTo(48));
     }
+
+    await disposeScreen(tester);
+  });
+
+  testWidgets('mematikan sesi fokus membatalkan notifikasi selesai yang dijadwalkan',
+      (tester) async {
+    var cancelled = 0;
+    await pumpScreen(tester, extraOverrides: [
+      pomodoroControllerProvider.overrideWith((ref) => PomodoroController(
+            scheduleCompletionNotification: (_, _, _) async {},
+            cancelCompletionNotification: () async => cancelled++,
+            completeHabitToday: (_) async {},
+            logHabitProgress: (_, _) async {},
+            logFocusSession: (_, _) async {},
+          )),
+    ]);
+
+    await tester.tap(find.text('Sesi fokus'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(cancelled, 1);
 
     await disposeScreen(tester);
   });

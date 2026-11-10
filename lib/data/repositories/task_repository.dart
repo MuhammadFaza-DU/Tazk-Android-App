@@ -130,7 +130,15 @@ class TaskRepository {
   }
 
   Future<void> deleteTask(int id) async {
-    await (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
+    await _db.transaction(() async {
+      final task = await (_db.select(_db.tasks)..where((t) => t.id.equals(id)))
+          .getSingleOrNull();
+      if (task != null && task.isCompleted) {
+        await _gamification.onTaskUncompleted(task.priority);
+      }
+      await (_db.delete(_db.subtasks)..where((s) => s.taskId.equals(id))).go();
+      await (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
+    });
     await _notifications.cancelTaskReminder(id);
     await _widget.refreshAll();
   }
@@ -185,11 +193,6 @@ class TaskRepository {
             .write(SubtasksCompanion(position: Value(index + 1)));
       }
     });
-  }
-
-  Future<void> setSubtaskCompleted(int subtaskId, bool completed) {
-    return (_db.update(_db.subtasks)..where((s) => s.id.equals(subtaskId)))
-        .write(SubtasksCompanion(isCompleted: Value(completed)));
   }
 
   /// Subtask checkbox entry point: keeps task completion and XP in step.

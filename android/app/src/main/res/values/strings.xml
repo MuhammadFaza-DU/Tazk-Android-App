@@ -4,4 +4,6 @@
     <string name="widget_tasks_only_description">Today\'s Tasks</string>
     <string name="widget_habits_only_description">Today\'s Habits</string>
     <string name="widget_streak_description">Streak Counter</string>
+    <string name="widget_mark_done">Tandai selesai</string>
+    <string name="widget_mark_undone">Tandai belum selesai</string>
 </resources>

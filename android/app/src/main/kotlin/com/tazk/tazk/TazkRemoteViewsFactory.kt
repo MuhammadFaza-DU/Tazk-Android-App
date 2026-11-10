@@ -68,6 +68,15 @@ class TazkRemoteViewsFactory(
         "setColorFilter",
         if (done) WidgetTheme.primary(context, dark) else WidgetTheme.label(context, dark))
 
+    // The check label says what a tap does next, not the current state.
+    views.setContentDescription(
+        R.id.item_check,
+        context.getString(
+            if (done) R.string.widget_mark_undone else R.string.widget_mark_done))
+    views.setContentDescription(
+        R.id.item_root,
+        prefs.getString("$prefix${itemName}_${position}_title", "") ?: "")
+
     // A view inside a collection cannot carry its own PendingIntent: the host
     // drops it (developer.android.com/develop/ui/views/appwidgets/collections).
     // Only a fill-in Intent survives, and the provider's template supplies the

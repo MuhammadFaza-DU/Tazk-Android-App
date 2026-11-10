@@ -95,7 +95,8 @@ void main() {
       'android/app/src/main/res/layout/widget_calendar_tasks_habits.xml',
     ).readAsStringSync();
 
-    expect(layout, contains('android:padding="5dp"'));
+    expect(layout, contains('android:padding="4dp"'));
+    expect(layout, isNot(contains('android:padding="5dp"')));
     expect(layout, isNot(contains('android:layout_height="14dp"')));
     expect(
       RegExp(r'android:layout_height="30dp"').allMatches(layout).length,
@@ -106,6 +107,51 @@ void main() {
       RegExp(r'android:textSize="12sp"').allMatches(layout).length,
       7,
       reason: 'one day-number label per cell',
+    );
+  });
+
+  test('calendar widget chrome trim leaves room for list rows', () {
+    final layout = File(
+      'android/app/src/main/res/layout/widget_calendar_tasks_habits.xml',
+    ).readAsStringSync();
+
+    final headerHeight = RegExp(
+      r'android:layout_height="(\d+)dp"[^>]*?android:orientation="horizontal"[^>]*?android:gravity="center_vertical"',
+    ).firstMatch(layout)?.group(1);
+    expect(headerHeight, '20', reason: 'header row is 20dp');
+
+    final weekStripHeight = RegExp(
+      r'@\+id/calendar_week_strip"[^>]*android:layout_height="(\d+)dp"',
+    ).firstMatch(layout)?.group(1);
+    expect(weekStripHeight, '30', reason: 'week strip is 30dp');
+
+    final goToAppHeight = RegExp(
+      r'@\+id/calendar_go_to_app"[^>]*android:layout_height="(\d+)dp"',
+    ).firstMatch(layout)?.group(1);
+    expect(goToAppHeight, '16', reason: 'go to app button is 16dp');
+
+    final rootPadding = RegExp(
+      r'android:padding="(\d+)dp"',
+    ).firstMatch(layout)?.group(1);
+    expect(rootPadding, '4', reason: 'root padding is 4dp');
+
+    final goToAppBlock = RegExp(
+      r'@\+id/calendar_go_to_app"[^>]*>',
+    ).firstMatch(layout)?.group(0) ?? '';
+    expect(
+      goToAppBlock,
+      isNot(contains('android:layout_marginTop')),
+      reason: 'go to app button has no top margin',
+    );
+
+    final chrome = int.parse(headerHeight!) +
+        int.parse(weekStripHeight!) +
+        int.parse(goToAppHeight!) +
+        int.parse(rootPadding!) * 2;
+    expect(
+      chrome,
+      lessThanOrEqualTo(78),
+      reason: 'chrome (header + week strip + button + padding) is $chrome dp',
     );
   });
 

@@ -328,6 +328,7 @@ class BackupRepository {
         'avatarId': row.avatarId,
         'xp': row.xp,
         'level': row.level,
+        'createdAt': row.createdAt.toIso8601String(),
       };
 
   Map<String, dynamic> _cosmeticUnlockJson(CosmeticUnlock row) => {
@@ -345,6 +346,8 @@ class BackupRepository {
         'notifyStreakWarning': row.notifyStreakWarning,
         'notifyFreezeUsed': row.notifyFreezeUsed,
         'notifyFocusSession': row.notifyFocusSession,
+        'checkUpdates': row.checkUpdates,
+        'skippedUpdateVersion': row.skippedUpdateVersion,
       };
 
   Map<String, dynamic> _focusSessionJson(FocusSession row) => {
@@ -436,6 +439,7 @@ class BackupRepository {
         avatarId: Value(row.stringOrNull('avatarId') ?? 'default'),
         xp: Value(row.intOr('xp', 0)),
         level: Value(row.intOr('level', 1)),
+        createdAt: Value(row.dateOrNull('createdAt') ?? DateTime.now()),
       );
 
   CosmeticUnlocksCompanion _cosmeticUnlockFrom(_Row row) =>
@@ -454,6 +458,8 @@ class BackupRepository {
         notifyStreakWarning: Value(row.boolOr('notifyStreakWarning', true)),
         notifyFreezeUsed: Value(row.boolOr('notifyFreezeUsed', true)),
         notifyFocusSession: Value(row.boolOr('notifyFocusSession', true)),
+        checkUpdates: Value(row.boolOr('checkUpdates', true)),
+        skippedUpdateVersion: Value(row.stringOrNull('skippedUpdateVersion')),
       );
 
   FocusSessionsCompanion _focusSessionFrom(_Row row) => FocusSessionsCompanion(

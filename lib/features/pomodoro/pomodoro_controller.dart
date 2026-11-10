@@ -88,6 +88,8 @@ class PomodoroController extends ChangeNotifier {
   Timer? _ticker;
   int _completionSerial = 0;
   String? _lastCompletedHabitName;
+  String _completionTitle = '';
+  String _completionBody = '';
   final ValueNotifier<Duration> remainingNotifier =
       ValueNotifier(const Duration(minutes: 25));
 
@@ -153,6 +155,8 @@ class PomodoroController extends ChangeNotifier {
     required String completionBody,
   }) async {
     if (!canStart) return;
+    _completionTitle = completionTitle;
+    _completionBody = completionBody;
     final endTime = _now().add(_sessionDuration);
     _endTime = endTime;
     _remaining = _sessionDuration;
@@ -180,6 +184,8 @@ class PomodoroController extends ChangeNotifier {
     required String completionBody,
   }) async {
     if (_status != PomodoroSessionStatus.paused) return;
+    _completionTitle = completionTitle;
+    _completionBody = completionBody;
     final endTime = _now().add(_remaining);
     _endTime = endTime;
     remainingNotifier.value = _remaining;
@@ -193,6 +199,23 @@ class PomodoroController extends ChangeNotifier {
         completionBody,
       );
     }
+  }
+
+  /// Reacts to the "Sesi fokus" toggle changing. Off cancels any scheduled
+  /// completion; on re-arms the completion for a running session's end time.
+  Future<void> onFocusSessionNotificationPrefChanged(bool enabled) async {
+    if (!enabled) {
+      await cancelCompletionNotification();
+      return;
+    }
+    if (_status != PomodoroSessionStatus.running) return;
+    final endTime = _endTime;
+    if (endTime == null) return;
+    await scheduleCompletionNotification(
+      endTime,
+      _completionTitle,
+      _completionBody,
+    );
   }
 
   Future<void> cancel() async {

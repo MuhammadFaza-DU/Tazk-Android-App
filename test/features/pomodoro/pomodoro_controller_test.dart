@@ -281,6 +281,78 @@ void main() {
       expect(controller.remaining, const Duration(minutes: 10));
     });
   });
+
+  test('turning focus-session notifications off cancels the completion', () {
+    fakeAsync((async) {
+      var now = DateTime(2026, 7, 12, 10);
+      var cancelled = 0;
+      var scheduled = 0;
+      final controller = PomodoroController(
+        now: () => now,
+        scheduleCompletionNotification: (_, _, _) async => scheduled++,
+        cancelCompletionNotification: () async => cancelled++,
+        completeHabitToday: (_) async {},
+        logHabitProgress: (_, _) async {},
+        logFocusSession: (_, _) async {},
+      );
+
+      controller.setDurationMinutes(10);
+      unawaited(
+        controller.start(completionTitle: 'Selesai', completionBody: 'Done'),
+      );
+      async.flushMicrotasks();
+      expect(scheduled, 1);
+
+      unawaited(controller.onFocusSessionNotificationPrefChanged(false));
+      async.flushMicrotasks();
+
+      expect(cancelled, 1);
+      expect(controller.status, PomodoroSessionStatus.running);
+    });
+  });
+
+  test('turning focus-session notifications back on re-arms a running session', () {
+    fakeAsync((async) {
+      var now = DateTime(2026, 7, 12, 10);
+      final scheduled = <DateTime>[];
+      final controller = PomodoroController(
+        now: () => now,
+        scheduleCompletionNotification: (endTime, _, _) async {
+          scheduled.add(endTime);
+        },
+        cancelCompletionNotification: () async {},
+        completeHabitToday: (_) async {},
+        logHabitProgress: (_, _) async {},
+        logFocusSession: (_, _) async {},
+      );
+
+      controller.setDurationMinutes(10);
+      unawaited(
+        controller.start(completionTitle: 'Selesai', completionBody: 'Done'),
+      );
+      async.flushMicrotasks();
+      scheduled.clear();
+
+      unawaited(controller.onFocusSessionNotificationPrefChanged(true));
+      async.flushMicrotasks();
+
+      expect(scheduled, [now.add(const Duration(minutes: 10))]);
+      expect(controller.status, PomodoroSessionStatus.running);
+    });
+  });
+
+  test('turning focus-session notifications on while idle schedules nothing',
+      () async {
+    var scheduled = 0;
+    final controller = _controller(
+      scheduleCompletionNotification: (_, _, _) async => scheduled++,
+    );
+
+    await controller.onFocusSessionNotificationPrefChanged(true);
+
+    expect(scheduled, 0);
+    expect(controller.status, PomodoroSessionStatus.idle);
+  });
 }
 
 PomodoroController _controller({

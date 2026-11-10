@@ -318,3 +318,13 @@
 
 ---
 
+## L-017 · STATUS.md menulis "input durasi bebas dihapus" padahal fiturnya ada di kode
+- **Tanggal:** 2026-11-10
+- **Salah:** baris fidelity board 05 Pomodoro di `docs/STATUS.md` berbunyi "**Regresi: input durasi bebas dihapus** (board hanya chip)", dan daftar "keputusan yang menunggu owner" masih memuat "durasi Pomodoro bebas dikembalikan?" — padahal fitur itu **sudah** ada di kode (`pomodoro_screen.dart` ketuk angka → sheet 1–180 menit; `setDurationMinutes`).
+- **Bukti:** `grep "durasi|sheet|1..180|setDurationMinutes" lib/features/pomodoro` → pemilih durasi bebas hadir dan teruji; log 2026-10-31 sendiri mencatatnya terverifikasi di HP.
+- **Dampak:** dokumen status menyesatkan sesi berikutnya (bisa memicu "membangun ulang" fitur yang sudah ada, atau keputusan yang salah).
+- **Aturan baru:** **status fitur wajib diverifikasi ke KODE sebelum ditulis** — klaim "X belum ada/dihilangkan" hanya setelah `grep`/membaca implementasi nyata, bukan dari board atau ingatan. Berlaku juga untuk tabel fidelity & daftar keputusan.
+- **Verifikasi:** `grep "input durasi bebas dihapus" docs/STATUS.md` → 0 hasil; baris board 05 dan daftar keputusan sudah dikoreksi.
+
+---
+

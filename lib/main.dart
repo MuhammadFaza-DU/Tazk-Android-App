@@ -21,25 +21,33 @@ import 'providers/task_providers.dart';
 import 'widgets/widget_tap_entry.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  // Stores the entry-point handle that the native widget-tap receiver uses to
-  // run a tap without the app being open. Best effort: a missing platform
-  // channel (e.g. under `flutter test`) must never block startup.
-  registerWidgetTapHandle().catchError((Object _) {});
-  runApp(const ProviderScope(child: TazkApp()));
-  // Arms the native midnight alarm so the widgets and reminders roll over to the
-  // new day even when the app is closed. Deferred until after the first frame
-  // so the (potentially slow) platform-channel init and timezone lookup in
-  // MidnightScheduler/NotificationService don't block the first paint.
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    unawaited(
-      MidnightScheduler.initialize()
-          .then((_) => MidnightScheduler.armNextMidnight())
-          .catchError((Object error) {
-        debugPrint('MidnightScheduler: background init failed: $error');
-      }),
-    );
-  });
+  runZonedGuarded(
+    () {
+      WidgetsFlutterBinding.ensureInitialized();
+      // Stores the entry-point handle that the native widget-tap receiver uses to
+      // run a tap without the app being open. Best effort: a missing platform
+      // channel (e.g. under `flutter test`) must never block startup.
+      registerWidgetTapHandle().catchError((Object _) {});
+      runApp(const ProviderScope(child: TazkApp()));
+      // Arms the native midnight alarm so the widgets and reminders roll over to the
+      // new day even when the app is closed. Deferred until after the first frame
+      // so the (potentially slow) platform-channel init and timezone lookup in
+      // MidnightScheduler/NotificationService don't block the first paint.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        unawaited(
+          MidnightScheduler.initialize()
+              .then((_) => MidnightScheduler.armNextMidnight())
+              .catchError((Object error) {
+            debugPrint('MidnightScheduler: background init failed: $error');
+          }),
+        );
+      });
+    },
+    (error, stackTrace) {
+      // Log unforeseen bootstrap errors instead of crashing silently.
+      debugPrint('Tazk: uncaught error: $error\n$stackTrace');
+    },
+  );
 }
 
 class TazkApp extends ConsumerWidget {

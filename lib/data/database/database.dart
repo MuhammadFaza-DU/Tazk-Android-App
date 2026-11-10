@@ -170,15 +170,42 @@ class AppDatabase extends _$AppDatabase {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'tazk.sqlite'));
-    final recovery = await ensureHealthyDatabaseFile(file.path);
-    if (recovery.quarantined) {
-      debugPrint(
-        'AppDatabase: corrupt database quarantined, starting fresh '
-        '(backup at ${p.basename(file.path)}.corrupt-*)',
-      );
+    return openDatabaseExecutor(
+      path: p.join(dbFolder.path, 'tazk.sqlite'),
+      open: (file) => NativeDatabase.createInBackground(file),
+    );
+  });
+}
+
+/// Opens the database file, quarantining a corrupt file first and retrying the
+/// open once if it throws anyway. A second failure is logged and rethrown as a
+/// clear [StateError] — a corrupt/unwritable database must never brick startup.
+Future<QueryExecutor> openDatabaseExecutor({
+  required String path,
+  required QueryExecutor Function(File file) open,
+}) async {
+  final file = File(path);
+  final recovery = await ensureHealthyDatabaseFile(path);
+  if (recovery.quarantined) {
+    debugPrint(
+      'AppDatabase: corrupt database quarantined, starting fresh '
+      '(backup at ${p.basename(path)}.corrupt-*)',
+    );
+    databaseRecoveredFromCorruption.value = true;
+  }
+  try {
+    return open(file);
+  } catch (error) {
+    debugPrint('AppDatabase: database open failed ($error); retrying once.');
+    final retryRecovery = await ensureHealthyDatabaseFile(path);
+    if (retryRecovery.quarantined) {
       databaseRecoveredFromCorruption.value = true;
     }
-    return NativeDatabase.createInBackground(file);
-  });
+    try {
+      return open(file);
+    } catch (secondError) {
+      debugPrint('AppDatabase: database open failed again: $secondError');
+      throw StateError('Gagal membuka database: $secondError');
+    }
+  }
 }

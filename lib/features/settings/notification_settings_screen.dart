@@ -8,6 +8,7 @@ import '../../core/widgets/list_row.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/settings_providers.dart';
+import '../pomodoro/pomodoro_controller.dart';
 
 class NotificationSettingsScreen extends ConsumerWidget {
   const NotificationSettingsScreen({super.key});
@@ -75,8 +76,12 @@ class NotificationSettingsScreen extends ConsumerWidget {
                   title: l10n.notifFocusSessionLabel,
                   subtitle: l10n.notifFocusSessionSubtitle,
                   value: settings?.notifyFocusSession ?? true,
-                  onChanged: (value) =>
-                      repo.updateNotificationPref(notifyFocusSession: value),
+                  onChanged: (value) {
+                    repo.updateNotificationPref(notifyFocusSession: value);
+                    ref
+                        .read(pomodoroControllerProvider)
+                        .onFocusSessionNotificationPrefChanged(value);
+                  },
                   showDivider: false,
                 ),
               ],

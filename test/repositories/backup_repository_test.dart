@@ -120,6 +120,7 @@ Future<void> _seedRich(AppDatabase db) async {
         avatarId: const Value('otter'),
         xp: const Value(120),
         level: const Value(3),
+        createdAt: Value(DateTime(2026, 1, 15)),
       ));
   await db.into(db.cosmeticUnlocks).insert(CosmeticUnlocksCompanion.insert(
         levelMilestone: 5,
@@ -133,6 +134,8 @@ Future<void> _seedRich(AppDatabase db) async {
         notifyStreakWarning: const Value(false),
         notifyFreezeUsed: const Value(false),
         notifyFocusSession: const Value(false),
+        checkUpdates: const Value(false),
+        skippedUpdateVersion: const Value('2.1.0'),
       ));
   await db.into(db.focusSessions).insert(FocusSessionsCompanion.insert(
         startedAt: DateTime(2026, 11, 1, 7),
