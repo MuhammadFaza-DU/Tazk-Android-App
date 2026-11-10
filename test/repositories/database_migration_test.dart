@@ -443,7 +443,7 @@ void main() {
       expect(taskCategoryKey.read<String>('on_delete'), 'SET NULL');
 
       final versionRow = await db.customSelect('PRAGMA user_version').getSingle();
-      expect(versionRow.read<int>('user_version'), 7);
+      expect(versionRow.read<int>('user_version'), 8);
 
       // The enum order is the stored contract: pin the raw ints, not the symbols.
       const expectedColorInts = <String, int>{
@@ -639,7 +639,93 @@ void main() {
       expect(settings.notifyFreezeUsed, isTrue);
 
       final versionRow = await db.customSelect('PRAGMA user_version').getSingle();
-      expect(versionRow.read<int>('user_version'), 7);
+      expect(versionRow.read<int>('user_version'), 8);
+    } finally {
+      await db.close();
+      await tempDir.delete(recursive: true);
+    }
+  });
+
+  test(
+      'opens a version 7 database and adds check_updates, skipped_update_version, '
+      'and created_at (schema v8)', () async {
+    final tempDir = await Directory.systemTemp.createTemp('tazk_db_migration_');
+    final dbFile =
+        File('${tempDir.path}${Platform.pathSeparator}tazk.sqlite');
+    final db = AppDatabase.forTesting(
+      NativeDatabase(
+        dbFile,
+        setup: (rawDb) {
+          rawDb.execute('''
+            CREATE TABLE app_settings (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              theme_mode INTEGER NOT NULL DEFAULT 0,
+              language INTEGER NOT NULL DEFAULT 0,
+              notify_tasks INTEGER NOT NULL DEFAULT 1 CHECK (notify_tasks IN (0, 1)),
+              notify_habits INTEGER NOT NULL DEFAULT 1 CHECK (notify_habits IN (0, 1)),
+              notify_streak_warning INTEGER NOT NULL DEFAULT 1 CHECK (notify_streak_warning IN (0, 1)),
+              notify_freeze_used INTEGER NOT NULL DEFAULT 1 CHECK (notify_freeze_used IN (0, 1)),
+              notify_focus_session INTEGER NOT NULL DEFAULT 1 CHECK (notify_focus_session IN (0, 1))
+            );
+          ''');
+          rawDb.execute('''
+            CREATE TABLE user_profile (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL DEFAULT '',
+              avatar_id TEXT NOT NULL DEFAULT 'default',
+              xp INTEGER NOT NULL DEFAULT 0,
+              level INTEGER NOT NULL DEFAULT 1
+            );
+          ''');
+          rawDb.execute(
+            'INSERT INTO app_settings '
+            '(id, theme_mode, language, notify_tasks, notify_habits, '
+            'notify_streak_warning, notify_freeze_used, notify_focus_session) '
+            'VALUES (1, 1, 1, 0, 1, 0, 1, 0);',
+          );
+          rawDb.execute(
+            "INSERT INTO user_profile (id, name, avatar_id, xp, level) "
+            "VALUES (1, 'Faza', 'otter', 120, 3);",
+          );
+          rawDb.execute('PRAGMA user_version = 7;');
+        },
+      ),
+    );
+    try {
+      Future<List<String>> columnNames(String table) async {
+        final rows = await db.customSelect("PRAGMA table_info('$table')").get();
+        return rows.map((row) => row.read<String>('name')).toList();
+      }
+
+      expect(await columnNames('app_settings'),
+          containsAll(['check_updates', 'skipped_update_version']));
+      expect(await columnNames('user_profile'), contains('created_at'));
+
+      final settings = await (db.select(db.appSettings)
+            ..where((row) => row.id.equals(1)))
+          .getSingle();
+      expect(settings.checkUpdates, isTrue);
+      expect(settings.skippedUpdateVersion, isNull);
+      expect(settings.themeMode, AppThemeMode.dark);
+      expect(settings.language, AppLanguage.english);
+      expect(settings.notifyTasks, isFalse);
+      expect(settings.notifyHabits, isTrue);
+      expect(settings.notifyStreakWarning, isFalse);
+      expect(settings.notifyFreezeUsed, isTrue);
+      expect(settings.notifyFocusSession, isFalse);
+
+      final profile = await (db.select(db.userProfile)
+            ..where((row) => row.id.equals(1)))
+          .getSingle();
+      expect(profile.name, 'Faza');
+      expect(profile.avatarId, 'otter');
+      expect(profile.xp, 120);
+      expect(profile.level, 3);
+      expect(profile.createdAt, isNotNull);
+
+      final versionRow =
+          await db.customSelect('PRAGMA user_version').getSingle();
+      expect(versionRow.read<int>('user_version'), 8);
     } finally {
       await db.close();
       await tempDir.delete(recursive: true);

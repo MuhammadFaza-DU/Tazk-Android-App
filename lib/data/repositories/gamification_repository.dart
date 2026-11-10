@@ -47,12 +47,13 @@ class GamificationRepository {
     return _db.select(_db.userProfile).watchSingleOrNull().map(
           (profile) =>
               profile ??
-              const UserProfileData(
+              UserProfileData(
                 id: 0,
                 name: '',
                 avatarId: 'default',
                 xp: 0,
                 level: 1,
+                createdAt: DateTime.now(),
               ),
         );
   }

@@ -3144,8 +3144,27 @@ class $UserProfileTable extends UserProfile
     requiredDuringInsert: false,
     defaultValue: const Constant(1),
   );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name, avatarId, xp, level];
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    avatarId,
+    xp,
+    level,
+    createdAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3182,6 +3201,12 @@ class $UserProfileTable extends UserProfile
         level.isAcceptableOrUnknown(data['level']!, _levelMeta),
       );
     }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
     return context;
   }
 
@@ -3211,6 +3236,10 @@ class $UserProfileTable extends UserProfile
         DriftSqlType.int,
         data['${effectivePrefix}level'],
       )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
     );
   }
 
@@ -3226,12 +3255,14 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
   final String avatarId;
   final int xp;
   final int level;
+  final DateTime createdAt;
   const UserProfileData({
     required this.id,
     required this.name,
     required this.avatarId,
     required this.xp,
     required this.level,
+    required this.createdAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3241,6 +3272,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
     map['avatar_id'] = Variable<String>(avatarId);
     map['xp'] = Variable<int>(xp);
     map['level'] = Variable<int>(level);
+    map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
 
@@ -3251,6 +3283,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
       avatarId: Value(avatarId),
       xp: Value(xp),
       level: Value(level),
+      createdAt: Value(createdAt),
     );
   }
 
@@ -3265,6 +3298,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
       avatarId: serializer.fromJson<String>(json['avatarId']),
       xp: serializer.fromJson<int>(json['xp']),
       level: serializer.fromJson<int>(json['level']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
   @override
@@ -3276,6 +3310,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
       'avatarId': serializer.toJson<String>(avatarId),
       'xp': serializer.toJson<int>(xp),
       'level': serializer.toJson<int>(level),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
@@ -3285,12 +3320,14 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
     String? avatarId,
     int? xp,
     int? level,
+    DateTime? createdAt,
   }) => UserProfileData(
     id: id ?? this.id,
     name: name ?? this.name,
     avatarId: avatarId ?? this.avatarId,
     xp: xp ?? this.xp,
     level: level ?? this.level,
+    createdAt: createdAt ?? this.createdAt,
   );
   UserProfileData copyWithCompanion(UserProfileCompanion data) {
     return UserProfileData(
@@ -3299,6 +3336,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
       avatarId: data.avatarId.present ? data.avatarId.value : this.avatarId,
       xp: data.xp.present ? data.xp.value : this.xp,
       level: data.level.present ? data.level.value : this.level,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
 
@@ -3309,13 +3347,14 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
           ..write('name: $name, ')
           ..write('avatarId: $avatarId, ')
           ..write('xp: $xp, ')
-          ..write('level: $level')
+          ..write('level: $level, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, avatarId, xp, level);
+  int get hashCode => Object.hash(id, name, avatarId, xp, level, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3324,7 +3363,8 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
           other.name == this.name &&
           other.avatarId == this.avatarId &&
           other.xp == this.xp &&
-          other.level == this.level);
+          other.level == this.level &&
+          other.createdAt == this.createdAt);
 }
 
 class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
@@ -3333,12 +3373,14 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
   final Value<String> avatarId;
   final Value<int> xp;
   final Value<int> level;
+  final Value<DateTime> createdAt;
   const UserProfileCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.avatarId = const Value.absent(),
     this.xp = const Value.absent(),
     this.level = const Value.absent(),
+    this.createdAt = const Value.absent(),
   });
   UserProfileCompanion.insert({
     this.id = const Value.absent(),
@@ -3346,6 +3388,7 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
     this.avatarId = const Value.absent(),
     this.xp = const Value.absent(),
     this.level = const Value.absent(),
+    this.createdAt = const Value.absent(),
   });
   static Insertable<UserProfileData> custom({
     Expression<int>? id,
@@ -3353,6 +3396,7 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
     Expression<String>? avatarId,
     Expression<int>? xp,
     Expression<int>? level,
+    Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3360,6 +3404,7 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
       if (avatarId != null) 'avatar_id': avatarId,
       if (xp != null) 'xp': xp,
       if (level != null) 'level': level,
+      if (createdAt != null) 'created_at': createdAt,
     });
   }
 
@@ -3369,6 +3414,7 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
     Value<String>? avatarId,
     Value<int>? xp,
     Value<int>? level,
+    Value<DateTime>? createdAt,
   }) {
     return UserProfileCompanion(
       id: id ?? this.id,
@@ -3376,6 +3422,7 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
       avatarId: avatarId ?? this.avatarId,
       xp: xp ?? this.xp,
       level: level ?? this.level,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -3397,6 +3444,9 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
     if (level.present) {
       map['level'] = Variable<int>(level.value);
     }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
     return map;
   }
 
@@ -3407,7 +3457,8 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
           ..write('name: $name, ')
           ..write('avatarId: $avatarId, ')
           ..write('xp: $xp, ')
-          ..write('level: $level')
+          ..write('level: $level, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
@@ -3788,6 +3839,32 @@ class $AppSettingsTable extends AppSettings
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _checkUpdatesMeta = const VerificationMeta(
+    'checkUpdates',
+  );
+  @override
+  late final GeneratedColumn<bool> checkUpdates = GeneratedColumn<bool>(
+    'check_updates',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("check_updates" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _skippedUpdateVersionMeta =
+      const VerificationMeta('skippedUpdateVersion');
+  @override
+  late final GeneratedColumn<String> skippedUpdateVersion =
+      GeneratedColumn<String>(
+        'skipped_update_version',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3798,6 +3875,8 @@ class $AppSettingsTable extends AppSettings
     notifyStreakWarning,
     notifyFreezeUsed,
     notifyFocusSession,
+    checkUpdates,
+    skippedUpdateVersion,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3859,6 +3938,24 @@ class $AppSettingsTable extends AppSettings
         ),
       );
     }
+    if (data.containsKey('check_updates')) {
+      context.handle(
+        _checkUpdatesMeta,
+        checkUpdates.isAcceptableOrUnknown(
+          data['check_updates']!,
+          _checkUpdatesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('skipped_update_version')) {
+      context.handle(
+        _skippedUpdateVersionMeta,
+        skippedUpdateVersion.isAcceptableOrUnknown(
+          data['skipped_update_version']!,
+          _skippedUpdateVersionMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3904,6 +4001,14 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.bool,
         data['${effectivePrefix}notify_focus_session'],
       )!,
+      checkUpdates: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}check_updates'],
+      )!,
+      skippedUpdateVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}skipped_update_version'],
+      ),
     );
   }
 
@@ -3927,6 +4032,8 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
   final bool notifyStreakWarning;
   final bool notifyFreezeUsed;
   final bool notifyFocusSession;
+  final bool checkUpdates;
+  final String? skippedUpdateVersion;
   const AppSetting({
     required this.id,
     required this.themeMode,
@@ -3936,6 +4043,8 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     required this.notifyStreakWarning,
     required this.notifyFreezeUsed,
     required this.notifyFocusSession,
+    required this.checkUpdates,
+    this.skippedUpdateVersion,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3956,6 +4065,10 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     map['notify_streak_warning'] = Variable<bool>(notifyStreakWarning);
     map['notify_freeze_used'] = Variable<bool>(notifyFreezeUsed);
     map['notify_focus_session'] = Variable<bool>(notifyFocusSession);
+    map['check_updates'] = Variable<bool>(checkUpdates);
+    if (!nullToAbsent || skippedUpdateVersion != null) {
+      map['skipped_update_version'] = Variable<String>(skippedUpdateVersion);
+    }
     return map;
   }
 
@@ -3969,6 +4082,10 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       notifyStreakWarning: Value(notifyStreakWarning),
       notifyFreezeUsed: Value(notifyFreezeUsed),
       notifyFocusSession: Value(notifyFocusSession),
+      checkUpdates: Value(checkUpdates),
+      skippedUpdateVersion: skippedUpdateVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(skippedUpdateVersion),
     );
   }
 
@@ -3992,6 +4109,10 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       ),
       notifyFreezeUsed: serializer.fromJson<bool>(json['notifyFreezeUsed']),
       notifyFocusSession: serializer.fromJson<bool>(json['notifyFocusSession']),
+      checkUpdates: serializer.fromJson<bool>(json['checkUpdates']),
+      skippedUpdateVersion: serializer.fromJson<String?>(
+        json['skippedUpdateVersion'],
+      ),
     );
   }
   @override
@@ -4010,6 +4131,8 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       'notifyStreakWarning': serializer.toJson<bool>(notifyStreakWarning),
       'notifyFreezeUsed': serializer.toJson<bool>(notifyFreezeUsed),
       'notifyFocusSession': serializer.toJson<bool>(notifyFocusSession),
+      'checkUpdates': serializer.toJson<bool>(checkUpdates),
+      'skippedUpdateVersion': serializer.toJson<String?>(skippedUpdateVersion),
     };
   }
 
@@ -4022,6 +4145,8 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     bool? notifyStreakWarning,
     bool? notifyFreezeUsed,
     bool? notifyFocusSession,
+    bool? checkUpdates,
+    Value<String?> skippedUpdateVersion = const Value.absent(),
   }) => AppSetting(
     id: id ?? this.id,
     themeMode: themeMode ?? this.themeMode,
@@ -4031,6 +4156,10 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     notifyStreakWarning: notifyStreakWarning ?? this.notifyStreakWarning,
     notifyFreezeUsed: notifyFreezeUsed ?? this.notifyFreezeUsed,
     notifyFocusSession: notifyFocusSession ?? this.notifyFocusSession,
+    checkUpdates: checkUpdates ?? this.checkUpdates,
+    skippedUpdateVersion: skippedUpdateVersion.present
+        ? skippedUpdateVersion.value
+        : this.skippedUpdateVersion,
   );
   AppSetting copyWithCompanion(AppSettingsCompanion data) {
     return AppSetting(
@@ -4052,6 +4181,12 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       notifyFocusSession: data.notifyFocusSession.present
           ? data.notifyFocusSession.value
           : this.notifyFocusSession,
+      checkUpdates: data.checkUpdates.present
+          ? data.checkUpdates.value
+          : this.checkUpdates,
+      skippedUpdateVersion: data.skippedUpdateVersion.present
+          ? data.skippedUpdateVersion.value
+          : this.skippedUpdateVersion,
     );
   }
 
@@ -4065,7 +4200,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
           ..write('notifyHabits: $notifyHabits, ')
           ..write('notifyStreakWarning: $notifyStreakWarning, ')
           ..write('notifyFreezeUsed: $notifyFreezeUsed, ')
-          ..write('notifyFocusSession: $notifyFocusSession')
+          ..write('notifyFocusSession: $notifyFocusSession, ')
+          ..write('checkUpdates: $checkUpdates, ')
+          ..write('skippedUpdateVersion: $skippedUpdateVersion')
           ..write(')'))
         .toString();
   }
@@ -4080,6 +4217,8 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     notifyStreakWarning,
     notifyFreezeUsed,
     notifyFocusSession,
+    checkUpdates,
+    skippedUpdateVersion,
   );
   @override
   bool operator ==(Object other) =>
@@ -4092,7 +4231,9 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
           other.notifyHabits == this.notifyHabits &&
           other.notifyStreakWarning == this.notifyStreakWarning &&
           other.notifyFreezeUsed == this.notifyFreezeUsed &&
-          other.notifyFocusSession == this.notifyFocusSession);
+          other.notifyFocusSession == this.notifyFocusSession &&
+          other.checkUpdates == this.checkUpdates &&
+          other.skippedUpdateVersion == this.skippedUpdateVersion);
 }
 
 class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
@@ -4104,6 +4245,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   final Value<bool> notifyStreakWarning;
   final Value<bool> notifyFreezeUsed;
   final Value<bool> notifyFocusSession;
+  final Value<bool> checkUpdates;
+  final Value<String?> skippedUpdateVersion;
   const AppSettingsCompanion({
     this.id = const Value.absent(),
     this.themeMode = const Value.absent(),
@@ -4113,6 +4256,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     this.notifyStreakWarning = const Value.absent(),
     this.notifyFreezeUsed = const Value.absent(),
     this.notifyFocusSession = const Value.absent(),
+    this.checkUpdates = const Value.absent(),
+    this.skippedUpdateVersion = const Value.absent(),
   });
   AppSettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -4123,6 +4268,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     this.notifyStreakWarning = const Value.absent(),
     this.notifyFreezeUsed = const Value.absent(),
     this.notifyFocusSession = const Value.absent(),
+    this.checkUpdates = const Value.absent(),
+    this.skippedUpdateVersion = const Value.absent(),
   });
   static Insertable<AppSetting> custom({
     Expression<int>? id,
@@ -4133,6 +4280,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     Expression<bool>? notifyStreakWarning,
     Expression<bool>? notifyFreezeUsed,
     Expression<bool>? notifyFocusSession,
+    Expression<bool>? checkUpdates,
+    Expression<String>? skippedUpdateVersion,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4145,6 +4294,9 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
       if (notifyFreezeUsed != null) 'notify_freeze_used': notifyFreezeUsed,
       if (notifyFocusSession != null)
         'notify_focus_session': notifyFocusSession,
+      if (checkUpdates != null) 'check_updates': checkUpdates,
+      if (skippedUpdateVersion != null)
+        'skipped_update_version': skippedUpdateVersion,
     });
   }
 
@@ -4157,6 +4309,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     Value<bool>? notifyStreakWarning,
     Value<bool>? notifyFreezeUsed,
     Value<bool>? notifyFocusSession,
+    Value<bool>? checkUpdates,
+    Value<String?>? skippedUpdateVersion,
   }) {
     return AppSettingsCompanion(
       id: id ?? this.id,
@@ -4167,6 +4321,8 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
       notifyStreakWarning: notifyStreakWarning ?? this.notifyStreakWarning,
       notifyFreezeUsed: notifyFreezeUsed ?? this.notifyFreezeUsed,
       notifyFocusSession: notifyFocusSession ?? this.notifyFocusSession,
+      checkUpdates: checkUpdates ?? this.checkUpdates,
+      skippedUpdateVersion: skippedUpdateVersion ?? this.skippedUpdateVersion,
     );
   }
 
@@ -4201,6 +4357,14 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     if (notifyFocusSession.present) {
       map['notify_focus_session'] = Variable<bool>(notifyFocusSession.value);
     }
+    if (checkUpdates.present) {
+      map['check_updates'] = Variable<bool>(checkUpdates.value);
+    }
+    if (skippedUpdateVersion.present) {
+      map['skipped_update_version'] = Variable<String>(
+        skippedUpdateVersion.value,
+      );
+    }
     return map;
   }
 
@@ -4214,7 +4378,9 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
           ..write('notifyHabits: $notifyHabits, ')
           ..write('notifyStreakWarning: $notifyStreakWarning, ')
           ..write('notifyFreezeUsed: $notifyFreezeUsed, ')
-          ..write('notifyFocusSession: $notifyFocusSession')
+          ..write('notifyFocusSession: $notifyFocusSession, ')
+          ..write('checkUpdates: $checkUpdates, ')
+          ..write('skippedUpdateVersion: $skippedUpdateVersion')
           ..write(')'))
         .toString();
   }
@@ -7490,6 +7656,7 @@ typedef $$UserProfileTableCreateCompanionBuilder =
       Value<String> avatarId,
       Value<int> xp,
       Value<int> level,
+      Value<DateTime> createdAt,
     });
 typedef $$UserProfileTableUpdateCompanionBuilder =
     UserProfileCompanion Function({
@@ -7498,6 +7665,7 @@ typedef $$UserProfileTableUpdateCompanionBuilder =
       Value<String> avatarId,
       Value<int> xp,
       Value<int> level,
+      Value<DateTime> createdAt,
     });
 
 class $$UserProfileTableFilterComposer
@@ -7531,6 +7699,11 @@ class $$UserProfileTableFilterComposer
 
   ColumnFilters<int> get level => $composableBuilder(
     column: $table.level,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -7568,6 +7741,11 @@ class $$UserProfileTableOrderingComposer
     column: $table.level,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UserProfileTableAnnotationComposer
@@ -7593,6 +7771,9 @@ class $$UserProfileTableAnnotationComposer
 
   GeneratedColumn<int> get level =>
       $composableBuilder(column: $table.level, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
 
 class $$UserProfileTableTableManager
@@ -7631,12 +7812,14 @@ class $$UserProfileTableTableManager
                 Value<String> avatarId = const Value.absent(),
                 Value<int> xp = const Value.absent(),
                 Value<int> level = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
               }) => UserProfileCompanion(
                 id: id,
                 name: name,
                 avatarId: avatarId,
                 xp: xp,
                 level: level,
+                createdAt: createdAt,
               ),
           createCompanionCallback:
               ({
@@ -7645,12 +7828,14 @@ class $$UserProfileTableTableManager
                 Value<String> avatarId = const Value.absent(),
                 Value<int> xp = const Value.absent(),
                 Value<int> level = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
               }) => UserProfileCompanion.insert(
                 id: id,
                 name: name,
                 avatarId: avatarId,
                 xp: xp,
                 level: level,
+                createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -7853,6 +8038,8 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
       Value<bool> notifyStreakWarning,
       Value<bool> notifyFreezeUsed,
       Value<bool> notifyFocusSession,
+      Value<bool> checkUpdates,
+      Value<String?> skippedUpdateVersion,
     });
 typedef $$AppSettingsTableUpdateCompanionBuilder =
     AppSettingsCompanion Function({
@@ -7864,6 +8051,8 @@ typedef $$AppSettingsTableUpdateCompanionBuilder =
       Value<bool> notifyStreakWarning,
       Value<bool> notifyFreezeUsed,
       Value<bool> notifyFocusSession,
+      Value<bool> checkUpdates,
+      Value<String?> skippedUpdateVersion,
     });
 
 class $$AppSettingsTableFilterComposer
@@ -7916,6 +8105,16 @@ class $$AppSettingsTableFilterComposer
     column: $table.notifyFocusSession,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<bool> get checkUpdates => $composableBuilder(
+    column: $table.checkUpdates,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get skippedUpdateVersion => $composableBuilder(
+    column: $table.skippedUpdateVersion,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$AppSettingsTableOrderingComposer
@@ -7966,6 +8165,16 @@ class $$AppSettingsTableOrderingComposer
     column: $table.notifyFocusSession,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get checkUpdates => $composableBuilder(
+    column: $table.checkUpdates,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get skippedUpdateVersion => $composableBuilder(
+    column: $table.skippedUpdateVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AppSettingsTableAnnotationComposer
@@ -8010,6 +8219,16 @@ class $$AppSettingsTableAnnotationComposer
     column: $table.notifyFocusSession,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get checkUpdates => $composableBuilder(
+    column: $table.checkUpdates,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get skippedUpdateVersion => $composableBuilder(
+    column: $table.skippedUpdateVersion,
+    builder: (column) => column,
+  );
 }
 
 class $$AppSettingsTableTableManager
@@ -8051,6 +8270,8 @@ class $$AppSettingsTableTableManager
                 Value<bool> notifyStreakWarning = const Value.absent(),
                 Value<bool> notifyFreezeUsed = const Value.absent(),
                 Value<bool> notifyFocusSession = const Value.absent(),
+                Value<bool> checkUpdates = const Value.absent(),
+                Value<String?> skippedUpdateVersion = const Value.absent(),
               }) => AppSettingsCompanion(
                 id: id,
                 themeMode: themeMode,
@@ -8060,6 +8281,8 @@ class $$AppSettingsTableTableManager
                 notifyStreakWarning: notifyStreakWarning,
                 notifyFreezeUsed: notifyFreezeUsed,
                 notifyFocusSession: notifyFocusSession,
+                checkUpdates: checkUpdates,
+                skippedUpdateVersion: skippedUpdateVersion,
               ),
           createCompanionCallback:
               ({
@@ -8071,6 +8294,8 @@ class $$AppSettingsTableTableManager
                 Value<bool> notifyStreakWarning = const Value.absent(),
                 Value<bool> notifyFreezeUsed = const Value.absent(),
                 Value<bool> notifyFocusSession = const Value.absent(),
+                Value<bool> checkUpdates = const Value.absent(),
+                Value<String?> skippedUpdateVersion = const Value.absent(),
               }) => AppSettingsCompanion.insert(
                 id: id,
                 themeMode: themeMode,
@@ -8080,6 +8305,8 @@ class $$AppSettingsTableTableManager
                 notifyStreakWarning: notifyStreakWarning,
                 notifyFreezeUsed: notifyFreezeUsed,
                 notifyFocusSession: notifyFocusSession,
+                checkUpdates: checkUpdates,
+                skippedUpdateVersion: skippedUpdateVersion,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -37,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -89,6 +89,17 @@ class AppDatabase extends _$AppDatabase {
             await _addColumnIfMissing(
                 m, appSettings, appSettings.notifyFocusSession);
           }
+          if (from < 8) {
+            // v8: update-check prefs (T11) + profile.createdAt (T12). Same
+            // tolerance as earlier branches: older files may lack the tables.
+            await _createTableIfMissing(m, appSettings);
+            await _createTableIfMissing(m, userProfile);
+            await _addColumnIfMissing(
+                m, appSettings, appSettings.checkUpdates);
+            await _addColumnIfMissing(
+                m, appSettings, appSettings.skippedUpdateVersion);
+            await _addCreatedAtIfNeeded(m);
+          }
         },
       );
 
@@ -132,6 +143,27 @@ class AppDatabase extends _$AppDatabase {
     if (!columnExists) {
       await migrator.addColumn(habits, column);
     }
+  }
+
+  // user_profile.created_at memakai clientDefault (tanpa SQL default), jadi
+  // `addColumn` akan menghasilkan `ADD COLUMN ... NOT NULL` yang ditolak SQLite
+  // pada tabel berisi baris. Tambahkan nullable lalu backfill dengan timestamp.
+  Future<void> _addCreatedAtIfNeeded(Migrator migrator) async {
+    final existingColumns = await customSelect(
+      'PRAGMA table_info(user_profile)',
+    ).get();
+    final columnExists = existingColumns.any(
+      (row) => row.read<String>('name') == 'created_at',
+    );
+    if (columnExists) return;
+    await customStatement(
+      'ALTER TABLE user_profile ADD COLUMN created_at INTEGER;',
+    );
+    await customStatement(
+      'UPDATE user_profile SET created_at = '
+      "(CAST(strftime('%s', 'now') AS INTEGER) * 1000) "
+      'WHERE created_at IS NULL;',
+    );
   }
 }
 

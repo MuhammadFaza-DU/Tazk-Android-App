@@ -46,6 +46,7 @@ void main() {
     avatarId: 'default',
     xp: 620,
     level: 12,
+    createdAt: DateTime(2026, 1, 1),
   );
 
   const streakState = StreakStateData(

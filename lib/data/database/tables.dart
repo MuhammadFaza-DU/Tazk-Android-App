@@ -96,6 +96,10 @@ class UserProfile extends Table {
   TextColumn get avatarId => text().withDefault(const Constant('default'))();
   IntColumn get xp => integer().withDefault(const Constant(0))();
   IntColumn get level => integer().withDefault(const Constant(1))();
+  // clientDefault (bukan withDefault): SQLite melarang ALTER TABLE ADD COLUMN
+  // dengan default non-konstanta (currentDateAndTime), jadi default "now" diisi
+  // di sisi Dart, dan migrasi menambah kolom nullable lalu backfill.
+  DateTimeColumn get createdAt => dateTime().clientDefault(() => DateTime.now())();
 }
 
 class CosmeticUnlocks extends Table {
@@ -123,6 +127,9 @@ class AppSettings extends Table {
       boolean().withDefault(const Constant(true))();
   BoolColumn get notifyFocusSession =>
       boolean().withDefault(const Constant(true))();
+  BoolColumn get checkUpdates =>
+      boolean().withDefault(const Constant(true))();
+  TextColumn get skippedUpdateVersion => text().nullable()();
 }
 
 @TableIndex(name: 'idx_focus_sessions_started_at', columns: {#startedAt})

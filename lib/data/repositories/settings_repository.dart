@@ -31,6 +31,8 @@ class SettingsRepository {
                 notifyStreakWarning: true,
                 notifyFreezeUsed: true,
                 notifyFocusSession: true,
+                checkUpdates: true,
+                skippedUpdateVersion: null,
               ),
         );
   }
