@@ -70,7 +70,7 @@
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/widget_text_muted"
-        android:textSize="8sp"
+        android:textSize="9sp"
         android:textStyle="bold" />
       <TextView
         android:id="@+id/calendar_day_0"
@@ -98,7 +98,7 @@
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/widget_text_muted"
-        android:textSize="8sp"
+        android:textSize="9sp"
         android:textStyle="bold" />
       <TextView
         android:id="@+id/calendar_day_1"
@@ -126,7 +126,7 @@
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/widget_text_muted"
-        android:textSize="8sp"
+        android:textSize="9sp"
         android:textStyle="bold" />
       <TextView
         android:id="@+id/calendar_day_2"
@@ -154,7 +154,7 @@
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/widget_text_muted"
-        android:textSize="8sp"
+        android:textSize="9sp"
         android:textStyle="bold" />
       <TextView
         android:id="@+id/calendar_day_3"
@@ -182,7 +182,7 @@
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/widget_text_muted"
-        android:textSize="8sp"
+        android:textSize="9sp"
         android:textStyle="bold" />
       <TextView
         android:id="@+id/calendar_day_4"
@@ -210,7 +210,7 @@
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/widget_text_muted"
-        android:textSize="8sp"
+        android:textSize="9sp"
         android:textStyle="bold" />
       <TextView
         android:id="@+id/calendar_day_5"
@@ -238,7 +238,7 @@
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/widget_text_muted"
-        android:textSize="8sp"
+        android:textSize="9sp"
         android:textStyle="bold" />
       <TextView
         android:id="@+id/calendar_day_6"
@@ -270,7 +270,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/cal_tasks_label" android:text="TASKS"
         android:textColor="@color/widget_label"
-        android:textSize="8sp"
+        android:textSize="9sp"
+        android:letterSpacing="0.08"
         android:textStyle="bold" />
       <FrameLayout
         android:layout_width="match_parent"
@@ -307,7 +308,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/cal_habits_label" android:text="HABITS"
         android:textColor="@color/widget_label"
-        android:textSize="8sp"
+        android:textSize="9sp"
+        android:letterSpacing="0.08"
         android:textStyle="bold" />
       <FrameLayout
         android:layout_width="match_parent"

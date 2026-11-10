@@ -25,28 +25,67 @@ Future<void> showRankCelebration(
   BuildContext context, {
   required String rankLabel,
 }) {
+  final l10n = AppLocalizations.of(context) ?? AppLocalizationsId();
+  return _showCelebrationDialog(
+    context,
+    title: l10n.celebrationRankTitle,
+    pillLabel: rankLabel,
+  );
+}
+
+/// Momen reward "naik level" — dialog yang sama dengan [showRankCelebration],
+/// judul diisi `levelUpTitle(level)` dan pill memakai [title].
+Future<void> showLevelCelebration(
+  BuildContext context, {
+  required int level,
+  required String title,
+}) {
+  final l10n = AppLocalizations.of(context) ?? AppLocalizationsId();
+  return _showCelebrationDialog(
+    context,
+    title: l10n.levelUpTitle(level),
+    pillLabel: title,
+  );
+}
+
+Future<void> _showCelebrationDialog(
+  BuildContext context, {
+  required String title,
+  required String pillLabel,
+}) {
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
     barrierLabel: 'celebration',
     transitionDuration: context.motion(AppMotion.base),
-    pageBuilder: (context, _, _) => _CelebrationDialog(rankLabel: rankLabel),
-    transitionBuilder: (context, animation, _, child) {
-      final scale = Tween<double>(begin: 0.96, end: 1.0).animate(
-        CurvedAnimation(parent: animation, curve: AppMotion.easeStandard),
-      );
-      return FadeTransition(
-        opacity: animation,
-        child: ScaleTransition(scale: scale, child: child),
-      );
-    },
+    pageBuilder: (context, _, _) => _CelebrationDialog(
+      title: title,
+      pillLabel: pillLabel,
+    ),
+    transitionBuilder: _celebrationTransition,
+  );
+}
+
+Widget _celebrationTransition(
+  BuildContext context,
+  Animation<double> animation,
+  Animation<double> secondaryAnimation,
+  Widget child,
+) {
+  final scale = Tween<double>(begin: 0.96, end: 1.0).animate(
+    CurvedAnimation(parent: animation, curve: AppMotion.easeStandard),
+  );
+  return FadeTransition(
+    opacity: animation,
+    child: ScaleTransition(scale: scale, child: child),
   );
 }
 
 class _CelebrationDialog extends StatefulWidget {
-  const _CelebrationDialog({required this.rankLabel});
+  const _CelebrationDialog({required this.title, required this.pillLabel});
 
-  final String rankLabel;
+  final String title;
+  final String pillLabel;
 
   /// Diameter lingkaran maskot. Board: 200px @2x.
   static const double mascotDiameter = 100;
@@ -136,12 +175,12 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
           ),
           const SizedBox(height: 24), // board: lingkaran → judul
           Text(
-            l10n.celebrationRankTitle,
+            widget.title,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineSmall?.copyWith(color: colors.ink),
           ),
           const SizedBox(height: 12), // board: judul → pill
-          _RankPill(label: widget.rankLabel),
+          _RankPill(label: widget.pillLabel),
           const SizedBox(height: 12), // board: pill → CTA
           AppButton.primary(
             label: l10n.celebrationContinueAction,

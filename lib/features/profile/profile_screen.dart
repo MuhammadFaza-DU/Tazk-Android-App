@@ -827,6 +827,9 @@ class _CollectionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final theme = Theme.of(context);
+    final status = isUnlocked
+        ? AppLocalizations.of(context)!.tileUnlockedLabel
+        : AppLocalizations.of(context)!.tileLockedLabel;
 
     final labelText = Text(
       label,
@@ -864,12 +867,24 @@ class _CollectionTile extends StatelessWidget {
                 child: labelText,
               ),
             ),
+          const SizedBox(height: 2),
+          Text(
+            status,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: isUnlocked ? colors.ink : colors.inkMuted,
+            ),
+          ),
         ],
       ),
     );
 
-    if (!shine || !isUnlocked) return tile;
-    return ShineSweep(borderRadius: _radius, child: tile);
+    final semantified = Semantics(label: '$label, $status', child: tile);
+
+    if (!shine || !isUnlocked) return semantified;
+    return ShineSweep(borderRadius: _radius, child: semantified);
   }
 }
 

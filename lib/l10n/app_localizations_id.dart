@@ -1210,6 +1210,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get updateBannerDismiss => 'Nanti';
 
   @override
+  String get updateCheckUpToDate => 'Kamu pakai versi terbaru';
+
+  @override
+  String get updateCheckFailed => 'Gagal memeriksa pembaruan';
+
+  @override
   String profileJoinedMonths(int months) {
     return 'Bergabung $months bulan lalu';
   }
@@ -1247,4 +1253,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get widgetMarkUndone => 'Tandai belum selesai';
+
+  @override
+  String get tileLockedLabel => 'Terkunci';
+
+  @override
+  String get tileUnlockedLabel => 'Terbuka';
 }

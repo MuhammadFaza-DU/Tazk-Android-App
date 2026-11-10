@@ -556,6 +556,8 @@
   },
   "updateBannerAction": "Unduh",
   "updateBannerDismiss": "Nanti",
+  "updateCheckUpToDate": "Kamu pakai versi terbaru",
+  "updateCheckFailed": "Gagal memeriksa pembaruan",
   "profileJoinedMonths": "Bergabung {months} bulan lalu",
   "@profileJoinedMonths": {
     "placeholders": {
@@ -585,5 +587,7 @@
   },
   "widgetOpenApp": "Buka aplikasi",
   "widgetMarkDone": "Tandai selesai",
-  "widgetMarkUndone": "Tandai belum selesai"
+  "widgetMarkUndone": "Tandai belum selesai",
+  "tileLockedLabel": "Terkunci",
+  "tileUnlockedLabel": "Terbuka"
 }

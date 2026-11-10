@@ -78,4 +78,27 @@ class SettingsRepository {
       ),
     );
   }
+
+  /// Sentinel pembeda "param `skippedUpdateVersion` tidak disebut" (== jangan
+  /// sentuh) dari "dikosongkan eksplisit" (== tulis NULL). Nilai ini mustahil
+  /// jadi versi sungguhan karena memuat karakter nol.
+  static const String _skipVersionUnset = '\u0000__unset__';
+
+  Future<void> updateCheckPref({
+    bool? checkUpdates,
+    String? skippedUpdateVersion = _skipVersionUnset,
+  }) async {
+    final settings = await ensureSettings();
+    await (_db.update(_db.appSettings)..where((s) => s.id.equals(settings.id)))
+        .write(
+      AppSettingsCompanion(
+        checkUpdates: checkUpdates != null
+            ? Value(checkUpdates)
+            : const Value.absent(),
+        skippedUpdateVersion: identical(skippedUpdateVersion, _skipVersionUnset)
+            ? const Value.absent()
+            : Value<String?>(skippedUpdateVersion),
+      ),
+    );
+  }
 }

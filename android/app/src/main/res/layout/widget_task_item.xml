@@ -6,12 +6,12 @@
     android:minHeight="48dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingVertical="3dp">
+    android:paddingVertical="4dp">
 
     <ImageView
         android:id="@+id/item_check"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:src="@drawable/ic_checkbox_unchecked" />
 
     <TextView
@@ -23,7 +23,8 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/widget_text"
-        android:textSize="11sp" />
+        android:textSize="13sp"
+        android:textFontWeight="600" />
 
     <TextView
         android:id="@+id/item_sub"
@@ -33,5 +34,5 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/widget_text_muted"
-        android:textSize="10sp" />
+        android:textSize="11sp" />
 </LinearLayout>

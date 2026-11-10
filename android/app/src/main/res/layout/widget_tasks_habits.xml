@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/widget_background"
-    android:padding="12dp">
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/widget_header"
@@ -35,7 +35,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tasks_label" android:text="TASKS"
                 android:textColor="@color/widget_label"
-                android:textSize="10sp"
+                android:textSize="9sp"
+                android:letterSpacing="0.08"
                 android:textStyle="bold"
                 android:paddingBottom="2dp" />
 
@@ -77,7 +78,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/habits_label" android:text="HABITS"
                 android:textColor="@color/widget_label"
-                android:textSize="10sp"
+                android:textSize="9sp"
+                android:letterSpacing="0.08"
                 android:textStyle="bold"
                 android:paddingBottom="2dp" />
 

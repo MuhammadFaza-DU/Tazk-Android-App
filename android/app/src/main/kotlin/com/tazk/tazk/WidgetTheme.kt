@@ -30,6 +30,10 @@ object WidgetTheme {
   @ColorInt fun onPrimary(ctx: Context, dark: Boolean): Int = pick(ctx, dark, R.color.widget_on_primary)
   @ColorInt fun border(ctx: Context, dark: Boolean): Int = pick(ctx, dark, R.color.widget_border)
 
+  /** List column divider is the [border] token at 40% alpha. */
+  @ColorInt fun divider(ctx: Context, dark: Boolean): Int =
+      (border(ctx, dark) and 0x00FFFFFF) or (0x66 shl 24) // 0x66 = 40% of 255
+
   @ColorInt
   private fun pick(ctx: Context, dark: Boolean, colorRes: Int): Int {
     val cfg = Configuration(ctx.resources.configuration)

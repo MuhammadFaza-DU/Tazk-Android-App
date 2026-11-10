@@ -171,9 +171,10 @@ void main() {
       await _pumpScreen(tester);
 
       // 6 baris grup Pemberitahuan (Task/Habit/Streak/Focus/Status/Alarm presisi)
-      // + 1 baris Kelola kategori + 1 baris Cadangkan & pulihkan + 1 baris
-      // Tentang App.
-      expect(_iconTiles, findsNWidgets(9));
+      // + 1 Kelola kategori + 1 Cadangkan & pulihkan + 1 Cek pembaruan + 1
+      // Tentang App = 10 petak ikon. Baris "Cek pembaruan" (T11.2) adalah baris
+      // aksi (hasil tampil sebaris), bukan navigasi, jadi tanpa chevron.
+      expect(_iconTiles, findsNWidgets(10));
       expect(find.byIcon(Icons.chevron_right_rounded), findsNWidgets(9));
 
       final tile = tester.widget<Container>(_iconTiles.first);
@@ -195,6 +196,7 @@ void main() {
       expect(find.byIcon(Icons.label_outline_rounded), findsOneWidget);
       expect(find.byIcon(Icons.save_alt_rounded), findsOneWidget);
       expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.system_update_rounded), findsOneWidget);
 
       await _disposeScreen(tester);
     });

@@ -424,6 +424,8 @@
   },
   "updateBannerAction": "Download",
   "updateBannerDismiss": "Later",
+  "updateCheckUpToDate": "You're on the latest version",
+  "updateCheckFailed": "Couldn't check for updates",
   "profileJoinedMonths": "Joined {months} months ago",
   "@profileJoinedMonths": {
     "placeholders": {
@@ -453,5 +455,7 @@
   },
   "widgetOpenApp": "Open app",
   "widgetMarkDone": "Mark done",
-  "widgetMarkUndone": "Mark not done"
+  "widgetMarkUndone": "Mark not done",
+  "tileLockedLabel": "Locked",
+  "tileUnlockedLabel": "Unlocked"
 }

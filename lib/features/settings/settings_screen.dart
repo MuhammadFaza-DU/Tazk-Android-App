@@ -17,6 +17,7 @@ import 'about_screen.dart';
 import 'backup_screen.dart';
 import 'categories_screen.dart';
 import 'notification_settings_screen.dart';
+import 'update_check_row.dart';
 
 /// Layar Pengaturan — fidelity board `design-export/08 Pengaturan.png`
 /// (780×1482 px, dibagi 2 → frame 390dp).
@@ -244,16 +245,24 @@ class SettingsScreen extends ConsumerWidget {
           _SectionLabel(l10n.navMore),
           AppCard(
             padding: EdgeInsets.zero,
-            child: ListRow(
-              leading: const _IconTile(Icons.info_outline_rounded),
-              title: l10n.settingsAbout,
-              trailing: const _Chevron(),
-              showDivider: false,
-              onTap: () {
-                Navigator.of(
-                  context,
-                ).push(AppPageRoute(builder: (_) => const AboutScreen()));
-              },
+            child: Column(
+              children: [
+                // T11.2: cek pembaruan manual (tanpa cek otomatis/banner, sesuai
+                // keputusan owner). Ditambah di atas Tentang di grup LAINNYA.
+                const UpdateCheckRow(),
+                Divider(height: 1, thickness: 1, color: colors.border),
+                ListRow(
+                  leading: const _IconTile(Icons.info_outline_rounded),
+                  title: l10n.settingsAbout,
+                  trailing: const _Chevron(),
+                  showDivider: false,
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).push(AppPageRoute(builder: (_) => const AboutScreen()));
+                  },
+                ),
+              ],
             ),
           ),
         ],

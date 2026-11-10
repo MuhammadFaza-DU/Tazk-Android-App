@@ -97,6 +97,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
     });
 
+    ref.listen(userProfileProvider, (previous, next) {
+      final prevLevel = previous?.valueOrNull?.level ?? 0;
+      final nextLevel = next.valueOrNull?.level ?? 0;
+      // `prevLevel > 0` menolak emisi pertama (loading → data): level awal
+      // bukan kenaikan, hanya status saat ini.
+      if (prevLevel > 0 && nextLevel > prevLevel) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          showLevelCelebration(
+            context,
+            level: nextLevel,
+            title: l10n.levelLabel(nextLevel),
+          );
+        });
+      }
+    });
+
     final tasks = tasksAsync.valueOrNull ?? const <Task>[];
     final remainingTasks = tasks.where((task) => !task.isCompleted).length;
     final doneHabits =

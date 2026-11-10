@@ -2282,6 +2282,18 @@ abstract class AppLocalizations {
   /// **'Nanti'**
   String get updateBannerDismiss;
 
+  /// No description provided for @updateCheckUpToDate.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu pakai versi terbaru'**
+  String get updateCheckUpToDate;
+
+  /// No description provided for @updateCheckFailed.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal memeriksa pembaruan'**
+  String get updateCheckFailed;
+
   /// No description provided for @profileJoinedMonths.
   ///
   /// In id, this message translates to:
@@ -2341,6 +2353,18 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Tandai belum selesai'**
   String get widgetMarkUndone;
+
+  /// No description provided for @tileLockedLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Terkunci'**
+  String get tileLockedLabel;
+
+  /// No description provided for @tileUnlockedLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Terbuka'**
+  String get tileUnlockedLabel;
 }
 
 class _AppLocalizationsDelegate

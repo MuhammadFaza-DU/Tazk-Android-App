@@ -1220,6 +1220,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateBannerDismiss => 'Later';
 
   @override
+  String get updateCheckUpToDate => 'You\'re on the latest version';
+
+  @override
+  String get updateCheckFailed => 'Couldn\'t check for updates';
+
+  @override
   String profileJoinedMonths(int months) {
     return 'Joined $months months ago';
   }
@@ -1257,4 +1263,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetMarkUndone => 'Mark not done';
+
+  @override
+  String get tileLockedLabel => 'Locked';
+
+  @override
+  String get tileUnlockedLabel => 'Unlocked';
 }
