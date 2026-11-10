@@ -16,20 +16,19 @@ const t = dict[lang];
 <section class="tk-hero" aria-labelledby="hero-title">
   <div class="tk-container tk-hero__grid">
     <div class="tk-hero__text">
-      <p class="tk-eyebrow" data-reveal style="--i:0">{t.hero.eyebrow}</p>
-      <h1 class="tk-h1" id="hero-title" data-reveal style="--i:1">
+      <h1 class="tk-h1" id="hero-title" data-reveal style="--i:0">
         {t.hero.title}
       </h1>
-      <p class="tk-lead" data-reveal style="--i:2">{t.hero.lead}</p>
-      <div class="tk-hero__cta" data-reveal style="--i:3">
+      <p class="tk-lead" data-reveal style="--i:1">{t.hero.lead}</p>
+      <div class="tk-hero__cta" data-reveal style="--i:2">
         <SplitCta href="#unduh" label={t.ctaDownload} />
         <GhostCta href="#fitur" label={t.ctaSeeFeatures} />
       </div>
-      <div data-reveal style="--i:4">
+      <div data-reveal style="--i:3">
         <ChipBar chips={t.hero.chips} />
       </div>
     </div>
-    <div class="tk-hero__media" data-reveal style="--i:3">
+    <div class="tk-hero__media" data-reveal style="--i:2">
       <PhoneMockup
         img="/img/otter-waving-720.webp"
         width={720}

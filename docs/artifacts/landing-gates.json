@@ -171,24 +171,24 @@
   },
   "reducedMotion": {
     "runningAnimations": 0,
-    "revealCount": 21,
+    "revealCount": 20,
     "allRevealsVisible": true,
     "cardTransitionDuration": "0s"
   },
   "jsOff": {
-    "htmlBytes": 17164,
+    "htmlBytes": 17475,
     "containsHeadline": true,
     "h1Text": "Selesai lebih tenang.",
     "containsAllSectionTitles": true
   },
   "weight": {
-    "count": 7,
-    "encodedKB": 135.4,
+    "count": 9,
+    "encodedKB": 155.8,
     "transferKB": 0,
     "byInitiatorKB": {
-      "link": 88.4,
-      "img": 35,
-      "css": 9.6,
+      "link": 88.3,
+      "img": 20.6,
+      "css": 44.5,
       "other": 2.5
     }
   },

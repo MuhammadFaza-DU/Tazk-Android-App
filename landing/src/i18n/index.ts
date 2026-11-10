@@ -26,7 +26,6 @@ export interface Copy {
   ctaDownload: string;
   ctaSeeFeatures: string;
   hero: {
-    eyebrow: string;
     title: string;
     lead: string;
     chips: string[];
@@ -90,7 +89,6 @@ const id: Copy = {
   ctaDownload: "Unduh APK",
   ctaSeeFeatures: "Lihat fitur",
   hero: {
-    eyebrow: "Tazk · v2.0",
     title: "Selesai lebih tenang.",
     lead:
       "Tugas, habit, dan sesi fokus dalam satu tempat. Semua tersimpan di HP-mu: tanpa akun, dan tanpa internet untuk pemakaian harian.",
@@ -260,7 +258,6 @@ const en: Copy = {
   ctaDownload: "Download APK",
   ctaSeeFeatures: "See features",
   hero: {
-    eyebrow: "Tazk · v2.0",
     title: "Done, calmer.",
     lead:
       "Tasks, habits, and focus sessions in one place. Everything stays on your phone: no account, and no internet needed for daily use.",
