@@ -6,7 +6,7 @@ const { items } = Astro.props;
 const tints = ["tk-tint--primary", "tk-tint--honey", "tk-tint--clay"];
 ---
 
-<div class="tk-grid tk-grid--3">
+<div class="tk-grid--tint">
   {
     items.map((item, i) => (
       <article class:list={["tk-tint", tints[i % tints.length]]} data-reveal>

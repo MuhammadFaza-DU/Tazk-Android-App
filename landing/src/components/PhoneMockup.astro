@@ -29,6 +29,8 @@ const srcset = hasVariants
   class:list={["tk-phone", second && "tk-phone--second"]}
   style={`--mascot:url(${img})`}
 >
+  <span class="tk-phone__side tk-phone__side--power" aria-hidden="true"></span>
+  <span class="tk-phone__side tk-phone__side--vol" aria-hidden="true"></span>
   <div class="tk-phone__screen">
     <img
       src={img}
@@ -43,5 +45,6 @@ const srcset = hasVariants
     />
     {label && <span class="tk-phone__label">{label}</span>}
     {sub && <span class="tk-phone__sub">{sub}</span>}
+    <span class="tk-phone__glare" aria-hidden="true"></span>
   </div>
 </figure>

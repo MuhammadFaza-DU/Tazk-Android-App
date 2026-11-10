@@ -176,17 +176,17 @@
     "cardTransitionDuration": "0s"
   },
   "jsOff": {
-    "htmlBytes": 17475,
+    "htmlBytes": 17886,
     "containsHeadline": true,
     "h1Text": "Selesai lebih tenang.",
     "containsAllSectionTitles": true
   },
   "weight": {
     "count": 9,
-    "encodedKB": 155.8,
-    "transferKB": 0,
+    "encodedKB": 156.9,
+    "transferKB": 0.3,
     "byInitiatorKB": {
-      "link": 88.3,
+      "link": 89.4,
       "img": 20.6,
       "css": 44.5,
       "other": 2.5
