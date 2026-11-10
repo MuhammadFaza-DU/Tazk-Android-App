@@ -34,11 +34,11 @@
 ## Screenshots
 
 <p align="center">
-  <img src="docs/assets/screens/home.webp" alt="Home: level card, today's tasks and habits" width="230">
-  &nbsp;&nbsp;
-  <img src="docs/assets/screens/stats.webp" alt="Statistics: completion rate, XP, habit heatmap" width="230">
-  &nbsp;&nbsp;
-  <img src="docs/assets/screens/pomodoro.webp" alt="Pomodoro: focus timer with duration presets" width="230">
+  <img src="docs/assets/screens/home.webp" alt="Home: level card, today's tasks and habits" width="190">
+  &nbsp;
+  <img src="docs/assets/screens/stats.webp" alt="Statistics: completion rate, XP, habit heatmap" width="190">
+  &nbsp;
+  <img src="docs/assets/screens/pomodoro.webp" alt="Pomodoro: focus timer with duration presets" width="190">
 </p>
 
 <p align="center">
