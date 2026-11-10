@@ -126,7 +126,7 @@ Laporkan `skills: NOT LOADED (<nama>)` + jalankan **baseline manual** (mis. untu
 | Subtask | Auto-selesai default ON (bisa dimatikan per task); lokasi teks/maps (tanpa GPS) |
 | Bahasa | Indonesia + Inggris; onboarding = nama + tema + bahasa |
 | Widget | Solid ikut tema; RemoteViews = feedback ikon/teks/warna (bukan animasi); maskot di semua kecuali Calendar |
-| Backup | Google Drive milik user (`drive.appdata`), tanpa server sendiri |
+| Backup | Ekspor/impor **JSON offline** (manual, `share_plus` + `file_selector`) + pengingat berkala. **Google Drive TIDAK masuk v2.0** (keputusan owner 2026-11-10; boleh dievaluasi ulang di versi berikutnya, bukan penghapusan permanen) |
 | Distribusi | APK dari landing page Astro+Vercel (bukan Play Store); **T15** |
 | Rilis | Satu rilis besar v2.0 (versi akhir 2.0.0+1) |
 | Privasi | Offline-first; tanpa akun; tanpa izin kamera/mic/lokasi/storage |

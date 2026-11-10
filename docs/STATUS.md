@@ -20,10 +20,11 @@ Terakhir diperbarui: **2026-11-09**
   terverifikasi muncul. Kalau butuh data uji, buat baru.
 - **BELUM** (lihat "Status 16 tahap"): **T11** cek update · **T12** gamifikasi polish ·
   **T13** bug audit/hardening · **T14** ikon app persegi · **T15** landing page ·
-  **T16** docs final + rilis v2.0. Plus: Google Drive backup (isu #14), scan Strix pre-release, push.
+  **T16** docs final + rilis v2.0. Plus: pengingat backup berkala (T13), scan Strix pre-release, push. **Google Drive: TIDAK masuk v2.0** (keputusan owner 2026-11-10, bukan penghapusan permanen).
 - **Rekomendasi lanjut:** **T13 dulu** (hardening + a11y + isu tertunda), lalu T12 → T14 → T11 → T15 → T16.
 
 ## Log Perubahan (terbaru duluan)
+- 2026-11-10 — **Keputusan owner: Google Drive TIDAK masuk v2.0.** Backup = JSON offline (manual) + pengingat berkala (rencana T13). Dokumen & teks privasi diperbarui: `AGENTS.md` §5 baris Backup, `docs/STATUS.md` (isu #14 ditutup, tabel keputusan, T10/T11, board 26), `PRD-v2.md` (US-B1, §2.2, §3.10, §5 Platform, §6.4, risiko, ringkasan), spec §8 T10, dan l10n (`app_id.arb`/`app_en.arb` → `aboutPrivacyBody` + `backupDriveDeferred`, regenerate `flutter gen-l10n`). Board 26 dibiarkan (deviasi dicatat). T11 dipastikan butuh izin INTERNET + revisi privasi saat dibangun. — *(belum commit)*
 - 2026-11-09 (penutup) — **Capaian sesi dikunci + data HP direset atas permintaan owner.**
   Checkpoint: commit `79def0d` + tag `stable-2026-11-09-v1`, tree bersih, server arsip
   disinkronkan (`adcfc40`). **Data app di HP dihapus** (`adb shell pm clear com.tazk.tazk`
@@ -123,7 +124,7 @@ Terakhir diperbarui: **2026-11-09**
 
 - 2026-11-02 — **T8 Widget scroll tuntas (T8.1–T8.3)**: widget homescreen kini **scrollable** — `RemoteViewsService`/`RemoteViewsFactory` (Kotlin) membaca SharedPreferences `"HomeWidgetPreferences"`; item row `widget_task_item`/`widget_habit_item` (hit ≥48dp via root baris; muted `#6A6659` = 5,36:1 AA); container 4 varian memakai `<ListView>` + empty view; provider memanggil `setRemoteAdapter` + `setPendingIntentTemplate`/`setOnClickFillInIntent` (pola klik item koleksi yang **benar** — `setOnClickPendingIntent` di item diabaikan framework) + `notifyAppWidgetViewDataChanged`; service didaftarkan dengan `BIND_REMOTEVIEWS`. Dart: `taskWidgetRows`/`habitWidgetRows`; push **full list** (`maxRows` 3→100) dengan invarian **`count == jumlah key yang ditulis`** (diuji jalur today *dan* calendar) + teks kosong terlokalisasi (`widgetTasksEmpty`/`widgetHabitsEmpty`). **527 test hijau (+12 dari 515), analyze 0, APK debug terbangun (213 MB)**; merged manifest memuat service. **Limitasi:** runtime widget (scroll, tap→selesai, refresh, empty) **belum diuji di HP**; widget **Calendar** dipaku board 4x2 (`minHeight=110dp`, dijaga `android_calendar_widget_config_test`) sehingga chrome grid ≈160dp bisa memotong list — board E sebenarnya **week-strip**, bukan grid 6×7 → perlu redesign (isu #15). — *(belum commit)*
 
-- 2026-11-02 — **T10 Backup offline tuntas (T10.1–T10.2)**: `BackupRepository` mengekspor seluruh DB (12 tabel) ke satu JSON `{version:1, exportedAt, checksum, data}` dengan **checksum SHA-256 kanonik** (kunci diurut rekursif), menolak versi/checksum salah **sebelum menyentuh DB**, dan memulihkan dalam **satu transaksi** (hapus-semua → insert-semua dengan id eksplisit; default key lama `autoCompleteSubtasks ?? true`, `position ?? 0`, `notifyFocusSession ?? true`; guard tabel singleton); layar **Cadangkan & pulihkan** (ekspor → share sheet; impor → file picker + dialog konfirmasi "Timpa data lokal?" + snackbar sukses/gagal) + grup `DATA` di Pengaturan. **515 test hijau, analyze 0, APK debug terbangun (187 MB).** **Ruling:** `file_picker` **diganti `file_selector`** — `file_picker 11.0.3` (KGP 1.8.22) gagal compile di **AGP 9.0.1** (`FilePickerPlugin` tidak ditemukan); `file_selector_android` (Kotlin 2.3.0) terbukti build + terpasang di APK. **Google Drive `drive.appdata` DITUNDA** (butuh proyek GCP + OAuth client + SHA-1 owner). Deviasi: layar backup offline **tidak ada di board** (dibangun dari token DESIGN); satu baris DATA (board 08 punya baris Drive + ekspor). **Verifikasi HP ditunda.** — *(belum commit)*
+- 2026-11-02 — **T10 Backup offline tuntas (T10.1–T10.2)**: `BackupRepository` mengekspor seluruh DB (12 tabel) ke satu JSON `{version:1, exportedAt, checksum, data}` dengan **checksum SHA-256 kanonik** (kunci diurut rekursif), menolak versi/checksum salah **sebelum menyentuh DB**, dan memulihkan dalam **satu transaksi** (hapus-semua → insert-semua dengan id eksplisit; default key lama `autoCompleteSubtasks ?? true`, `position ?? 0`, `notifyFocusSession ?? true`; guard tabel singleton); layar **Cadangkan & pulihkan** (ekspor → share sheet; impor → file picker + dialog konfirmasi "Timpa data lokal?" + snackbar sukses/gagal) + grup `DATA` di Pengaturan. **515 test hijau, analyze 0, APK debug terbangun (187 MB).** **Ruling:** `file_picker` **diganti `file_selector`** — `file_picker 11.0.3` (KGP 1.8.22) gagal compile di **AGP 9.0.1** (`FilePickerPlugin` tidak ditemukan); `file_selector_android` (Kotlin 2.3.0) terbukti build + terpasang di APK. **Google Drive `drive.appdata` DITUNDA** (butuh proyek GCP + OAuth client + SHA-1 owner) — **status berubah 2026-11-10: tidak masuk v2.0**. Deviasi: layar backup offline **tidak ada di board** (dibangun dari token DESIGN); satu baris DATA (board 08 punya baris Drive + ekspor). **Verifikasi HP ditunda.** — *(belum commit)*
 
 - 2026-11-01 — **T9 Notifikasi channel ke-5 tuntas (T9.1–T9.2)**: schema **v7** (`AppSettings.notifyFocusSession` BoolColumn default true; migrasi v6→v7 teruji di file SQLite nyata — baris lama selamat, default ter-backfill, `PRAGMA user_version == 7`); `updateNotificationPref` dapat `notifyFocusSession` tanpa menimpa 4 channel lain; layar Notifikasi kini **5 baris judul+subjudul** (board 21) termasuk `Sesi fokus / Saat timer Pomodoro habis`; baris shortcut **Focus** ke-4 di Pengaturan; **Pomodoro** hanya menjadwalkan notifikasi selesai sesi bila `notifyFocusSession` true (gate di `start` & `resume`; `logFocusSession` + cancel tetap jalan). **492 test hijau (+15), analyze 0, APK debug terbangun.** Deviasi tercatat: baris Focus ke-4 **tidak ada di board 08** (perluasan produk, preseden T6.4); subjudul streak tanpa `20:00`; judul pendek `Sesi fokus` (board `Sesi fokus selesai`); toggle ke-5 ON (schema true) walau board menggambarnya redup. **Limitasi diterima:** mematikan channel saat sesi berjalan TIDAK membatalkan notifikasi yang sudah terjadwal (revisit T12/T13). **Verifikasi HP ditunda.** — *(belum commit)*
 
@@ -176,7 +177,7 @@ tanpa angka palsu), dan **T6 subtask & lokasi selesai** (schema v5, XP 15/10/5 +
 reorder + toggle atomik, "Buka di Maps", progress `x/y` di kartu), dan **T7 kategori & pencarian selesai**
 (schema v6, kategori 1/item + kelola, pencarian lintas task/habit literal), dan **T9 notifikasi channel
 ke-5 selesai** (schema v7, toggle Focus + gate notifikasi Pomodoro), dan **T10 backup offline selesai**
-(JSON + SHA-256 kanonik + restore atomik; Google Drive ditunda), dan **T8 widget scroll selesai**
+(JSON + SHA-256 kanonik + restore atomik; Google Drive **tidak masuk v2.0**), dan **T8 widget scroll selesai**
 (RemoteViews collections + full-list push). **Semua tahap T6–T10 selesai.** Berikutnya: **verifikasi HP
 akhir** (owner) lalu review whole-branch.
 
@@ -359,8 +360,8 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 | T7 Kategori/tag & pencarian | ✅ selesai | **T7.1** schema v6 `Categories`+`categoryId`; **T7.2** repo+palette (12/12 kontras); **T7.3** picker+Kelola kategori; **T7.4** pencarian lintas item (board 26 D). 475 test |
 | T8 Widget | ✅ selesai & **terverifikasi perangkat** (v2036) | 5 varian + ListView scroll + empty view + full-list push. **Tap berfungsi saat app mati (~600 ms) dan setelah reboot (~1,2 s)** lewat `TazkWidgetTapReceiver` (BroadcastReceiver + `goAsync`, bukan JobScheduler). **Tema ikut app** (terang & gelap, token-exact: `#FBF9F4`/`#26251F`/`#C97B5A`/`#E2DACB`/`#4A5A44`). Layout: baris tanggal dobel dihapus, divider kolom 1dp, empty state rata atas. Calendar kini **week-strip 7 sel**. 535 test |
 | T9 Notifikasi | ✅ selesai | **T9.1** schema v7 `notifyFocusSession`; **T9.2** 5 toggle judul+subjudul (board 21) + baris Focus di Pengaturan + gate notifikasi selesai sesi di `start`/`resume`. 492 test |
-| T10 Backup/restore | ✅ selesai (offline) | **T10.1** `BackupRepository` JSON + SHA-256 kanonik + restore atomik + guard singleton; **T10.2** layar Cadangkan & pulihkan + grup DATA (`share_plus` + `file_selector`). Google Drive **ditunda**. 515 test |
-| T11 Cek update | ⬜ belum | |
+| T10 Backup/restore | ✅ selesai (offline) | **T10.1** `BackupRepository` JSON + SHA-256 kanonik + restore atomik + guard singleton; **T10.2** layar Cadangkan & pulihkan + grup DATA (`share_plus` + `file_selector`). Google Drive **tidak masuk v2.0** (keputusan owner 2026-11-10); pengingat backup berkala → T13. 515 test |
+| T11 Cek update | ⬜ belum | Butuh izin **INTERNET** + `version.json` di landing page (T15). Saat dibangun, teks privasi wajib direvisi agar jujur menyebut satu request keluar |
 | T12 Gamifikasi polish | ⬜ belum | |
 | T13 Bug audit | ⬜ belum | |
 | T14 Ikon & logo | 🟡 sebagian | Maskot & logo ada; **ikon app persegi belum di-generate** |
@@ -393,7 +394,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
    | 07 Statistik | ✅ sesuai | board 07 dibangun + **diverifikasi di HP (Galaxy A52, Android 14)**. Tabel selisih lengkap di section "T5 — fidelity board 07 Statistik". Screenshot HP: `docs/artifacts/hp-07-statistik-*.png` (light Mingu/Tahun, dark), render pembanding `07-statistik-render.png` |
    | 21 Notifikasi | ✅ sesuai (T9.2) | 5 baris judul+subjudul (board 21) + baris shortcut Focus di Pengaturan. Deviasi: subjudul streak tanpa `20:00`; judul pendek `Sesi fokus` (board `Sesi fokus selesai`); toggle ke-5 ON walau board redup (schema default true) |
    | 20 Widgets | ✅ sesuai (T8) | 5 varian + state kosong (F); list **scrollable** (ListView + RemoteViews collections). Deviasi: hit target via root baris (bukan kotak 48dp), teks kosong via l10n, **Calendar list bisa terpotong di 4x2** (isu #15) |
-   | 26 Backup & Pencarian | ✅ sebagian (T7.4 + T10) | **D** Pencarian (T7.4); backup **offline** (T10.2). Bagian **Drive A/B/C ditunda** (butuh GCP + OAuth client + SHA-1) |
+   | 26 Backup & Pencarian | ✅ sebagian (T7.4 + T10) | **D** Pencarian (T7.4); backup **offline** (T10.2). Bagian **Drive A/B/C tidak masuk v2.0** (keputusan owner 2026-11-10); board dibiarkan, deviasi dicatat |
 
    **Gutter:** diseragamkan **20dp** (nilai board 19.5–20) di `AppScaffold.gutter` + Kalender/Habits/Tasks/HabitDetail/Pengaturan/NotifSettings/Home/HabitForm/Profil. Onboarding tetap 24 sesuai board 09.
 
@@ -413,7 +414,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 12. **Kontras GRAPHIC pada chart/heatmap di bawah 3:1 (light)** — dihitung, bukan ditebak: batang `primaryContainer` vs `surface` = **1.24**, batang terpilih `honey` vs `surface` = **2.34**, level-0 heatmap `surfaceAlt` vs `surface` = **1.17**, `primaryContainer` vs `surfaceAlt` = **1.06**, `primary` vs `primarySoft` (level 2 vs 3) = **1.70**. Semua **teks** lolos AA (`ink` di `primaryContainer` 11.73/11.12, `inkMuted` di `surface` 5.46/7.11). Ini warisan board 07 → **menunggu keputusan owner** (pertahankan board vs pertegas ramp). Kandidat pertegas tanpa ubah token: beri tepi 1px `border` pada batang/sel.
 13. **Kartu Level di Home (tema gelap): kontras pil streak & isi XP gagal ambang** — dicoba digelapkan (v8) lalu **di-revert** atas permintaan owner (warna awal dinilai lebih baik). Kondisi sekarang: label+ikon pil "1 day" = **1,37:1** (`ink` terang di atas `honey` terang) dan isi XP vs track = **1,68:1** (ambang non-teks 3:1). **Diterima owner.** Perbaikan termurah tanpa mengubah warna: label/ikon pil memakai `on-primary` dark (`#0F1A14`) → ±7:1, pil tetap kuning.
 
-14. **Backup Google Drive `drive.appdata` DITUNDA** — butuh proyek Google Cloud + OAuth client ID + SHA-1 owner; antarmuka Drive **tidak dibuat**, dan dep `google_sign_in`/Drive **tidak** ditambahkan. Backup **offline** (JSON + `share_plus` ekspor + `file_selector` impor) tersedia di Pengaturan → DATA.
+14. **Backup Google Drive `drive.appdata` TIDAK MASUK v2.0** (keputusan owner 2026-11-10, DITUTUP untuk rilis ini — bukan penghapusan permanen, boleh dievaluasi ulang di versi berikutnya): butuh proyek Google Cloud + OAuth client ID + SHA-1 owner; antarmuka Drive **tidak dibuat**, dan dep `google_sign_in`/Drive **tidak** ditambahkan. Backup **offline** (JSON + `share_plus` ekspor + `file_selector` impor) tersedia di Pengaturan → DATA; pengingat backup berkala direncanakan di T13. Teks `backupDriveDeferred` & `aboutPrivacyBody` sudah disesuaikan agar tidak lagi menjanjikan Drive.
 
 15. ~~**Widget Calendar: konten melebihi ukuran 4x2**~~ **TERKIKIS — perlu verifikasi ulang.** Layout kini memakai **week-strip 7 sel** (`calendar_week_strip` + `calendar_day_cell_0..6`) + list, bukan grid 6×7. Yang belum diukur: apakah chrome (header + strip + tombol) masih melebihi `minHeight=110dp` di 4x2. Ukur dulu sebelum menyatakan tertutup.
 
@@ -430,7 +431,7 @@ lihat isu terbuka no. 12. Di HP sel yang kosong memang nyaris tak terlihat.
 | Maskot | Otter (bukan honey badger — aset final owner adalah otter) |
 | Navigasi | Tab bar 5 + sheet "Lainnya", **tanpa ☰** |
 | Widget | Solid ikut tema, maskot di semua kecuali Calendar, scroll + hint teks |
-| Backup | Google Drive milik user (`drive.appdata`), tanpa server sendiri |
+| Backup | Ekspor/impor JSON offline (manual) + pengingat berkala; **Google Drive tidak masuk v2.0** (keputusan owner 2026-11-10) |
 | Distribusi | APK dari landing page sendiri (Astro + Vercel), **bukan Play Store** |
 | Rilis | Satu rilis besar **v2.0** |
 | Verifikasi | HP Android via USB |
@@ -517,7 +518,7 @@ Sisa tahap (detail lengkap di "Status 16 tahap" di atas):
 | **T15** | Landing page | Astro + Vercel + distribusi APK |
 | **T16** | Docs final + rilis | bump versi, release build, tag **v2.0** |
 
-Isu terbuka: **#14** Google Drive ditunda, **#15** widget Calendar 4×2 sempit (bisa dinaikkan default),
+Isu terbuka: **#15** widget Calendar 4×2 sempit (bisa dinaikkan default),
 toggle focus mid-session, minor tertunda T13. Sebelum rilis: **scan Strix** + **izin push**.
 
 Rujukan: ledger `.superpowers/sdd/t6-t10/progress.md` (semua `Ruling:` + minor) + plan T6–T10.

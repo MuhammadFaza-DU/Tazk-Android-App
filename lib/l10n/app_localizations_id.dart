@@ -975,7 +975,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get aboutPrivacyBody =>
-      'Tazk bekerja sepenuhnya di HP-mu. Tidak ada akun, tidak ada server kami, dan tidak ada data yang dikirim ke siapa pun. Aplikasi tidak meminta izin kamera, mikrofon, lokasi, atau penyimpanan. Semua catatan tugas, habit, dan sesi fokus tersimpan di database lokal perangkatmu. Cadangan hanya dibuat bila kamu sendiri mengaktifkan backup ke Google Drive milikmu, dan file itu tetap di Drive-mu, bukan di tempat kami. Menghapus aplikasi menghapus seluruh data lokal.';
+      'Tazk bekerja sepenuhnya di HP-mu. Tidak ada akun, tidak ada server kami, dan data tidak pernah meninggalkan HP-mu. Aplikasi tidak meminta izin kamera, mikrofon, lokasi, atau penyimpanan. Semua catatan tugas, habit, dan sesi fokus tersimpan di database lokal perangkatmu. Kamu bisa membuat cadangan kapan saja dengan mengekspor file JSON ke tempat yang kamu pilih sendiri. Menghapus aplikasi menghapus seluruh data lokal.';
 
   @override
   String get aboutLicensesTitle => 'Lisensi open source';
@@ -1118,7 +1118,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get backupImportAction => 'Pulihkan data';
 
   @override
-  String get backupDriveDeferred => 'Backup Google Drive belum tersedia.';
+  String get backupDriveDeferred =>
+      'Tidak ada backup otomatis ke cloud; file JSON yang kamu ekspor adalah cadanganmu.';
 
   @override
   String get backupExportDone => 'File backup dibagikan.';

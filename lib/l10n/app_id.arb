@@ -467,7 +467,7 @@
   "habitsSummaryOnTrack": "Jaga ritme, kamu sedang on-track",
 
   "aboutPrivacyTitle": "Kebijakan privasi",
-  "aboutPrivacyBody": "Tazk bekerja sepenuhnya di HP-mu. Tidak ada akun, tidak ada server kami, dan tidak ada data yang dikirim ke siapa pun. Aplikasi tidak meminta izin kamera, mikrofon, lokasi, atau penyimpanan. Semua catatan tugas, habit, dan sesi fokus tersimpan di database lokal perangkatmu. Cadangan hanya dibuat bila kamu sendiri mengaktifkan backup ke Google Drive milikmu, dan file itu tetap di Drive-mu, bukan di tempat kami. Menghapus aplikasi menghapus seluruh data lokal.",
+  "aboutPrivacyBody": "Tazk bekerja sepenuhnya di HP-mu. Tidak ada akun, tidak ada server kami, dan data tidak pernah meninggalkan HP-mu. Aplikasi tidak meminta izin kamera, mikrofon, lokasi, atau penyimpanan. Semua catatan tugas, habit, dan sesi fokus tersimpan di database lokal perangkatmu. Kamu bisa membuat cadangan kapan saja dengan mengekspor file JSON ke tempat yang kamu pilih sendiri. Menghapus aplikasi menghapus seluruh data lokal.",
   "aboutLicensesTitle": "Lisensi open source",
   "aboutFooter": "Dibuat dengan Flutter. Gratis, tanpa iklan, tanpa akun.",
 
@@ -516,7 +516,7 @@
   "backupLocalNote": "File tetap di perangkatmu. Tanpa akun, tanpa server.",
   "backupExportAction": "Ekspor data",
   "backupImportAction": "Pulihkan data",
-  "backupDriveDeferred": "Backup Google Drive belum tersedia.",
+  "backupDriveDeferred": "Tidak ada backup otomatis ke cloud; file JSON yang kamu ekspor adalah cadanganmu.",
   "backupExportDone": "File backup dibagikan.",
   "backupImportDone": "Data berhasil dipulihkan.",
   "backupImportInvalid": "File backup tidak valid atau rusak.",

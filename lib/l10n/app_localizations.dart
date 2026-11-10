@@ -1841,7 +1841,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutPrivacyBody.
   ///
   /// In id, this message translates to:
-  /// **'Tazk bekerja sepenuhnya di HP-mu. Tidak ada akun, tidak ada server kami, dan tidak ada data yang dikirim ke siapa pun. Aplikasi tidak meminta izin kamera, mikrofon, lokasi, atau penyimpanan. Semua catatan tugas, habit, dan sesi fokus tersimpan di database lokal perangkatmu. Cadangan hanya dibuat bila kamu sendiri mengaktifkan backup ke Google Drive milikmu, dan file itu tetap di Drive-mu, bukan di tempat kami. Menghapus aplikasi menghapus seluruh data lokal.'**
+  /// **'Tazk bekerja sepenuhnya di HP-mu. Tidak ada akun, tidak ada server kami, dan data tidak pernah meninggalkan HP-mu. Aplikasi tidak meminta izin kamera, mikrofon, lokasi, atau penyimpanan. Semua catatan tugas, habit, dan sesi fokus tersimpan di database lokal perangkatmu. Kamu bisa membuat cadangan kapan saja dengan mengekspor file JSON ke tempat yang kamu pilih sendiri. Menghapus aplikasi menghapus seluruh data lokal.'**
   String get aboutPrivacyBody;
 
   /// No description provided for @aboutLicensesTitle.
@@ -2117,7 +2117,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupDriveDeferred.
   ///
   /// In id, this message translates to:
-  /// **'Backup Google Drive belum tersedia.'**
+  /// **'Tidak ada backup otomatis ke cloud; file JSON yang kamu ekspor adalah cadanganmu.'**
   String get backupDriveDeferred;
 
   /// No description provided for @backupExportDone.

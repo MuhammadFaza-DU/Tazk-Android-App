@@ -244,3 +244,17 @@
 
 ---
 
+## L-012 · Teks privasi di app menjanjikan Google Drive padahal fiturnya tidak pernah dibangun
+- **Tanggal:** 2026-11-10
+- **Salah:** `aboutPrivacyBody` di l10n (id & en) menyatakan *"Cadangan hanya dibuat bila kamu sendiri mengaktifkan backup ke Google Drive milikmu…"*, padahal tidak ada satu baris pun kode Drive — keputusan T10 selalu "offline JSON dulu, Drive ditunda".
+- **Bukti (2 sumber):** ① `pubspec.yaml` → 0 dep `google_sign_in`/Drive dan `grep drive` di `lib/` → 0 hasil; ② manifest tanpa izin `INTERNET` — app bahkan belum bisa bicara ke jaringan.
+- **Dampak:** app membuat klaim ke pengguna yang tidak ada wujudnya; dokumen plan & ledger juga masih menulis "Drive ditunda/akan datang" sehingga sesi berikutnya bisa menghidupkannya tanpa sadar.
+- **Aturan baru:**
+  1. **Teks user-facing wajib mencerminkan kode nyata saat ini**, bukan rencana. Sebelum menulis janji fitur di UI/privasi/README, buktikan dep-nya terpasang (`pubspec` + grep kode + `flutter analyze`).
+  2. **Meniadakan fitur = hapus jejak janjinya di teks produk**, bukan sekadar menandai "ditunda".
+  3. Dokumen plan/ledger yang menyimpan status lama wajib diberi catatan *"status berubah tanggal X"*, bukan dihapus diam-diam.
+- **Verifikasi:** `flutter gen-l10n` → `dart analyze` 0 issue; `grep "Google Drive"` di file user-facing (`lib/l10n/*.arb`) = 0 tersisa (kecuali catatan keputusan "tidak masuk v2.0" di dokumen).
+- **Pencegahan otomatis (belum dipasang):** usul test l10n yang menolak string berisi nama layanan pihak ketiga (`Drive`, `Firebase`, dst.) bila dep-nya tidak ada di `pubspec.yaml`.
+
+---
+

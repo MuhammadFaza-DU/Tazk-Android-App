@@ -31,7 +31,7 @@ Lihat §9 (KPI). Ringkas: semua angka performa T1 tercapai + widget centang inst
 
 ### 2.1 User Personas
 - **Mahasiswa / pekerja muda Gen Z** (primer): pakai sesi pendek harian — cek "apa yang penting hari ini", centang task/habit, mulai fokus, lihat progres. Android, offline, tanpa akun.
-- **Pengguna offline-first** (sekunder): value = data 100% lokal, tetap berfungsi tanpa internet, backup opsional ke Google Drive sendiri.
+- **Pengguna offline-first** (sekunder): value = data 100% lokal, tetap berfungsi tanpa internet, backup manual berupa file JSON yang disimpan sendiri.
 
 ### 2.2 User Stories inti (dengan Acceptance Criteria)
 
@@ -90,8 +90,9 @@ Lihat §9 (KPI). Ringkas: semua angka performa T1 tercapai + widget centang inst
 
 **US-B1 — Backup/restore**
 > Sebagai pengguna, saya tidak takut kehilangan data.
-- **AC:** Export/import JSON ter-versi + checksum, 100% offline (share sheet).
-- **AC:** Backup/restore Google Drive `drive.appdata` (opsional, login Google, file tidak terlihat app lain).
+- **AC:** Export/import JSON ter-versi + checksum, 100% offline (share sheet + file picker).
+- **AC:** Pengingat berkala bila sudah lama tidak mengekspor backup (offline, tanpa akun).
+- **Bukan AC v2.0:** backup cloud/Google Drive `drive.appdata` — **tidak masuk v2.0** (keputusan owner 2026-11-10); boleh dievaluasi ulang di versi berikutnya.
 - **AC:** Data user tidak hilang/reset saat upgrade (migrasi Drift terkontrol + test migrasi).
 
 **US-U1 — Onboarding baru**
@@ -169,7 +170,7 @@ Lihat §9 (KPI). Ringkas: semua angka performa T1 tercapai + widget centang inst
 - Lihat US-F1.
 
 ### 3.10 Backup/restore
-- Lihat US-B1 (export/import offline + Google Drive `drive.appdata` + migrasi terkontrol).
+- Lihat US-B1 (export/import JSON offline + pengingat backup + migrasi terkontrol). Google Drive tidak masuk v2.0.
 
 ### 3.11 Cek update
 - Lihat US-U2 (`version.json` di landing page).
@@ -203,8 +204,8 @@ Sumber kanonik: [`DESIGN.md`](./DESIGN.md). Ringkas:
 
 ## 5. Platform Concerns (Android)
 
-- **Permission:** Notifikasi (wajib) + izin exact alarm (android 12+, ditangani jujur + fallback inexact) + reboot broadcast. **Tanpa** kamera/mic/lokasi/storage eksplisit.
-- **Offline:** 100%; fitur online (backup Drive, cek update) opsional, tidak memblokir fungsi inti.
+- **Permission:** Notifikasi (wajib) + izin exact alarm (android 12+, ditangani jujur + fallback inexact) + reboot broadcast + **INTERNET** (khusus cek update T11; bukan untuk mengunggah data). **Tanpa** kamera/mic/lokasi/storage eksplisit.
+- **Offline:** 100%; satu-satunya fitur online = cek update (opsional, tidak memblokir fungsi inti). Backup tetap offline (file JSON).
 - **Background:**
   - Local notification scheduling (reminder tepat waktu).
   - Pomodoro timer jalan saat minimize.
@@ -216,7 +217,7 @@ Sumber kanonik: [`DESIGN.md`](./DESIGN.md). Ringkas:
 
 ### 6.1 Stack (tetap, tidak naik mayor)
 - Flutter 3.44.6 / Dart 3.12.2 · Riverpod 2.6 · Drift + SQLite (migrasi terkontrol + index baru) · flutter_local_notifications + timezone · home_widget · table_calendar · android_alarm_manager_plus · video_player.
-- **→ Keputusan teknis (dari spec §5):** tetap Riverpod 2.6 (tidak naik 3); tetap Drift (tambah index, bukan ganti ORM); tidak pakai freezed/json_serializable; animasi pakai API Flutter (bukan Lottie default; Lottie opsional untuk momen langka); chart custom `CustomPainter`; widget pisahkan "hitung snapshot" dari "dorong ke widget"; cek update via manifest JSON statis; backup Drive scope `drive.appdata`.
+- **→ Keputusan teknis (dari spec §5):** tetap Riverpod 2.6 (tidak naik 3); tetap Drift (tambah index, bukan ganti ORM); tidak pakai freezed/json_serializable; animasi pakai API Flutter (bukan Lottie default; Lottie opsional untuk momen langka); chart custom `CustomPainter`; widget pisahkan "hitung snapshot" dari "dorong ke widget"; cek update via manifest JSON statis; backup = file JSON lokal (share/pick), tanpa cloud.
 
 ### 6.2 Perbaikan performa (T1 — diurut dampak)
 1. Debounce/koalesensi `refreshAll()`; hapus yang redundan.
@@ -237,9 +238,9 @@ Sumber kanonik: [`DESIGN.md`](./DESIGN.md). Ringkas:
 - **Toleransi reboot (dokumentasi jujur):** tap widget tetap berfungsi tanpa app dibuka; setelah reboot/force-stop, broadcast harus terdaftar ulang (BOOT_COMPLETED). Batas Android: background WorkManager/AlarmManager menghormati Doze/battery protection → perilaku "instan penuh" tidak dijamin 100% oleh OS pada semua vendor; solusi = coverage maksimal + dokumentasi.
 
 ### 6.4 Security & Privacy
-- Data lokal di device; backup hanya ke Google Drive milik user atas izin user (`drive.appdata`).
+- Data lokal di device; backup = file JSON yang diekspor user sendiri ke tempat pilihannya (`share_plus` + `file_selector`). Tidak ada unggahan otomatis; Google Drive tidak masuk v2.0.
 - Tidak ada telemetry; referral di-hormati; `version.json` diperlakukan sebagai data (validasi skema, tanpa eksekusi).
-- Privacy policy jujur: data tetap lokal; backup cloud opsional.
+- Privacy policy jujur: data tetap lokal; cek update adalah satu-satunya request keluar (tanpa mengirim data pengguna).
 
 ---
 
@@ -288,7 +289,7 @@ Perubahan besar: `core/theme/*` diganti ke token `DESIGN.md`; widget kit baru; g
 | Redesign+animasi malah menambah lag | T1 dulu; profil ulang akhir T3/T4; batas 60fps |
 | Identitas playful vs "kalem premium" | Playful dipindah ke momen reward & judul; diuji di mockup |
 | Font baru membengkakkan APK | Bundle instance saja; hapus font lama |
-| Backup Drive butuh login | Opsional penuh; app tetap berfungsi offline |
+| User lupa backup → data hilang saat HP rusak | Backup manual JSON + pengingat berkala (T13); Drive tidak masuk v2.0 |
 | Cek update disalahgunakan (prompt injection) | Manifest = data + validasi skema |
 | Widget Kotlin sulit diverifikasi tanpa HP | Verifikasi manual via USB + test unit logika murni |
 | Batas OS untuk "instan penuh" widget (Doze/reboot) | Coverage maksimal + dokumentasi jujur (§6.3) |
@@ -316,7 +317,7 @@ Perubahan besar: `core/theme/*` diganti ke token `DESIGN.md`; widget kit baru; g
 
 ## 10. Keputusan final (jangan ditanya ulang saat build)
 
-Palet Sage&Sand/Dusk Forest · font Fredoka+Plus Jakarta Sans · maskot otter · tab bar 5 + sheet "Lainnya" (tanpa ☰) · widget solid ikut tema (maskot di semua kecuali Calendar) · backup Google Drive `drive.appdata` · distribusi APK landing page (bukan Play Store) · satu rilis v2.0 · verifikasi HP via USB · anti-slop DURING · push hanya izin eksplisit · XP 15/10/5 (task) & 15 (habit, builder) · subtask auto-selesai default ON (bisa dimatikan) · lokasi teks/maps tanpa GPS · onboarding nama+tema+bahasa · bahasa id&en · statistik TETAP masuk · reduced-motion dihormati · toggle centang dua arah tanpa dialog.
+Palet Sage&Sand/Dusk Forest · font Fredoka+Plus Jakarta Sans · maskot otter · tab bar 5 + sheet "Lainnya" (tanpa ☰) · widget solid ikut tema (maskot di semua kecuali Calendar) · backup JSON manual tanpa cloud (Drive tidak masuk v2.0) · distribusi APK landing page (bukan Play Store) · satu rilis v2.0 · verifikasi HP via USB · anti-slop DURING · push hanya izin eksplisit · XP 15/10/5 (task) & 15 (habit, builder) · subtask auto-selesai default ON (bisa dimatikan) · lokasi teks/maps tanpa GPS · onboarding nama+tema+bahasa · bahasa id&en · statistik TETAP masuk · reduced-motion dihormati · toggle centang dua arah tanpa dialog.
 
 ---
 

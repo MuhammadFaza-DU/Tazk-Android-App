@@ -987,7 +987,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutPrivacyBody =>
-      'Tazk runs entirely on your phone. There is no account, no server of ours, and no data sent to anyone. The app never asks for camera, microphone, location, or storage permission. Every task, habit, and focus session lives in the device\'s local database. A backup exists only if you turn on backup to your own Google Drive, and that file stays in your Drive, not with us. Uninstalling the app removes all local data.';
+      'Tazk runs entirely on your phone. There is no account, no server of ours, and your data never leaves your phone. The app never asks for camera, microphone, location, or storage permission. Every task, habit, and focus session lives in the device\'s local database. You can back up anytime by exporting a JSON file to a place you choose yourself. Uninstalling the app removes all local data.';
 
   @override
   String get aboutLicensesTitle => 'Open source licenses';
@@ -1128,7 +1128,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupImportAction => 'Restore data';
 
   @override
-  String get backupDriveDeferred => 'Google Drive backup isn\'t available yet.';
+  String get backupDriveDeferred =>
+      'No automatic cloud backup; the JSON file you export is your backup.';
 
   @override
   String get backupExportDone => 'Backup file shared.';
