@@ -369,7 +369,10 @@ void main() {
 
     testWidgets('data ekstrem tidak overflow: layar 320dp, nama panjang, '
         'level 100, teks diperbesar', (tester) async {
-      tester.view.physicalSize = const Size(320 * 3, 800 * 3);
+      // Lebar tetap 320 (fokus uji overflow sempit); tinggi diperlebar supaya
+      // seluruh konten (sampai grid kosmetik) ikut terbangun — pola sama dengan
+      // test "kosmetik" di file ini.
+      tester.view.physicalSize = const Size(320 * 3, 2000 * 3);
       tester.view.devicePixelRatio = 3;
       tester.view.platformDispatcher.textScaleFactorTestValue = 1.6;
       addTearDown(tester.view.reset);

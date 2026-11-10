@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_motion.dart';
+import '../../core/utils/joined_label.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_dialog.dart';
@@ -15,6 +16,7 @@ import '../../core/widgets/animated_xp_progress.dart';
 import '../../core/widgets/shine_sweep.dart';
 import '../../data/models/enums.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/current_date_provider.dart';
 import '../../providers/gamification_providers.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/task_providers.dart';
@@ -80,6 +82,7 @@ class ProfileScreen extends ConsumerWidget {
     final badgesAsync = ref.watch(badgesProvider);
     final cosmeticsAsync = ref.watch(cosmeticsProvider);
     final todayTasks = ref.watch(todayTasksProvider).valueOrNull;
+    final today = ref.watch(currentDateProvider);
     final l10n = AppLocalizations.of(context)!;
 
     final avatarId = profile?.avatarId ?? 'default';
@@ -125,6 +128,9 @@ class ProfileScreen extends ConsumerWidget {
             name: name,
             level: profile?.level ?? 1,
             xp: profile?.xp ?? 0,
+            joinedLabel: profile == null
+                ? null
+                : joinedLabel(profile.createdAt, today, l10n),
             onEditName: profile == null
                 ? null
                 : () => _openRenameDialog(context, ref, profile.name),
@@ -159,6 +165,13 @@ class ProfileScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: _blockGap),
+          if (streak != null && streak.freezeCount > 0) ...[
+            _FreezeInfo(
+              freezeCount: streak.freezeCount,
+              freezeProgressDays: streak.freezeProgressDays,
+            ),
+            const SizedBox(height: _blockGap),
+          ],
           _SectionHeading(
             title: l10n.badgeCollectionTitle,
             trailing: unlockedBadges == null
@@ -274,6 +287,7 @@ class _ProfileCard extends StatelessWidget {
     required this.name,
     required this.level,
     required this.xp,
+    this.joinedLabel,
     this.onEditName,
   });
 
@@ -281,6 +295,11 @@ class _ProfileCard extends StatelessWidget {
   final String name;
   final int level;
   final int xp;
+
+  /// Teks "Bergabung X bulan lalu" yang sudah diolah dari `createdAt`. `null`
+  /// saat profil belum dimuat, jadi baris ini tidak ditampilkan.
+  final String? joinedLabel;
+
   final VoidCallback? onEditName;
 
   /// Diameter lingkaran maskot — board mengukur 84dp.
@@ -321,6 +340,18 @@ class _ProfileCard extends StatelessWidget {
                   color: colors.ink,
                 ),
               ),
+              if (joinedLabel != null) ...[
+                const SizedBox(height: 4), // spacing.xs
+                Text(
+                  joinedLabel!,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.inkMuted,
+                  ),
+                ),
+              ],
               const SizedBox(height: 12), // spacing.md
               _LevelPill(level: level, progress: progress),
             ],
@@ -469,6 +500,69 @@ class _StatTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Blok info freeze: berapa freeze masih tersedia + berapa hari lagi menuju
+/// freeze berikutnya. Dirender hanya saat `freezeCount > 0` supaya layar tidak
+/// bertambah tinggi sebelum pemain punya satu freeze pun.
+class _FreezeInfo extends StatelessWidget {
+  const _FreezeInfo({
+    required this.freezeCount,
+    required this.freezeProgressDays,
+  });
+
+  final int freezeCount;
+  final int freezeProgressDays;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _FreezeRow(
+            icon: Icons.ac_unit_rounded,
+            text: l10n.freezeAvailableLabel(freezeCount),
+          ),
+          const SizedBox(height: 8), // spacing.sm
+          _FreezeRow(
+            icon: Icons.hourglass_empty_rounded,
+            text: l10n.freezeProgressLabel(freezeProgressDays),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Satu baris ikon + teks di dalam blok freeze.
+class _FreezeRow extends StatelessWidget {
+  const _FreezeRow({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: colors.primary),
+        const SizedBox(width: 8), // spacing.sm
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium?.copyWith(color: colors.ink),
+          ),
+        ),
+      ],
     );
   }
 }
