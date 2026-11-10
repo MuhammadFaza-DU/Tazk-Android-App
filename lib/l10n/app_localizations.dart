@@ -2251,6 +2251,96 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Nanti saja'**
   String get batteryLater;
+
+  /// No description provided for @updateCheckLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'Pemeriksaan pembaruan'**
+  String get updateCheckLabel;
+
+  /// No description provided for @updateCheckSubtitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Periksa versi terbaru secara manual'**
+  String get updateCheckSubtitle;
+
+  /// No description provided for @updateBannerTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Versi {version} tersedia'**
+  String updateBannerTitle(String version);
+
+  /// No description provided for @updateBannerAction.
+  ///
+  /// In id, this message translates to:
+  /// **'Unduh'**
+  String get updateBannerAction;
+
+  /// No description provided for @updateBannerDismiss.
+  ///
+  /// In id, this message translates to:
+  /// **'Nanti'**
+  String get updateBannerDismiss;
+
+  /// No description provided for @profileJoinedMonths.
+  ///
+  /// In id, this message translates to:
+  /// **'Bergabung {months} bulan lalu'**
+  String profileJoinedMonths(int months);
+
+  /// No description provided for @profileJoinedThisMonth.
+  ///
+  /// In id, this message translates to:
+  /// **'Bergabung bulan ini'**
+  String get profileJoinedThisMonth;
+
+  /// No description provided for @streakBrokenTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak kamu putus'**
+  String get streakBrokenTitle;
+
+  /// No description provided for @streakBrokenBody.
+  ///
+  /// In id, this message translates to:
+  /// **'Kemarin tidak ada yang selesai, jadi streak dimulai ulang. Selesaikan hari ini untuk menjaga kelanjutannya.'**
+  String get streakBrokenBody;
+
+  /// No description provided for @freezeAvailableLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} freeze tersedia'**
+  String freezeAvailableLabel(int count);
+
+  /// No description provided for @freezeProgressLabel.
+  ///
+  /// In id, this message translates to:
+  /// **'{days} hari menuju freeze berikutnya'**
+  String freezeProgressLabel(int days);
+
+  /// No description provided for @levelUpTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Naik ke level {level}!'**
+  String levelUpTitle(int level);
+
+  /// No description provided for @widgetOpenApp.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka aplikasi'**
+  String get widgetOpenApp;
+
+  /// No description provided for @widgetMarkDone.
+  ///
+  /// In id, this message translates to:
+  /// **'Tandai selesai'**
+  String get widgetMarkDone;
+
+  /// No description provided for @widgetMarkUndone.
+  ///
+  /// In id, this message translates to:
+  /// **'Tandai belum selesai'**
+  String get widgetMarkUndone;
 }
 
 class _AppLocalizationsDelegate

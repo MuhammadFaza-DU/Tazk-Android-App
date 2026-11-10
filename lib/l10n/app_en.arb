@@ -412,5 +412,46 @@
   "batteryTitle": "Keep Tazk running",
   "batteryBody": "Android defers work for apps that sit idle, which can hold back widget taps. Allow a battery optimisation exemption so widgets and reminders stay on time.",
   "batteryAllow": "Allow",
-  "batteryLater": "Not now"
+  "batteryLater": "Not now",
+
+  "updateCheckLabel": "Update check",
+  "updateCheckSubtitle": "Manually check for the latest version",
+  "updateBannerTitle": "Version {version} is available",
+  "@updateBannerTitle": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
+  "updateBannerAction": "Download",
+  "updateBannerDismiss": "Later",
+  "profileJoinedMonths": "Joined {months} months ago",
+  "@profileJoinedMonths": {
+    "placeholders": {
+      "months": { "type": "int" }
+    }
+  },
+  "profileJoinedThisMonth": "Joined this month",
+  "streakBrokenTitle": "Your streak broke",
+  "streakBrokenBody": "Nothing was completed yesterday, so your streak restarted. Finish something today to keep it going.",
+  "freezeAvailableLabel": "{count} freezes available",
+  "@freezeAvailableLabel": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "freezeProgressLabel": "{days} days until the next freeze",
+  "@freezeProgressLabel": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "levelUpTitle": "Reached level {level}!",
+  "@levelUpTitle": {
+    "placeholders": {
+      "level": { "type": "int" }
+    }
+  },
+  "widgetOpenApp": "Open app",
+  "widgetMarkDone": "Mark done",
+  "widgetMarkUndone": "Mark not done"
 }

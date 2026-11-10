@@ -30,7 +30,7 @@ typography:
     lineHeight: 1.2
   title:
     fontFamily: Fredoka
-    fontSize: 22px
+    fontSize: 24px
     fontWeight: 600
     lineHeight: 1.25
   headline:

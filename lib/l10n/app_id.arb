@@ -544,5 +544,46 @@
   "batteryTitle": "Izinkan Tazk tetap berjalan",
   "batteryBody": "Android menunda pekerjaan app yang lama tidak dibuka, sehingga centang di widget bisa tertahan. Beri pengecualian optimasi baterai agar widget dan pengingat tetap tepat waktu.",
   "batteryAllow": "Izinkan",
-  "batteryLater": "Nanti saja"
+  "batteryLater": "Nanti saja",
+
+  "updateCheckLabel": "Pemeriksaan pembaruan",
+  "updateCheckSubtitle": "Periksa versi terbaru secara manual",
+  "updateBannerTitle": "Versi {version} tersedia",
+  "@updateBannerTitle": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
+  "updateBannerAction": "Unduh",
+  "updateBannerDismiss": "Nanti",
+  "profileJoinedMonths": "Bergabung {months} bulan lalu",
+  "@profileJoinedMonths": {
+    "placeholders": {
+      "months": { "type": "int" }
+    }
+  },
+  "profileJoinedThisMonth": "Bergabung bulan ini",
+  "streakBrokenTitle": "Streak kamu putus",
+  "streakBrokenBody": "Kemarin tidak ada yang selesai, jadi streak dimulai ulang. Selesaikan hari ini untuk menjaga kelanjutannya.",
+  "freezeAvailableLabel": "{count} freeze tersedia",
+  "@freezeAvailableLabel": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "freezeProgressLabel": "{days} hari menuju freeze berikutnya",
+  "@freezeProgressLabel": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "levelUpTitle": "Naik ke level {level}!",
+  "@levelUpTitle": {
+    "placeholders": {
+      "level": { "type": "int" }
+    }
+  },
+  "widgetOpenApp": "Buka aplikasi",
+  "widgetMarkDone": "Tandai selesai",
+  "widgetMarkUndone": "Tandai belum selesai"
 }

@@ -1201,4 +1201,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get batteryLater => 'Not now';
+
+  @override
+  String get updateCheckLabel => 'Update check';
+
+  @override
+  String get updateCheckSubtitle => 'Manually check for the latest version';
+
+  @override
+  String updateBannerTitle(String version) {
+    return 'Version $version is available';
+  }
+
+  @override
+  String get updateBannerAction => 'Download';
+
+  @override
+  String get updateBannerDismiss => 'Later';
+
+  @override
+  String profileJoinedMonths(int months) {
+    return 'Joined $months months ago';
+  }
+
+  @override
+  String get profileJoinedThisMonth => 'Joined this month';
+
+  @override
+  String get streakBrokenTitle => 'Your streak broke';
+
+  @override
+  String get streakBrokenBody =>
+      'Nothing was completed yesterday, so your streak restarted. Finish something today to keep it going.';
+
+  @override
+  String freezeAvailableLabel(int count) {
+    return '$count freezes available';
+  }
+
+  @override
+  String freezeProgressLabel(int days) {
+    return '$days days until the next freeze';
+  }
+
+  @override
+  String levelUpTitle(int level) {
+    return 'Reached level $level!';
+  }
+
+  @override
+  String get widgetOpenApp => 'Open app';
+
+  @override
+  String get widgetMarkDone => 'Mark done';
+
+  @override
+  String get widgetMarkUndone => 'Mark not done';
 }

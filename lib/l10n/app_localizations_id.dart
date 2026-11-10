@@ -1191,4 +1191,60 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get batteryLater => 'Nanti saja';
+
+  @override
+  String get updateCheckLabel => 'Pemeriksaan pembaruan';
+
+  @override
+  String get updateCheckSubtitle => 'Periksa versi terbaru secara manual';
+
+  @override
+  String updateBannerTitle(String version) {
+    return 'Versi $version tersedia';
+  }
+
+  @override
+  String get updateBannerAction => 'Unduh';
+
+  @override
+  String get updateBannerDismiss => 'Nanti';
+
+  @override
+  String profileJoinedMonths(int months) {
+    return 'Bergabung $months bulan lalu';
+  }
+
+  @override
+  String get profileJoinedThisMonth => 'Bergabung bulan ini';
+
+  @override
+  String get streakBrokenTitle => 'Streak kamu putus';
+
+  @override
+  String get streakBrokenBody =>
+      'Kemarin tidak ada yang selesai, jadi streak dimulai ulang. Selesaikan hari ini untuk menjaga kelanjutannya.';
+
+  @override
+  String freezeAvailableLabel(int count) {
+    return '$count freeze tersedia';
+  }
+
+  @override
+  String freezeProgressLabel(int days) {
+    return '$days hari menuju freeze berikutnya';
+  }
+
+  @override
+  String levelUpTitle(int level) {
+    return 'Naik ke level $level!';
+  }
+
+  @override
+  String get widgetOpenApp => 'Buka aplikasi';
+
+  @override
+  String get widgetMarkDone => 'Tandai selesai';
+
+  @override
+  String get widgetMarkUndone => 'Tandai belum selesai';
 }
