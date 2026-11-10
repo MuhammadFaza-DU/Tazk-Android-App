@@ -328,3 +328,17 @@
 
 ---
 
+## L-018 · Tap `adb` buta dengan koordinat salah membuka aplikasi pribadi owner dan memotret isinya
+- **Tanggal:** 2026-11-10
+- **Salah:** menguji tap widget dengan `adb shell input tap <x> <y>` memakai koordinat yang dibaca dari screenshot berukuran **900×2000**, padahal layar perangkat **1080×2400**. Tanpa kalibrasi, tap mendarat di luar widget dan membuka **Telegram**, lalu `screencap` memotret grup pribadi owner (nama grup, isi pesan, nomor, foto). Aku juga sempat menyimpulkan "tap widget rusak" dari satu screenshot yang sebenarnya diambil **sebelum widget ter-refresh**.
+- **Bukti:** `wm size` = 1080×2400 vs `Image.open(...).size` = 900×2000 (skala 1,2). Setelah tap mendarat di area widget dengan koordinat benar, task "y" berubah ☐ → ☑ → ☐ (dua arah), jadi receiver tetap berfungsi.
+- **Dampak:** privasi owner tersentuh (screenshot aplikasi pribadi ikut terbaca), dan hampir melaporkan regresi palsu pada jalur widget yang justru sudah terbukti benar (kelas kesalahan L-002: menyimpulkan dari kondisi uji yang salah).
+- **Aturan baru:**
+  1. **Sebelum tap apa pun lewat `adb`:** jalankan `adb shell wm size` dan bandingkan dengan ukuran file screenshot; hitung skala eksplisit, jangan menebak. Kalau ragu, pakai `uiautomator dump` dan ambil koordinat dari `bounds` node, bukan dari mata.
+  2. **Tap hanya di area yang sudah dipastikan** (widget/aplikasi target). Setelah tap, verifikasi `topResumedActivity` **sebelum** mengambil screenshot, supaya aplikasi pribadi tidak ikut terpotret.
+  3. **Screenshot yang memuat konten pribadi owner wajib langsung dihapus** dari disk dan tidak boleh masuk repo.
+  4. **Jangan menyimpulkan "rusak" dari satu screenshot.** Widget me-refresh asinkron; tunggu dan ambil ulang, atau buktikan lewat data (DB/log), sebelum menyatakan regresi.
+- **Verifikasi:** koordinat dihitung ulang (skala 1,2), tap mendarat di widget, perubahan centang terbukti dua arah; screenshot berisi konten pribadi dihapus (`docs/artifacts/w4_now.png`, `w4_after_tap.png`, `w4_home_widgets.png`).
+
+---
+

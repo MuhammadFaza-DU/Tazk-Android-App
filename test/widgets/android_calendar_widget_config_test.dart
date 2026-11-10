@@ -13,14 +13,21 @@ void main() {
     // plugin routes them through a JobIntentService, and JobScheduler holds
     // back jobs for an idle app: taps sat in the queue forever and the widget
     // looked frozen until the app was reopened (docs/LESSONS.md L-005).
+    //
+    // exported="false" since Strix vuln-0001: every tap arrives as an explicit
+    // Intent(context, TazkWidgetTapReceiver) wrapped in PendingIntent, delivered
+    // with our own UID, so self-delivery still works while other apps can no
+    // longer forge a broadcast to toggle tasks or cancel reminders. Verified on
+    // a Galaxy A52 (tap toggles a task both ways with exported="false").
     expect(
       manifest,
       matches(
         RegExp(
-          r'<receiver\s+android:name="\.TazkWidgetTapReceiver"\s+android:exported="true">',
+          r'<receiver\s+android:name="\.TazkWidgetTapReceiver"\s+android:exported="false">',
           multiLine: true,
         ),
       ),
+      reason: 'taps must reach our receiver, and no other app may forge them',
     );
     expect(
       manifest,

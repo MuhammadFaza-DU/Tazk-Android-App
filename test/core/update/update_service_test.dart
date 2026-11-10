@@ -6,7 +6,7 @@ import 'package:tazk/core/update/update_service.dart';
 
 String _manifest({
   String version = '2.2.0',
-  String downloadUrl = 'https://tazk.example.com/tazk.apk',
+  String downloadUrl = 'https://tazk-manager-mfdu.vercel.app/downloads/tazk.apk',
   String? notes,
   String? sha256,
 }) {

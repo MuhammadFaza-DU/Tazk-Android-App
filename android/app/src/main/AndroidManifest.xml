@@ -142,8 +142,14 @@
              JobIntentService: JobScheduler holds back jobs for an idle app, which
              left taps frozen until the app was reopened (docs/LESSONS.md L-005).
              A receiver gets a guaranteed execution window, so the work always
-             runs and the widget never silently stops responding. -->
-        <receiver android:name=".TazkWidgetTapReceiver" android:exported="true">
+             runs and the widget never silently stops responding.
+
+             exported="false" is deliberate (Strix finding vuln-0001): every tap
+             arrives as an explicit Intent(context, TazkWidgetTapReceiver) wrapped
+             in PendingIntent.getBroadcast, which Android delivers with THIS app's
+             UID, so self-delivery keeps working while other apps can no longer
+             forge a broadcast to toggle tasks or cancel reminders. -->
+        <receiver android:name=".TazkWidgetTapReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="es.antonborri.home_widget.action.BACKGROUND" />
             </intent-filter>

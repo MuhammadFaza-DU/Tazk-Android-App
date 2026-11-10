@@ -19,8 +19,22 @@ class UpdateManifest {
 
   static final RegExp _versionPattern = RegExp(r'^\d+\.\d+\.\d+$');
 
+  /// Satu-satunya host yang boleh menjadi tujuan unduhan. Manifest yang
+  /// menunjuk host lain ditolak: cek skema `https://` saja masih membiarkan
+  /// penyerang mengarahkan tombol "Unduh" ke APK mana pun.
+  static const Set<String> _trustedDownloadHosts = {
+    'tazk-manager-mfdu.vercel.app',
+  };
+
+  static bool _isTrustedDownloadHost(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return false;
+    return _trustedDownloadHosts.contains(uri.host.toLowerCase());
+  }
+
   /// Mengembalikan `null` bila JSON rusak, bentuk salah, [version] tidak cocok
-  /// pola semver tiga-segmen, atau [downloadUrl] tidak berawalan `https://`.
+  /// pola semver tiga-segmen, [downloadUrl] tidak berawalan `https://`, atau
+  /// host [downloadUrl] bukan host rilis Tazk.
   static UpdateManifest? tryParse(String raw) {
     final Object? decoded;
     try {
@@ -34,7 +48,9 @@ class UpdateManifest {
     if (version is! String || !_versionPattern.hasMatch(version)) return null;
 
     final downloadUrl = decoded['downloadUrl'];
-    if (downloadUrl is! String || !downloadUrl.startsWith('https://')) {
+    if (downloadUrl is! String ||
+        !downloadUrl.startsWith('https://') ||
+        !_isTrustedDownloadHost(downloadUrl)) {
       return null;
     }
 
