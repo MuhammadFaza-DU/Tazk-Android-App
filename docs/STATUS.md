@@ -3,9 +3,46 @@
 Dokumen penanda posisi kerja. Baca ini dulu sebelum melanjutkan, supaya tidak
 mengulang keputusan yang sudah diambil atau mengerjakan hal yang sudah selesai.
 
-Terakhir diperbarui: **2026-11-09**
+Terakhir diperbarui: **2026-11-10**
 
-## Handoff cepat (2026-11-09) — untuk sesi berikutnya
+## Handoff cepat (2026-11-10) — WAJIB dibaca sesi berikutnya
+
+**Posisi:** HEAD/tag = lihat `git log -1` & `git tag --points-at HEAD` (`stable-2026-11-10-v2`).
+Tree bersih. **Belum di-push** (64+ commit lokal).
+
+**Sudah selesai hari ini (2026-11-10):**
+1. **Google Drive ditutup untuk v2.0** (bukan hapus permanen) — backup = JSON offline + rencana pengingat (T13). Isu #14 ditutup.
+2. **L-012** (teks privasi menjanjikan fitur yang tak ada) dan **L-013** (mengklaim "sudah bedah sampai motion" padahal hanya CSS) masuk `docs/LESSONS.md`.
+3. **Design system landing** diukur dari **render** (`docs/design/2026-11-10-landing-design-reference.md`) + design system Tazk (`docs/design/2026-11-10-landing-design-system.md`): token light+dark, tipografi responsif, 10 komponen, motion, 8 section, copy deck ID/EN, anggaran ≤900 KB.
+4. **Aset web** di `assets/landing/` — 11 WebP, **178 KB** (asal ±4,9 MB).
+5. **Plan eksekusi** ditulis: `docs/superpowers/plans/2026-11-10-t14-t11-t12-t13-app-stages.md` (**folder ini gitignored** — plan hanya ada di mesin ini, bukan di repo).
+
+**Keputusan owner yang MENGIKAT (jangan ditanya ulang):**
+| Topik | Nilai |
+|---|---|
+| Eksekusi | **Laptop saja**; server `resserver` tidak dipakai |
+| Urutan | **Wave L (landing)** → W0 fondasi → W1–W3 kode → W4 build & uji |
+| Cek update | **Manual** (tombol di Pengaturan); tanpa otomatis, tanpa banner Home |
+| Verifikasi HP | Di **W4**; PM build+install, **owner** jalankan skenario & kirim screenshot |
+| Widget | **3 varian di W4** → owner pilih → build final |
+| Widget logic | **TIDAK BOLEH disentuh** (sync/tap terverifikasi — L-002/L-005) |
+| Freeze/streak | Tampil di **Profil** |
+| Hapus task selesai | **Refund XP** |
+| Calendar 4×2 | **Pangkas chrome** (header 20dp, tombol 16dp, padding 4dp, tanpa margin) |
+| Token `title` | **24** (ubah `DESIGN.md`) |
+| `createdAt` profil | Ditambah di migrasi **schema v8** |
+| Landing | Light Sage & Sand **+ dark toggle**, bilingual ID/EN, tanpa board kanvas |
+| Ritme | Lapor per wave, lanjut otomatis kecuali ada keputusan baru |
+
+**Langkah berikutnya (mulai dari sini):** **Wave L.1** di plan — scaffold Astro `landing/`, `tokens.css` dari `DESIGN.md`, font Fredoka+PJS, `npm run build` exit 0.
+
+**Blocker/izin yang sudah diketahui:**
+- **Deploy Vercel butuh login owner** (§1.8) — berhenti dan minta saat `vercel --prod`.
+- APK belum ada → tombol unduh L.4 ke `#unduh` + catatan "APK segera hadir" (jangan tautan mati).
+- Push ke GitHub **belum diizinkan**.
+- Di luar scope saat ini: isu **#12** (kontras chart), landing APK final, pengingat backup (masuk T13).
+
+## Handoff cepat (2026-11-09) — arsip
 
 - **HEAD** `79def0d` · tag **`stable-2026-11-09-v1`** (+ `-v2` sesudah dokumen ini) · **tree bersih** · **belum di-push**.
 - **T1–T10 SELESAI & terverifikasi di perangkat.** `flutter analyze` 0 issue · `flutter test` **535/535**.
@@ -24,6 +61,9 @@ Terakhir diperbarui: **2026-11-09**
 - **Rekomendasi lanjut:** **T13 dulu** (hardening + a11y + isu tertunda), lalu T12 → T14 → T11 → T15 → T16.
 
 ## Log Perubahan (terbaru duluan)
+- 2026-11-10 (lanjutan 2) — **Design system landing page Tazk v1 + aset web diproduksi.** `docs/design/2026-11-10-landing-design-system.md`: token light+dark dari `DESIGN.md` (canvas **#F4F1EA**, surface #FBF9F4 — koreksi dari catatan lama), skala tipografi responsif, spacing, **10 spesifikasi komponen**, motion Tazk (reveal 320ms/stagger 40ms, hover 150ms, reduced-motion), arsitektur konten + **copy deck ID/EN**, anggaran berat ≤900 KB, dan 6 gerbang verifikasi. Aset: `assets/landing/` — 11 file WebP dari maskot & logo, total **178 KB** (asal ±4,9 MB; `otter-sprout` 1.475 KB → 21 KB @720w). Referensi openbot diukur ulang di **390/768/1440** (h1 48/61,44/104px, gutter 16/30,7/48, total halaman 1.214 KB termasuk 433 KB WebP bentuk) dan 3 klaim lama dikoreksi (Inter Variable, easing hover `.23,1,.32,1`, ada aset raster). Catatan: PNG maskot **tanpa alpha** → belum bisa jadi stiker; perlu ekspor alpha dari owner bila diinginkan. — *(belum commit)*
+- 2026-11-10 (lanjutan) — **L-013 dicatat** di `docs/LESSONS.md`: mengklaim "sudah membedah sampai motion" padahal hanya membaca CSS bundle; font & easing salah; aset belum dihitung (dampak: dokumen desain tidak terpakai, satu putaran terbuang). Aturan baru: untuk situs web wajib **render dulu** (computed style/getAnimations/screenshot), token CSS bukan bukti pemakaian, dan klaim cakupan harus menyebut metode + batasnya. — *(belum commit)*
+- 2026-11-10 (lanjutan) — **Design reference landing page diukur dari render, bukan CSS saja.** `docs/design/2026-11-10-landing-design-reference.md` ditulis ulang berbasis browser: struktur 10 section + koordinat/tinggi, tipografi terukur (**Inter Variable**, h1 64–80px weight 500, tracking −0.065em, body 17/1.55 kolom 720px), warna menurut frekuensi pemakaian, 9 komponen khas (split download button, mascot-di-judul, mockup app, kartu pastel), **motion terukur** (hero-in 500ms, header 240ms, marquee 36s, reveal 500ms+stagger 40ms, hover 120–200ms `cubic-bezier(.23,1,.32,1)`), dan **strategi aset** (198 SVG, 0 video, 2 raster kecil, art = CSS gradient). Dua klaim versi pertama dikoreksi: font bukan system, easing hover beda dari reveal. Belum diukur: Lighthouse, perilaku HP asli. Landing page belum diimplementasikan — menunggu arah desain owner. — *(belum commit)*
 - 2026-11-10 — **Keputusan owner: Google Drive TIDAK masuk v2.0.** Backup = JSON offline (manual) + pengingat berkala (rencana T13). Dokumen & teks privasi diperbarui: `AGENTS.md` §5 baris Backup, `docs/STATUS.md` (isu #14 ditutup, tabel keputusan, T10/T11, board 26), `PRD-v2.md` (US-B1, §2.2, §3.10, §5 Platform, §6.4, risiko, ringkasan), spec §8 T10, dan l10n (`app_id.arb`/`app_en.arb` → `aboutPrivacyBody` + `backupDriveDeferred`, regenerate `flutter gen-l10n`). Board 26 dibiarkan (deviasi dicatat). T11 dipastikan butuh izin INTERNET + revisi privasi saat dibangun. — *(belum commit)*
 - 2026-11-09 (penutup) — **Capaian sesi dikunci + data HP direset atas permintaan owner.**
   Checkpoint: commit `79def0d` + tag `stable-2026-11-09-v1`, tree bersih, server arsip
@@ -251,6 +291,21 @@ Tag stabil sebelumnya: `stable-2026-10-30-v1`, `stable-2026-10-29-v1`, `stable-2
 | `docs/design/2026-10-26-arahan-visual.html` | Mockup 3 arah visual awal |
 | `docs/design/ikon-logo-prompts.md` | Prompt generate aset (sudah dipakai, hasilnya di `assets/mascot/`) |
 | `archive/v1/README.md` | Dokumentasi arsip v1 + cara restore |
+| `docs/design/2026-11-10-landing-design-reference.md` | Bedah **render** openbot.run: 3 viewport, tipografi, warna, motion terukur, strategi aset, jebakan |
+| `docs/design/2026-11-10-landing-design-system.md` | **Design system landing Tazk v1**: token light+dark, tipografi responsif, 10 komponen, motion, arsitektur konten, copy deck ID/EN, anggaran berat, gerbang verifikasi |
+| `assets/landing/` (11 file WebP) | Aset web hasil turunan maskot & logo — **178 KB** total (asal ±4,9 MB) |
+
+### Landing page — design system (2026-11-10)
+
+Belum diimplementasikan (menunggu arah owner), tetapi **fondasinya sudah berbasis ukur**:
+
+| Bukti | Angka |
+|---|---|
+| Referensi diukur di 390 / 768 / 1440 | h1 **48 / 61,44 / 104px**, body **16 / 17 / 20px**, gutter **16 / 30,7 / 48px**, tinggi halaman **16.019 / 13.859 / 12.545px** |
+| Berat referensi | **1.214 KB** (CSS 49 · font 47 · WebP bentuk 433 · JS ±115) |
+| Motion referensi | reveal 500ms + stagger 40ms · hover 160ms warna / 120–200ms transform `(.23,1,.32,1)` · header 240ms |
+| Aset Tazk diproduksi | `otter-sprout` 1.475 → **21 KB** @720w; 11 file total **178 KB** |
+| Batasan tercatat | PNG maskot **tanpa alpha** (24bpp) → butuh ekspor PNG-32 dari owner untuk stok transparan |
 
 ### Arsip v1
 

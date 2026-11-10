@@ -258,3 +258,20 @@
 
 ---
 
+## L-013 · Mengklaim "sudah kubedah sampai motion & struktur" padahal cuma membaca CSS bundle
+- **Tanggal:** 2026-11-10
+- **Salah:** ketika owner memberi referensi desain `https://openbot.run/`, aku hanya mengunduh **CSS bundle** (254 KB) + markup SSR, lalu melaporkan seolah sudah membedah sistem desainnya. Aku juga menulis kesimpulan yang **tidak kuperiksa di render**:
+  1. "openbot pakai system font" — **salah**, yang dirender **`Inter Variable`**.
+  2. "easing utama `.22,1,.36,1`" — hanya untuk reveal hero; **hover transform memakai `.23,1,.32,1`**.
+  3. Menyebut "sudah sampai motion" padahal tidak pernah membuka halaman; aset (gambar/video/ikon) belum dihitung sama sekali.
+- **Bukti (2 sumber, sesudah render):** ① `getComputedStyle(h1).fontFamily` = `"Inter Variable", "Inter Variable Fallback", …` dan `document.fonts` memuat Inter Variable (100–900); sementara `--font-sans` di CSS hanya *deklarasi* system stack yang **tidak dipakai**. ② `document.getAnimations()` → `landing-hero-in` 500ms, `landing-header-enter` 240ms, `landing-marquee` 36.000ms; `transition` terhitung → `transform 0.2s cubic-bezier(0.23, 1, 0.32, 1)` pada 52 elemen, berbeda dari `.22,1,.36,1` milik stagger. ③ Setelah render: **198 SVG, 0 video, 2 raster kecil**, art honeycomb = CSS gradient.
+- **Dampak:** owner kecewa dan benar — dokumen "design system" pertama **tidak bisa dipakai** membangun landing page karena tidak memuat UI/UX, motion nyata, dan strategi aset. Satu putaran kerja terbuang, dan kepercayaan pada laporan turun.
+- **Aturan baru:**
+  1. **Untuk situs web, "bedah" = render dulu.** Buka di browser, ukur `getComputedStyle`/`getAnimations`/`getBoundingClientRect`, screenshot, scroll untuk memicu state. Fetch CSS/markup hanya boleh jadi *hipotesis awal*, bukan hasil.
+  2. **Token ≠ pemakaian.** Nilai yang dideklarasikan di CSS bisa tidak dipakai (kasus `--font-sans`). Setiap klaim "dipakai" wajib dari render.
+  3. **Klaim cakupan harus menyebut metode dan batasnya**: "terukur X, belum diukur Y". Dilarang menyimpulkan cakupan dari sebagian kecil bukti.
+  4. **Motion tidak boleh disimpulkan dari nama keyframes**: durasi/easing per peran (reveal vs hover) berbeda dan harus diukur per elemen.
+- **Verifikasi:** `docs/design/2026-11-10-landing-design-reference.md` ditulis ulang dengan tabel render + catatan metode; font/easing/aset dikutip dari hasil ukur, bukan dari deklarasi; bagian "yang tidak diukur" (Lighthouse, HP asli, TalkBack) dinyatakan terbuka.
+
+---
+
