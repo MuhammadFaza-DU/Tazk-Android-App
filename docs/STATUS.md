@@ -7,7 +7,7 @@ Terakhir diperbarui: **2026-11-14**
 
 ## Handoff cepat (2026-11-14) — WAJIB dibaca sesi berikutnya
 
-**Posisi:** HEAD `6518003`, tag **`stable-2026-11-14-v1`**. Tree bersih. **Sudah di-push** (0 commit tertunda).
+**Posisi:** HEAD = `git log -1`. Rilis v2.0.1 = commit **`6518003`** + tag **`stable-2026-11-14-v1`**; commit sesudahnya hanya dokumentasi. Tree bersih, **sudah di-push** (0 commit tertunda).
 
 **Rilis terkini: v2.0.1 (versionCode 2002) — TAYANG.** `https://tazk-manager-mfdu.vercel.app`
 APK 54,4 MB · SHA-256 `645fc20a…32186e13` · `version.json` publik 200 · APK publik 200 · **hash end-to-end cocok**.
@@ -271,7 +271,7 @@ akhir** (owner) lalu review whole-branch.
 |---|---|
 | Branch | `main` |
 | Commit terakhir | jalankan `git log -1` — dokumen ini di-commit sesudahnya, jadi hash di teks akan selalu tertinggal satu |
-| Commit terakhir yang tercatat saat dokumen ditulis | `6518003` — release: Tazk v2.0.1 (versionCode 2002) |
+| Commit terakhir yang tercatat saat dokumen ditulis | `4c8863c` — docs: record v2.0.1 release and guard against blind adb taps |
 | Tag stabil terakhir | `stable-2026-11-14-v1` (lihat `git tag \| Select-String stable` untuk yang terbaru) |
 | Status push | **SUDAH di-push** ke `origin` (GitHub) 2026-11-14 — commit `6518003` + tag `stable-2026-11-14-v1`, 0 commit tertunda |
 | Versi terpasang di HP owner | **v2.0.0 / versionCode 2001** — sengaja tidak di-upgrade; cek-update sudah menawarkan 2.0.1 |
