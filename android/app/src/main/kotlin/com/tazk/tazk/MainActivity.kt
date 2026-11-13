@@ -104,7 +104,6 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    @android.annotation.SuppressLint("BatteryLife")
     private fun openBatteryOptimizationSettings() {
         try {
             val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {

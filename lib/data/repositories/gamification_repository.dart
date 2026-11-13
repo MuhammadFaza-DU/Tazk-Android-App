@@ -116,12 +116,16 @@ class GamificationRepository {
 
   /// Re-settles XP when a completed task's priority is edited, so a later
   /// uncheck refunds exactly what the task is already holding.
+  ///
+  /// Tagged [XpSource.adjustment], not [XpSource.task]: the task was completed
+  /// on an earlier day, so this award must never make today look like a day with
+  /// a completion.
   Future<void> onTaskPriorityChanged(TaskPriority from, TaskPriority to) async {
     final delta = taskXpFor(to) - taskXpFor(from);
     if (delta > 0) {
-      await _awardXp(delta, XpSource.task);
+      await _awardXp(delta, XpSource.adjustment);
     } else if (delta < 0) {
-      await _deductXp(-delta, XpSource.task);
+      await _deductXp(-delta, XpSource.adjustment);
     }
   }
 
@@ -267,6 +271,12 @@ class GamificationRepository {
 
     if (remainingMissed > 0) {
       // Not enough freezes to cover the gap — streak breaks.
+      //
+      // `lastActiveDate` is left untouched on purpose: it still records the last
+      // real completion, which the history strip needs. The cost is that the gap
+      // stays > 1 day forever, so this branch runs on every later rollover; the
+      // `wasActive` guard keeps the notification to the single transition.
+      final wasActive = state.currentStreak > 0;
       await (_db.update(_db.streakState)..where((s) => s.id.equals(state.id)))
           .write(
         StreakStateCompanion(
@@ -277,13 +287,15 @@ class GamificationRepository {
       );
       // A reset used to happen silently: the user saw the number drop with no
       // explanation and reasonably assumed the streak was broken code.
-      final settings = await _settings.ensureSettings();
-      if (settings.notifyStreakWarning) {
-        final l10n = await _l10n();
-        await _notifications.showStreakBrokenNotification(
-          title: l10n.streakBrokenTitle,
-          body: l10n.streakBrokenBody,
-        );
+      if (wasActive) {
+        final settings = await _settings.ensureSettings();
+        if (settings.notifyStreakWarning) {
+          final l10n = await _l10n();
+          await _notifications.showStreakBrokenNotification(
+            title: l10n.streakBrokenTitle,
+            body: l10n.streakBrokenBody,
+          );
+        }
       }
     } else {
       // All missed days covered by freezes — streak survives.
@@ -291,7 +303,7 @@ class GamificationRepository {
           .write(
         StreakStateCompanion(
           freezeCount: Value(newFreezeCount),
-          lastActiveDate: Value(today.subtract(const Duration(days: 1))),
+          lastActiveDate: Value(_addDays(today, -1)),
         ),
       );
       if (freezesToUse > 0) {
@@ -309,6 +321,17 @@ class GamificationRepository {
 
   DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
+  /// Calendar-day arithmetic, not absolute-time subtraction: across a
+  /// daylight-saving change `subtract(Duration(days: 1))` can land at 23:00 or
+  /// 01:00 and stop matching the midnight-normalised day keys.
+  DateTime _addDays(DateTime day, int delta) =>
+      DateTime(day.year, day.month, day.day + delta);
+
+  /// Sources that mean "the user completed something". `adjustment` is excluded
+  /// because re-settling a completed task's priority awards XP without a
+  /// completion happening that day.
+  static const _completionSources = {XpSource.task, XpSource.habit};
+
   /// Days (date-only, oldest first) on which at least one completion stuck.
   ///
   /// Positive `xp_events` are the only trustworthy marker: habit logs back-
@@ -317,7 +340,7 @@ class GamificationRepository {
   /// are summed per day so a completion that was later undone nets back to zero
   /// instead of leaving the day marked active forever.
   Future<List<DateTime>> activeDays({int lookbackDays = 60}) async {
-    final start = _dateOnly(_now()).subtract(Duration(days: lookbackDays));
+    final start = _addDays(_dateOnly(_now()), -lookbackDays);
     final rows = await (_db.select(_db.xpEvents)
           ..where((e) => e.createdAt.isBiggerOrEqualValue(start)))
         .get();
@@ -326,7 +349,7 @@ class GamificationRepository {
 
   /// Reactive version of [activeDays] for the profile history strip.
   Stream<List<DateTime>> watchActiveDays({int lookbackDays = 6}) {
-    final start = _dateOnly(_now()).subtract(Duration(days: lookbackDays));
+    final start = _addDays(_dateOnly(_now()), -lookbackDays);
     return (_db.select(_db.xpEvents)
           ..where((e) => e.createdAt.isBiggerOrEqualValue(start)))
         .watch()
@@ -336,6 +359,7 @@ class GamificationRepository {
   List<DateTime> _netActiveDays(Iterable<XpEvent> events) {
     final net = <DateTime, int>{};
     for (final event in events) {
+      if (!_completionSources.contains(event.source)) continue;
       final day = _dateOnly(event.createdAt);
       net[day] = (net[day] ?? 0) + event.amount;
     }
@@ -352,14 +376,12 @@ class GamificationRepository {
   Future<int> streakFromHistory({int lookbackDays = 400}) async {
     final active = (await activeDays(lookbackDays: lookbackDays)).toSet();
     final today = _dateOnly(_now());
-    var cursor = active.contains(today)
-        ? today
-        : today.subtract(const Duration(days: 1));
+    var cursor = active.contains(today) ? today : _addDays(today, -1);
 
     var streak = 0;
     while (active.contains(cursor)) {
       streak++;
-      cursor = cursor.subtract(const Duration(days: 1));
+      cursor = _addDays(cursor, -1);
     }
     return streak;
   }
@@ -371,33 +393,50 @@ class GamificationRepository {
   /// Returns whether anything was written.
   Future<bool> repairStreakFromHistory({int lookbackDays = 400}) async {
     final computed = await streakFromHistory(lookbackDays: lookbackDays);
-    final state = await ensureStreakState();
-    final newCurrent =
-        computed > state.currentStreak ? computed : state.currentStreak;
-    final newLongest =
-        computed > state.longestStreak ? computed : state.longestStreak;
-    if (newCurrent == state.currentStreak &&
-        newLongest == state.longestStreak) {
-      return false;
-    }
+    if (computed == 0) return false;
 
-    final active = await activeDays(lookbackDays: lookbackDays);
+    final active = (await activeDays(lookbackDays: lookbackDays)).toSet();
     final today = _dateOnly(_now());
-    final lastActive = active.isEmpty
-        ? state.lastActiveDate
-        : (active.contains(today)
-            ? today
-            : today.subtract(const Duration(days: 1)));
+    final computedLastActive = active.contains(today) ? today : _addDays(today, -1);
 
-    await (_db.update(_db.streakState)..where((s) => s.id.equals(state.id)))
-        .write(
-      StreakStateCompanion(
-        currentStreak: Value(newCurrent),
-        longestStreak: Value(newLongest),
-        lastActiveDate: Value(lastActive),
-      ),
-    );
-    await _unlockBadgeIfNeeded(newCurrent);
+    // Read-modify-write inside one transaction: the midnight isolate and a live
+    // UI can both reach this, and a stale write would roll `lastActiveDate`
+    // back and desynchronise the freeze counters.
+    final changed = await _db.transaction(() async {
+      final state = await ensureStreakState();
+      final newCurrent =
+          computed > state.currentStreak ? computed : state.currentStreak;
+      final newLongest =
+          computed > state.longestStreak ? computed : state.longestStreak;
+      if (newCurrent == state.currentStreak &&
+          newLongest == state.longestStreak) {
+        return false;
+      }
+
+      // Never move the active date backwards: a day whose completions were all
+      // undone still had activity, and rewinding it would break the next
+      // rollover's gap calculation.
+      final stored = state.lastActiveDate == null
+          ? null
+          : _dateOnly(state.lastActiveDate!);
+      final lastActive = stored != null && stored.isAfter(computedLastActive)
+          ? stored
+          : computedLastActive;
+
+      await (_db.update(_db.streakState)..where((s) => s.id.equals(state.id)))
+          .write(
+        StreakStateCompanion(
+          currentStreak: Value(newCurrent),
+          longestStreak: Value(newLongest),
+          lastActiveDate: Value(lastActive),
+        ),
+      );
+      return true;
+    });
+
+    if (!changed) return false;
+    final state = await ensureStreakState();
+    await _unlockBadgeIfNeeded(state.currentStreak);
     return true;
   }
 }

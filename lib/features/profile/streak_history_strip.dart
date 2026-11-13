@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/current_date_provider.dart';
 import '../../providers/gamification_providers.dart';
 
 /// Jumlah hari yang ditampilkan strip riwayat (termasuk hari ini).
@@ -33,8 +34,7 @@ class StreakHistoryDay extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final theme = Theme.of(context);
-    final weekday = DateFormat.E(Localizations.localeOf(context).toString())
-        .format(date);
+    final weekday = _weekdayLabel(context, date);
 
     return Semantics(
       // Status tidak boleh hanya dibedakan warna (DESIGN.md): sel aktif memakai
@@ -95,11 +95,15 @@ class StreakHistoryStrip extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colors = context.colors;
-    final today = _dateOnly(now ?? DateTime.now());
-    final active = ref.watch(streakHistoryProvider).valueOrNull ?? const [];
+    final today = _dateOnly(now ?? ref.watch(currentDateProvider));
+    final history = ref.watch(streakHistoryProvider);
 
-    final activeDays = {
-      for (final day in active) _dateOnly(day),
+    // A missing value must not render as seven "no activity" cells: that is a
+    // false statement about the user's own history while the query is still in
+    // flight. Matches the Profile screen's rule for the badge/avatar counters.
+    final active = history.valueOrNull;
+    final activeDays = <DateTime>{
+      for (final day in active ?? const <DateTime>[]) _dateOnly(day),
     };
 
     return Column(
@@ -117,15 +121,16 @@ class StreakHistoryStrip extends ConsumerWidget {
           children: [
             for (var i = streakHistoryLength - 1; i >= 0; i--)
               Expanded(
-                child: StreakHistoryDay(
-                  key: ValueKey('streak-history-day-$i'),
-                  date: today.subtract(Duration(days: i)),
-                  isActive:
-                      activeDays.contains(today.subtract(Duration(days: i))),
-                  isToday: i == 0,
-                  activeLabel: l10n.streakHistoryActive,
-                  missedLabel: l10n.streakHistoryMissed,
-                ),
+                child: active == null
+                    ? const _PendingDay()
+                    : StreakHistoryDay(
+                        key: ValueKey('streak-history-day-$i'),
+                        date: _addDays(today, -i),
+                        isActive: activeDays.contains(_addDays(today, -i)),
+                        isToday: i == 0,
+                        activeLabel: l10n.streakHistoryActive,
+                        missedLabel: l10n.streakHistoryMissed,
+                      ),
               ),
           ],
         ),
@@ -134,4 +139,40 @@ class StreakHistoryStrip extends ConsumerWidget {
   }
 }
 
+/// Placeholder sel selama riwayat belum punya nilai — sengaja tanpa centang
+/// maupun cincin supaya tidak menyatakan "ada" atau "tidak ada" aktivitas.
+class _PendingDay extends StatelessWidget {
+  const _PendingDay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: context.colors.surfaceAlt,
+        ),
+      ),
+    );
+  }
+}
+
+/// Nama hari singkat mengikuti locale aktif, dengan fallback `en` seperti
+/// pemformat tanggal lain di app ini.
+String _weekdayLabel(BuildContext context, DateTime date) {
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  try {
+    return DateFormat.E(locale).format(date);
+  } catch (_) {
+    return DateFormat.E('en').format(date);
+  }
+}
+
 DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+
+/// Calendar-day arithmetic so a daylight-saving change cannot shift the key off
+/// midnight and mark a genuinely active day as missed.
+DateTime _addDays(DateTime day, int delta) =>
+    DateTime(day.year, day.month, day.day + delta);

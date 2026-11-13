@@ -1,5 +1,5 @@
 {
-  "base": "http://localhost:4322",
+  "base": "http://localhost:4321",
   "contrast": {
     "light": [
       {
@@ -178,9 +178,9 @@
   },
   "weight": {
     "count": 9,
-    "encodedKB": 156.9,
+    "encodedKB": 143.7,
     "byInitiatorKB": {
-      "link": 89.4,
+      "link": 76.1,
       "img": 20.6,
       "css": 44.5,
       "other": 2.5

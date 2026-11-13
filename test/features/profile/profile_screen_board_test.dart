@@ -197,9 +197,15 @@ void main() {
       expect(find.text('tugas selesai'), findsOneWidget);
       expect(find.text('badge'), findsOneWidget);
 
-      // Ikon: api (streak), centang (tugas), medali (badge).
+      // Ikon: api (streak), centang (tugas), medali (badge). Dicakup ke baris
+      // statistik saja: strip riwayat di bawahnya juga memakai `check_rounded`
+      // per hari aktif, jadi pencarian global akan jadi rapuh.
       expect(find.byIcon(Icons.local_fire_department_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+      final statRow = find.byKey(profileStatRowKey);
+      expect(
+        find.descendant(of: statRow, matching: find.byIcon(Icons.check_rounded)),
+        findsOneWidget,
+      );
 
       await _disposeScreen(tester);
     });

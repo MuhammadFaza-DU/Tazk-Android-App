@@ -87,7 +87,11 @@ void main() {
     await tester.tap(find.byType(Switch));
     await tester.pumpAndSettle();
 
-    expect(calls, contains('requestIgnoreBatteryOptimizations'));
+    expect(
+      calls.where((c) => c == 'requestIgnoreBatteryOptimizations').length,
+      1,
+      reason: 'permintaan izin tidak boleh terkirim dua kali',
+    );
     // Izin hanya berubah setelah dialog sistem dijawab, jadi status tetap
     // ditanyakan ulang ke platform.
     expect(calls, contains('isIgnoringBatteryOptimizations'));
@@ -103,7 +107,11 @@ void main() {
     await tester.tap(find.byType(Switch));
     await tester.pumpAndSettle();
 
-    expect(calls, contains('openBatteryOptimizationSettings'));
+    expect(
+      calls.where((c) => c == 'openBatteryOptimizationSettings').length,
+      1,
+      reason: 'layar pengaturan sistem dibuka sekali',
+    );
     // App tidak boleh berpura-pura mematikan sendiri: nilainya masih dari
     // platform sampai user mengubahnya di pengaturan sistem.
     expect(switchOf(tester).value, isTrue);

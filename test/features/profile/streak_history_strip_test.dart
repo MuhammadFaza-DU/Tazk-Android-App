@@ -11,13 +11,16 @@ import 'package:tazk/data/models/enums.dart';
 import 'package:tazk/features/profile/streak_history_strip.dart';
 import 'package:tazk/l10n/app_localizations.dart';
 import 'package:tazk/providers/database_provider.dart';
+import 'package:tazk/providers/gamification_providers.dart';
 
 /// Strip "7 hari terakhir" di Profil.
 ///
 /// Tujuannya menjawab "kenapa streak-ku tidak naik": hari yang bolong harus
 /// kelihatan, dan status tidak boleh dibedakan lewat warna saja (DESIGN.md).
 void main() {
-  final now = DateTime(2026, 11, 14, 10);
+  // Diambil dari jam nyata, bukan tanggal tetap: provider riwayat memakai jam
+  // sistem, jadi fixture bertanggal tetap akan gagal beberapa hari kemudian.
+  final now = DateTime.now();
 
   DateTime dayBefore(int daysAgo) =>
       DateTime(now.year, now.month, now.day - daysAgo);
@@ -133,6 +136,51 @@ void main() {
     final days = daysOf(tester);
     expect(days, hasLength(7));
     expect(days.every((d) => !d.isActive), isTrue);
+
+    await disposeStrip(tester);
+  });
+
+  testWidgets('selama data belum ada, tidak menyatakan "tidak ada aktivitas"', (
+    tester,
+  ) async {
+    // Provider belum punya nilai: menampilkan 7 sel "no activity" adalah
+    // pernyataan palsu tentang riwayat user.
+    tester.view.physicalSize = const Size(1170, 2400);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(db),
+          streakHistoryProvider.overrideWith((ref) => const Stream.empty()),
+        ],
+        child: MaterialApp(
+          locale: const Locale('id'),
+          theme: AppTheme.light,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(20),
+              child: StreakHistoryStrip(now: now),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(daysOf(tester), isEmpty, reason: 'belum ada sel hari');
+    expect(find.bySemanticsLabel(RegExp('tidak ada aktivitas')), findsNothing);
 
     await disposeStrip(tester);
   });

@@ -32,7 +32,9 @@ enum AppThemeMode { light, dark }
 
 enum AppLanguage { indonesian, english }
 
-enum XpSource { task, habit, streak, badge }
+/// Stored as an int — the order is part of the database contract. Append new
+/// values at the end so existing rows keep their meaning.
+enum XpSource { task, habit, streak, badge, adjustment }
 
 /// Stored as an int — the order is part of the database contract.
 enum CategoryColor { sage, honey, rose, sky, plum, sand }

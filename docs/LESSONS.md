@@ -379,3 +379,20 @@
 
 ---
 
+## L-021 · Memperbaiki bug streak tapi memasukkan bug yang sama lewat "self-heal"
+- **Tanggal:** 2026-11-14
+- **Salah:** menulis `repairStreakFromHistory()` yang menganggap hari aktif bila ada `xp_events` positif, tanpa memeriksa **sumber** event itu. `onTaskPriorityChanged` (menaikkan prioritas task yang sudah selesai) memberi XP hari ini tanpa penyelesaian — jadi hari tanpa penyelesaian tampak aktif, `lastActiveDate` ditulis ke hari ini, lalu `_registerActiveDay()` **menelan penyelesaian berikutnya** (`return` awal karena tanggal aktif sudah hari ini). Persis gejala asli yang sedang diperbaiki: "sudah dikerjakan tapi streak tidak naik".
+- **Bukti:** `flutter test` menangkapnya lebih dulu setelah saya menulis test khusus — `Expected: [2026-11-13]` / `Actual: [2026-11-13, 2026-11-14]`. Scan Strix (diff-scoped) menemukan cacat yang sama secara independen, ditambah 2 cacat lain: notifikasi "streak putus" **terkirim ulang tiap hari** (dibuktikan test: `['streakBroken','streakBroken']`), dan `lastActiveDate` bisa **mundur** walau kontraknya "monoton".
+- **Dampak:** kalau dirilis apa adanya, fitur yang dimaksudkan memulihkan kepercayaan justru menampilkan streak yang tidak layak dan membekukan streak berikutnya — kerusakan lebih besar daripada bug awal.
+- **Aturan baru:**
+  1. **"Hari aktif" harus punya sumber eksplisit.** Event XP yang berarti penyelesaian = `XpSource.task` / `XpSource.habit`. Penyesuaian XP (ubah prioritas, refund, bonus) **tidak** boleh dihitung. Menambah `enum` = aman selama **ditambahkan di akhir** (nilai disimpan sebagai int).
+  2. **Notifikasi yang dipicu kondisi persisten wajib dijaga transisi** (`state lama > 0`), bukan hanya gate preferensi — kalau tidak, ia berulang setiap rollover selamanya.
+  3. **Kontrak "monoton" harus mencakup SEMUA field**, bukan hanya counter yang dibandingkan; `lastActiveDate` ikut dijaga.
+  4. **Read-modify-write lintas isolate wajib transaksi** (isolate tengah malam + UI bisa menulis bersamaan).
+  5. **Aritmetika tanggal pakai konstruktor kalender** (`DateTime(y, m, d + n)`), bukan `subtract(Duration(days: n))` — DST membuat hasilnya bukan tengah malam.
+  6. **Widget yang menampilkan data wajib membedakan "belum ada nilai" dari "kosong"** — `valueOrNull ?? []` membuat layar menyatakan "tidak ada aktivitas" padahal masih memuat.
+  7. **Test dengan tanggal tetap akan kedaluwarsa.** Fixture berbasis jam nyata, atau clock harus disuntikkan sampai ke repository.
+- **Verifikasi:** `flutter test` **629/629** · `dart analyze` 0 issue · probe ulang pada salinan DB asli tetap `CHANGED=false` (tidak mengarang streak) · notifikasi hanya pada transisi (test).
+
+---
+

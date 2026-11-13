@@ -1,6 +1,6 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "downloadUrl": "https://tazk-manager-mfdu.vercel.app/downloads/tazk.apk",
-  "notes": "Rilis v2.0: redesign antarmuka, widget yang andal, statistik dari data nyata, backup JSON offline, dan pemeriksaan pembaruan manual.",
-  "sha256": "8ff4570409388127d9492ef1ec022450c610d3c5f40fca4a851e601a8f198c38"
+  "notes": "Perbaikan v2.0.1: riwayat 7 hari di Profil (hari aktif vs bolong), pemberitahuan saat streak putus, perbaikan data streak yang tertinggal, dan sakelar pengecualian optimasi baterai di Pengaturan.",
+  "sha256": "645fc20ab00d47643a59ac1563e7299ab7288e2e23e3e679aa9a63bd32186e13"
 }
