@@ -340,6 +340,14 @@
   4. **Jangan menyimpulkan "rusak" dari satu screenshot.** Widget me-refresh asinkron; tunggu dan ambil ulang, atau buktikan lewat data (DB/log), sebelum menyatakan regresi.
 - **Verifikasi:** koordinat dihitung ulang (skala 1,2), tap mendarat di widget, perubahan centang terbukti dua arah; screenshot berisi konten pribadi dihapus (`docs/artifacts/w4_now.png`, `w4_after_tap.png`, `w4_home_widgets.png`).
 
+### ⚠️ Kambuh 2026-11-14 — kesalahan yang sama terulang
+- **Apa yang terjadi:** saat memandu owner mengekspor backup lewat `adb`, tap dengan koordinat hasil hitungan dari screenshot **meleset** dan membuka **WhatsApp** lalu **Kamera**, dan `screencap` memotret keduanya. Persis pola L-018.
+- **Dampak:** privasi owner tersentuh lagi; screenshot pribadi tidak dikirim ke mana pun (share sheet dibatalkan), tapi tetap terambil.
+- **Kenapa terulang:** aturan L-018 berbentuk *"ingat untuk menghitung"* — tidak ada penegakan. Kesalahan berbasis ingatan akan terulang.
+- **Pencegahan otomatis (bukan sekadar diingat):** `tool/adb-tap.ps1` — menolak tap kalau fokus layar bukan app target (**sebelum** dan **sesudah**), dan mengambil koordinat **hanya** dari `uiautomator dump` (`bounds` node), tidak dari perkiraan. Screenshot hanya diambil setelah fokus terverifikasi.
+- **Status:** sintaks PowerShell terverifikasi (`Parser::ParseFile` → OK). **Belum diuji fungsional** — perangkat sudah dicabut; uji pertama harus dilakukan saat HP tersambung lagi, dan hasilnya dicatat di sini.
+- **Aturan baru:** setiap tap `adb` untuk uji manual **WAJIB lewat `tool/adb-tap.ps1`**. Tap manual langsung hanya boleh bila skripnya tidak tersedia, dan saat itu wajib menyebutkan alasan di laporan.
+
 ---
 
 ## L-019 · `Set-Content -NoNewline` merusak `pubspec.yaml` jadi satu baris
