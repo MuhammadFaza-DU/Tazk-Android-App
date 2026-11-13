@@ -355,3 +355,27 @@
 
 ---
 
+## L-020 · Streak "tidak bertambah" — reset terjadi karena hari bolong, dan app diam saja saat reset
+- **Tanggal:** 2026-11-14
+- **Keluhan owner:** "streak tidak bertambah padahal task & habit hari itu sudah dikerjakan semua" (streak mentok di 1 dari hari pertama).
+- **Investigasi:** seluruh logika diuji dan **terbukti benar** — `_registerActiveDay`, `evaluateMissedDay`, round-trip `DateTime` Drift (probe: `2026-11-14` masuk → `2026-11-14` keluar), `switch` callback widget tidak fall-through (dibuktikan `dart run` → `RESULT=A`), dan semua jalur centang memanggil gamifikasi.
+- **Bukti akar masalah (DB asli dari perangkat, dibaca lewat build ber-`debuggable` + `run-as`):**
+  ```
+  streak_state: current=1 longest=1 last_active=2026-11-13
+  xp_events per hari: 2026-11-11 → 30 event, 2026-11-12 → 0 event, 2026-11-13 → 5 event
+  habit_logs:        2026-11-09, 11-10, 11-11, 11-13 (12 Nov tidak ada)
+  tasks:             "SDL P2" due 2026-11-12, is_completed=1, TAPI tidak ada xp_event 12 Nov
+  ```
+  Jadi **12 November tidak ada penyelesaian tercatat** → `evaluateMissedDay` pada 13 Nov melihat jarak 2 hari → streak direset → naik lagi jadi 1. Perilaku **sesuai desain** (streak butuh ≥1 item selesai tiap hari).
+- **Probe konfirmasi pada SALINAN DB asli:** `BEFORE cur=1 last=2026-11-13` → `onHabitCompleted()` → `cur=2 longest=2 last=2026-11-14`. Logika naik dengan benar.
+- **Salah (produk):** `streakBrokenTitle` / `streakBrokenBody` sudah ada di l10n ID+EN tetapi **tidak dipakai di kode mana pun** — streak bisa direset tanpa satu pun pemberitahuan. Owner tidak punya cara mengetahui hari mana yang bolong, sehingga bug terlihat seperti "streak tidak berfungsi".
+- **Dampak:** kepercayaan pada fitur gamifikasi turun; owner mengira ada bug hitung padahal reset-nya benar.
+- **Aturan baru:**
+  1. **Jangan menyimpulkan "bug" dari kode saja.** Untuk keluhan berbasis riwayat (streak/statistik/XP), baca **database asli** dulu: `xp_events` per hari + `habit_logs` + `streak_state.last_active_date`. Kode yang lulus test belum membuktikan data user benar.
+  2. **Reset streak wajib bisa dilihat user.** Setiap kali `evaluateMissedDay` mengosongkan streak, kabari (notifikasi/banner) + sebutkan tanggal yang bolong.
+  3. Membaca DB release butuh `debuggable=true` + **keystore rilis yang sama** supaya `adb install -r` tidak menghapus data. Selalu revert flag itu sebelum build rilis berikutnya.
+  4. Menarik file biner dari adb **jangan** lewat redirection PowerShell (`>` merusak byte). Pakai `cmd /c "... exec-out ... > file"`.
+- **Verifikasi:** DB perangkat terbaca (schema v8, 22 objek), probe pada salinan DB asli menunjukkan streak 1→2, HP dipulihkan ke build rilis non-debuggable dengan data utuh (Faza, 95 XP).
+
+---
+

@@ -545,6 +545,9 @@
   "batteryBody": "Android menunda pekerjaan app yang lama tidak dibuka, sehingga centang di widget bisa tertahan. Beri pengecualian optimasi baterai agar widget dan pengingat tetap tepat waktu.",
   "batteryAllow": "Izinkan",
   "batteryLater": "Nanti saja",
+  "batterySettingsTitle": "Jangan optimalkan baterai",
+  "batterySettingsOn": "Widget dan pengingat tetap sinkron",
+  "batterySettingsOff": "Android bisa menahan sinkronisasi saat app lama tidak dibuka",
 
   "updateCheckLabel": "Pemeriksaan pembaruan",
   "updateCheckSubtitle": "Periksa versi terbaru secara manual",
@@ -566,7 +569,10 @@
   },
   "profileJoinedThisMonth": "Bergabung bulan ini",
   "streakBrokenTitle": "Streak kamu putus",
-  "streakBrokenBody": "Kemarin tidak ada yang selesai, jadi streak dimulai ulang. Selesaikan hari ini untuk menjaga kelanjutannya.",
+  "streakBrokenBody": "Tidak ada aktivitas pada hari yang terlewat, jadi streak dimulai ulang. Selesaikan satu hal hari ini untuk memulai lagi.",
+  "streakHistoryTitle": "7 hari terakhir",
+  "streakHistoryActive": "ada aktivitas",
+  "streakHistoryMissed": "tidak ada aktivitas",
   "freezeAvailableLabel": "{count} freeze tersedia",
   "@freezeAvailableLabel": {
     "placeholders": {

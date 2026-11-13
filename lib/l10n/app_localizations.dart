@@ -2252,6 +2252,24 @@ abstract class AppLocalizations {
   /// **'Nanti saja'**
   String get batteryLater;
 
+  /// No description provided for @batterySettingsTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'Jangan optimalkan baterai'**
+  String get batterySettingsTitle;
+
+  /// No description provided for @batterySettingsOn.
+  ///
+  /// In id, this message translates to:
+  /// **'Widget dan pengingat tetap sinkron'**
+  String get batterySettingsOn;
+
+  /// No description provided for @batterySettingsOff.
+  ///
+  /// In id, this message translates to:
+  /// **'Android bisa menahan sinkronisasi saat app lama tidak dibuka'**
+  String get batterySettingsOff;
+
   /// No description provided for @updateCheckLabel.
   ///
   /// In id, this message translates to:
@@ -2315,8 +2333,26 @@ abstract class AppLocalizations {
   /// No description provided for @streakBrokenBody.
   ///
   /// In id, this message translates to:
-  /// **'Kemarin tidak ada yang selesai, jadi streak dimulai ulang. Selesaikan hari ini untuk menjaga kelanjutannya.'**
+  /// **'Tidak ada aktivitas pada hari yang terlewat, jadi streak dimulai ulang. Selesaikan satu hal hari ini untuk memulai lagi.'**
   String get streakBrokenBody;
+
+  /// No description provided for @streakHistoryTitle.
+  ///
+  /// In id, this message translates to:
+  /// **'7 hari terakhir'**
+  String get streakHistoryTitle;
+
+  /// No description provided for @streakHistoryActive.
+  ///
+  /// In id, this message translates to:
+  /// **'ada aktivitas'**
+  String get streakHistoryActive;
+
+  /// No description provided for @streakHistoryMissed.
+  ///
+  /// In id, this message translates to:
+  /// **'tidak ada aktivitas'**
+  String get streakHistoryMissed;
 
   /// No description provided for @freezeAvailableLabel.
   ///

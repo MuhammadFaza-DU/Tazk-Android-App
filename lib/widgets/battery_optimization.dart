@@ -32,6 +32,16 @@ class BatteryOptimization {
     }
   }
 
+  /// Opens the system list where the user can switch this app's exemption off.
+  /// Android offers no API to revoke it from inside the app.
+  static Future<void> openSystemSettings() async {
+    try {
+      await _channel.invokeMethod<void>('openBatteryOptimizationSettings');
+    } catch (_) {
+      // Best effort.
+    }
+  }
+
   static Future<bool> promptShown() async {
     try {
       return await _channel.invokeMethod<bool>('batteryPromptShown') ?? true;

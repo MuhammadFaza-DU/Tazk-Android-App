@@ -15,6 +15,7 @@ import '../../providers/repository_providers.dart';
 import '../../providers/settings_providers.dart';
 import 'about_screen.dart';
 import 'backup_screen.dart';
+import 'battery_optimization_row.dart';
 import 'categories_screen.dart';
 import 'notification_settings_screen.dart';
 import 'update_check_row.dart';
@@ -149,7 +150,6 @@ class SettingsScreen extends ConsumerWidget {
                           ? l10n2.exactAlarmActive
                           : l10n2.exactAlarmInactive,
                       trailing: const _Chevron(),
-                      showDivider: false,
                       onTap: () async {
                         await ref
                             .read(notificationServiceProvider)
@@ -159,6 +159,10 @@ class SettingsScreen extends ConsumerWidget {
                     );
                   },
                 ),
+                // Pengecualian optimasi baterai bisa diubah kapan saja. Dulu
+                // hanya ditawarkan sekali saat app pertama dibuka, sehingga
+                // penolakan di awal tidak bisa ditarik kembali.
+                const BatteryOptimizationRow(showDivider: false),
               ],
             ),
           ),

@@ -9,7 +9,13 @@ import '../models/enums.dart';
 import 'settings_repository.dart';
 
 class GamificationRepository {
-  GamificationRepository(this._db, this._notifications, this._settings, this._widget);
+  GamificationRepository(
+    this._db,
+    this._notifications,
+    this._settings,
+    this._widget, {
+    DateTime Function()? now,
+  }) : _now = now ?? DateTime.now;
 
   final AppDatabase _db;
   final NotificationService _notifications;
@@ -18,6 +24,7 @@ class GamificationRepository {
   // the service is retained on the public constructor for call-site stability.
   // ignore: unused_field
   final HomeWidgetService _widget;
+  final DateTime Function() _now;
 
   Future<AppLocalizations> _l10n() async {
     final settings = await _settings.ensureSettings();
@@ -167,7 +174,7 @@ class GamificationRepository {
   }
 
   Future<void> _registerActiveDay() async {
-    final today = _dateOnly(DateTime.now());
+    final today = _dateOnly(_now());
     final state = await ensureStreakState();
     if (state.lastActiveDate != null &&
         _dateOnly(state.lastActiveDate!) == today) {
@@ -218,7 +225,7 @@ class GamificationRepository {
     }
 
     final state = await ensureStreakState();
-    final today = _dateOnly(DateTime.now());
+    final today = _dateOnly(_now());
     final alreadyActiveToday =
         state.lastActiveDate != null && _dateOnly(state.lastActiveDate!) == today;
 
@@ -246,7 +253,7 @@ class GamificationRepository {
   /// with no task/habit completion. Call once when the app opens. Each missed
   /// day needs its own freeze; one freeze cannot forgive a multi-day gap.
   Future<void> evaluateMissedDay() async {
-    final today = _dateOnly(DateTime.now());
+    final today = _dateOnly(_now());
     final state = await ensureStreakState();
     if (state.lastActiveDate == null) return;
     final lastActive = _dateOnly(state.lastActiveDate!);
@@ -268,6 +275,16 @@ class GamificationRepository {
           freezeCount: Value(newFreezeCount),
         ),
       );
+      // A reset used to happen silently: the user saw the number drop with no
+      // explanation and reasonably assumed the streak was broken code.
+      final settings = await _settings.ensureSettings();
+      if (settings.notifyStreakWarning) {
+        final l10n = await _l10n();
+        await _notifications.showStreakBrokenNotification(
+          title: l10n.streakBrokenTitle,
+          body: l10n.streakBrokenBody,
+        );
+      }
     } else {
       // All missed days covered by freezes — streak survives.
       await (_db.update(_db.streakState)..where((s) => s.id.equals(state.id)))
@@ -291,4 +308,96 @@ class GamificationRepository {
   }
 
   DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+
+  /// Days (date-only, oldest first) on which at least one completion stuck.
+  ///
+  /// Positive `xp_events` are the only trustworthy marker: habit logs back-
+  /// filled through the calendar and a task's due date both leave rows without
+  /// ever advancing the streak, so counting them would invent history. Amounts
+  /// are summed per day so a completion that was later undone nets back to zero
+  /// instead of leaving the day marked active forever.
+  Future<List<DateTime>> activeDays({int lookbackDays = 60}) async {
+    final start = _dateOnly(_now()).subtract(Duration(days: lookbackDays));
+    final rows = await (_db.select(_db.xpEvents)
+          ..where((e) => e.createdAt.isBiggerOrEqualValue(start)))
+        .get();
+    return _netActiveDays(rows);
+  }
+
+  /// Reactive version of [activeDays] for the profile history strip.
+  Stream<List<DateTime>> watchActiveDays({int lookbackDays = 6}) {
+    final start = _dateOnly(_now()).subtract(Duration(days: lookbackDays));
+    return (_db.select(_db.xpEvents)
+          ..where((e) => e.createdAt.isBiggerOrEqualValue(start)))
+        .watch()
+        .map(_netActiveDays);
+  }
+
+  List<DateTime> _netActiveDays(Iterable<XpEvent> events) {
+    final net = <DateTime, int>{};
+    for (final event in events) {
+      final day = _dateOnly(event.createdAt);
+      net[day] = (net[day] ?? 0) + event.amount;
+    }
+    final days = net.entries
+        .where((entry) => entry.value > 0)
+        .map((entry) => entry.key)
+        .toList()
+      ..sort();
+    return days;
+  }
+
+  /// Consecutive active days ending today, or ending yesterday when today has
+  /// no completion yet. An unfinished today must not read as a broken streak.
+  Future<int> streakFromHistory({int lookbackDays = 400}) async {
+    final active = (await activeDays(lookbackDays: lookbackDays)).toSet();
+    final today = _dateOnly(_now());
+    var cursor = active.contains(today)
+        ? today
+        : today.subtract(const Duration(days: 1));
+
+    var streak = 0;
+    while (active.contains(cursor)) {
+      streak++;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    return streak;
+  }
+
+  /// Raises a stored streak that drifted below the real history.
+  ///
+  /// Monotonic on purpose: it never lowers a value, so a streak kept alive by a
+  /// freeze stays intact, and running it on every app open is idempotent.
+  /// Returns whether anything was written.
+  Future<bool> repairStreakFromHistory({int lookbackDays = 400}) async {
+    final computed = await streakFromHistory(lookbackDays: lookbackDays);
+    final state = await ensureStreakState();
+    final newCurrent =
+        computed > state.currentStreak ? computed : state.currentStreak;
+    final newLongest =
+        computed > state.longestStreak ? computed : state.longestStreak;
+    if (newCurrent == state.currentStreak &&
+        newLongest == state.longestStreak) {
+      return false;
+    }
+
+    final active = await activeDays(lookbackDays: lookbackDays);
+    final today = _dateOnly(_now());
+    final lastActive = active.isEmpty
+        ? state.lastActiveDate
+        : (active.contains(today)
+            ? today
+            : today.subtract(const Duration(days: 1)));
+
+    await (_db.update(_db.streakState)..where((s) => s.id.equals(state.id)))
+        .write(
+      StreakStateCompanion(
+        currentStreak: Value(newCurrent),
+        longestStreak: Value(newLongest),
+        lastActiveDate: Value(lastActive),
+      ),
+    );
+    await _unlockBadgeIfNeeded(newCurrent);
+    return true;
+  }
 }

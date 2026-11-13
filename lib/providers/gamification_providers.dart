@@ -22,3 +22,8 @@ final badgesProvider = StreamProvider<List<BadgeUnlock>>((ref) {
 final cosmeticsProvider = StreamProvider<List<CosmeticUnlock>>((ref) {
   return ref.watch(gamificationRepositoryProvider).watchCosmetics();
 });
+
+/// Hari-hari yang punya penyelesaian, untuk strip riwayat streak di Profil.
+final streakHistoryProvider = StreamProvider<List<DateTime>>((ref) {
+  return ref.watch(gamificationRepositoryProvider).watchActiveDays();
+});

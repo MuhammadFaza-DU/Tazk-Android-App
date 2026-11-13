@@ -43,6 +43,9 @@ class DailyMaintenanceService {
     if (_lastRolloverDate == today) return;
     _lastRolloverDate = today;
     await _gamification.evaluateMissedDay();
+    // Self-heal a stored streak that drifted below the real history (the user
+    // saw "1" for days of real work). Monotonic, so freezes stay meaningful.
+    await _gamification.repairStreakFromHistory();
     await rescheduleAllReminders();
     await _gamification.refreshStreakWarningNotification();
     await _widget.refreshAll();

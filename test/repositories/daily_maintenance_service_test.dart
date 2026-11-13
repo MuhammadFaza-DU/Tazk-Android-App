@@ -32,10 +32,17 @@ class _CountingGamificationRepository extends Fake
     implements GamificationRepository {
   int evaluateCount = 0;
   int refreshWarningCount = 0;
+  int repairCount = 0;
 
   @override
   Future<void> evaluateMissedDay() async {
     evaluateCount++;
+  }
+
+  @override
+  Future<bool> repairStreakFromHistory({int lookbackDays = 400}) async {
+    repairCount++;
+    return false;
   }
 
   @override
@@ -162,6 +169,7 @@ void main() {
     expect(tasks.rescheduleCount, 1);
     expect(habits.rescheduleCount, 1);
     expect(gamification.evaluateCount, 1);
+    expect(gamification.repairCount, 1);
     expect(gamification.refreshWarningCount, 1);
     expect(widgets.refreshAllCount, 1);
 
@@ -172,6 +180,7 @@ void main() {
     expect(tasks.rescheduleCount, 2);
     expect(habits.rescheduleCount, 2);
     expect(gamification.evaluateCount, 2);
+    expect(gamification.repairCount, 2);
     expect(gamification.refreshWarningCount, 2);
     expect(widgets.refreshAllCount, 2);
   });

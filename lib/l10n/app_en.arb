@@ -413,6 +413,9 @@
   "batteryBody": "Android defers work for apps that sit idle, which can hold back widget taps. Allow a battery optimisation exemption so widgets and reminders stay on time.",
   "batteryAllow": "Allow",
   "batteryLater": "Not now",
+  "batterySettingsTitle": "Don't optimise battery",
+  "batterySettingsOn": "Widgets and reminders stay in sync",
+  "batterySettingsOff": "Android may defer sync while the app sits idle",
 
   "updateCheckLabel": "Update check",
   "updateCheckSubtitle": "Manually check for the latest version",
@@ -434,7 +437,10 @@
   },
   "profileJoinedThisMonth": "Joined this month",
   "streakBrokenTitle": "Your streak broke",
-  "streakBrokenBody": "Nothing was completed yesterday, so your streak restarted. Finish something today to keep it going.",
+  "streakBrokenBody": "A day was missed, so your streak restarted. Finish one thing today to start again.",
+  "streakHistoryTitle": "Last 7 days",
+  "streakHistoryActive": "active",
+  "streakHistoryMissed": "no activity",
   "freezeAvailableLabel": "{count} freezes available",
   "@freezeAvailableLabel": {
     "placeholders": {

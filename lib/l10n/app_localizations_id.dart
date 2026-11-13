@@ -1193,6 +1193,16 @@ class AppLocalizationsId extends AppLocalizations {
   String get batteryLater => 'Nanti saja';
 
   @override
+  String get batterySettingsTitle => 'Jangan optimalkan baterai';
+
+  @override
+  String get batterySettingsOn => 'Widget dan pengingat tetap sinkron';
+
+  @override
+  String get batterySettingsOff =>
+      'Android bisa menahan sinkronisasi saat app lama tidak dibuka';
+
+  @override
   String get updateCheckLabel => 'Pemeriksaan pembaruan';
 
   @override
@@ -1228,7 +1238,16 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get streakBrokenBody =>
-      'Kemarin tidak ada yang selesai, jadi streak dimulai ulang. Selesaikan hari ini untuk menjaga kelanjutannya.';
+      'Tidak ada aktivitas pada hari yang terlewat, jadi streak dimulai ulang. Selesaikan satu hal hari ini untuk memulai lagi.';
+
+  @override
+  String get streakHistoryTitle => '7 hari terakhir';
+
+  @override
+  String get streakHistoryActive => 'ada aktivitas';
+
+  @override
+  String get streakHistoryMissed => 'tidak ada aktivitas';
 
   @override
   String freezeAvailableLabel(int count) {

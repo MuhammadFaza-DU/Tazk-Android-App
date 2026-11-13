@@ -48,7 +48,8 @@ class _FakeExactAlarmController extends ExactAlarmController {
 
 /// Pump [SettingsScreen] dengan DB memori + locale `id` (copy board), pada
 /// viewport 390dp supaya seluruh grup ikut dibangun (ListView bersifat lazy).
-/// Tinggi 1200dp: lima grup (termasuk KATEGORI, T7.3) tidak lagi muat di 900.
+/// Tinggi 1400dp: baris pengecualian baterai (grup Pemberitahuan) menambah satu
+/// baris, jadi enam grup tidak lagi muat di 1200.
 Future<AppDatabase> _pumpScreen(
   WidgetTester tester, {
   NotificationPermissionState permission = const NotificationPermissionState(
@@ -58,7 +59,7 @@ Future<AppDatabase> _pumpScreen(
     status: ExactAlarmStatus.allowed,
   ),
   double width = 390,
-  double height = 1200,
+  double height = 1400,
 }) async {
   tester.view.physicalSize = Size(width * 3, height * 3);
   tester.view.devicePixelRatio = 3;
@@ -147,6 +148,7 @@ void main() {
         'Streak Warning',
         'Status notifikasi',
         'Alarm presisi',
+        'Jangan optimalkan baterai',
         'Kelola kategori',
         'Cadangkan & pulihkan',
         'Tentang App',
@@ -170,11 +172,12 @@ void main() {
     ) async {
       await _pumpScreen(tester);
 
-      // 6 baris grup Pemberitahuan (Task/Habit/Streak/Focus/Status/Alarm presisi)
-      // + 1 Kelola kategori + 1 Cadangkan & pulihkan + 1 Cek pembaruan + 1
-      // Tentang App = 10 petak ikon. Baris "Cek pembaruan" (T11.2) adalah baris
-      // aksi (hasil tampil sebaris), bukan navigasi, jadi tanpa chevron.
-      expect(_iconTiles, findsNWidgets(10));
+      // 7 baris grup Pemberitahuan (Task/Habit/Streak/Focus/Status/Alarm presisi/
+      // pengecualian baterai) + 1 Kelola kategori + 1 Cadangkan & pulihkan + 1
+      // Cek pembaruan + 1 Tentang App = 11 petak ikon. Baris "Cek pembaruan"
+      // (T11.2) adalah baris aksi (hasil tampil sebaris), bukan navigasi, jadi
+      // tanpa chevron — begitu pula baris baterai yang memakai `Switch`.
+      expect(_iconTiles, findsNWidgets(11));
       expect(find.byIcon(Icons.chevron_right_rounded), findsNWidgets(9));
 
       final tile = tester.widget<Container>(_iconTiles.first);
@@ -197,6 +200,7 @@ void main() {
       expect(find.byIcon(Icons.save_alt_rounded), findsOneWidget);
       expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
       expect(find.byIcon(Icons.system_update_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.battery_saver_rounded), findsOneWidget);
 
       await _disposeScreen(tester);
     });
@@ -249,9 +253,10 @@ void main() {
 
   group('SettingsScreen — stress data', () {
     testWidgets('tidak overflow di layar sempit 320dp', (tester) async {
-      // Tinggi 1400: enam grup (DATA masuk di T10.2) tidak lagi muat di 1200
-      // pada lebar 320, dan ListView tidak membangun kartu di luar viewport.
-      await _pumpScreen(tester, width: 320, height: 1400);
+      // Tinggi 1600: enam grup (DATA masuk di T10.2) plus baris pengecualian
+      // baterai tidak lagi muat di 1400 pada lebar 320, dan ListView tidak
+      // membangun kartu di luar viewport.
+      await _pumpScreen(tester, width: 320, height: 1600);
 
       expect(tester.takeException(), isNull);
       expect(find.byType(AppCard), findsNWidgets(6));
@@ -343,12 +348,12 @@ void main() {
     });
 
     testWidgets(
-      'setiap baris punya aksi, dan toggle tidak diduplikasi di sini',
+      'setiap baris punya aksi, dan satu-satunya toggle adalah pengecualian baterai',
       (tester) async {
         await _pumpScreen(tester);
 
         final rows = tester.widgetList<ListRow>(find.byType(ListRow)).toList();
-        expect(rows, hasLength(9));
+        expect(rows, hasLength(10));
         for (final row in rows) {
           expect(
             row.onTap,
@@ -357,10 +362,19 @@ void main() {
           );
         }
 
-        // Board 08 memakai chevron untuk semua baris; toggle nyata tinggal di
-        // layar Notifikasi (file itu tidak disentuh), jadi tidak ada `Switch`
-        // duplikat di sini.
-        expect(find.byType(Switch), findsNothing);
+        // Toggle notifikasi tetap tinggal di layar Notifikasi (file itu tidak
+        // disentuh). Satu-satunya `Switch` di sini adalah pengecualian optimasi
+        // baterai, yang memang harus bisa diubah kapan saja.
+        final switches = find.byType(Switch);
+        expect(switches, findsOneWidget);
+        final batteryRow = find.ancestor(
+          of: switches,
+          matching: find.byType(ListRow),
+        );
+        expect(
+          tester.widget<ListRow>(batteryRow).title,
+          'Jangan optimalkan baterai',
+        );
 
         await _disposeScreen(tester);
       },

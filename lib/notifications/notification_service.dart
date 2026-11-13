@@ -26,6 +26,7 @@ class NotificationService {
   static const streakWarningNotificationId = 900001;
   static const freezeUsedNotificationId = 900002;
   static const focusSessionNotificationId = 900003;
+  static const streakBrokenNotificationId = 900004;
 
   static const _taskChannelId = 'task_reminders';
   static const _habitChannelId = 'habit_reminders';
@@ -298,6 +299,30 @@ class NotificationService {
       );
     } catch (error) {
       debugPrint('NotificationService: showFreezeUsedNotification failed: $error');
+    }
+  }
+
+  /// Tells the user a streak was reset, so a shrinking number never happens
+  /// without an explanation.
+  Future<void> showStreakBrokenNotification({
+    required String title,
+    required String body,
+  }) async {
+    try {
+      const androidDetails = AndroidNotificationDetails(
+        _streakChannelId,
+        'Streak',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+      );
+      await _plugin.show(
+        streakBrokenNotificationId,
+        title,
+        body,
+        const NotificationDetails(android: androidDetails),
+      );
+    } catch (error) {
+      debugPrint('NotificationService: showStreakBrokenNotification failed: $error');
     }
   }
 

@@ -56,6 +56,10 @@ class MainActivity : FlutterActivity() {
                         requestIgnoreBatteryOptimizations()
                         result.success(null)
                     }
+                    "openBatteryOptimizationSettings" -> {
+                        openBatteryOptimizationSettings()
+                        result.success(null)
+                    }
                     "batteryPromptShown" -> {
                         result.success(
                             applicationContext
@@ -96,6 +100,26 @@ class MainActivity : FlutterActivity() {
                 startActivity(fallback)
             } catch (_: Exception) {
                 // Best effort â€” the user can still enable it from system settings.
+            }
+        }
+    }
+
+    @android.annotation.SuppressLint("BatteryLife")
+    private fun openBatteryOptimizationSettings() {
+        try {
+            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(intent)
+        } catch (_: Exception) {
+            try {
+                val fallback = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = android.net.Uri.parse("package:$packageName")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                startActivity(fallback)
+            } catch (_: Exception) {
+                // Best effort — the user can still change it from system settings.
             }
         }
     }

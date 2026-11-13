@@ -20,6 +20,7 @@ import '../../providers/current_date_provider.dart';
 import '../../providers/gamification_providers.dart';
 import '../../providers/repository_providers.dart';
 import '../../providers/task_providers.dart';
+import 'streak_history_strip.dart';
 
 /// Key kartu profil (maskot + nama + baris level).
 const Key profileCardKey = ValueKey('profile-card');
@@ -164,6 +165,10 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
           ),
+          const SizedBox(height: _blockGap),
+          // Riwayat 7 hari: menjawab "kenapa streak tidak naik" dengan
+          // menunjukkan hari yang bolong, bukan sekadar angka.
+          const StreakHistoryStrip(),
           const SizedBox(height: _blockGap),
           if (streak != null && streak.freezeCount > 0) ...[
             _FreezeInfo(

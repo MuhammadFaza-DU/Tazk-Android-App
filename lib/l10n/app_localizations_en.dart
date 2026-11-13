@@ -1203,6 +1203,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get batteryLater => 'Not now';
 
   @override
+  String get batterySettingsTitle => 'Don\'t optimise battery';
+
+  @override
+  String get batterySettingsOn => 'Widgets and reminders stay in sync';
+
+  @override
+  String get batterySettingsOff =>
+      'Android may defer sync while the app sits idle';
+
+  @override
   String get updateCheckLabel => 'Update check';
 
   @override
@@ -1238,7 +1248,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get streakBrokenBody =>
-      'Nothing was completed yesterday, so your streak restarted. Finish something today to keep it going.';
+      'A day was missed, so your streak restarted. Finish one thing today to start again.';
+
+  @override
+  String get streakHistoryTitle => 'Last 7 days';
+
+  @override
+  String get streakHistoryActive => 'active';
+
+  @override
+  String get streakHistoryMissed => 'no activity';
 
   @override
   String freezeAvailableLabel(int count) {
