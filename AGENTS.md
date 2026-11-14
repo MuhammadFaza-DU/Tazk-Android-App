@@ -128,7 +128,7 @@ Laporkan `skills: NOT LOADED (<nama>)` + jalankan **baseline manual** (mis. untu
 | Widget | Solid ikut tema; RemoteViews = feedback ikon/teks/warna (bukan animasi); maskot di semua kecuali Calendar |
 | Backup | Ekspor/impor **JSON offline** (manual, `share_plus` + `file_selector`) + pengingat berkala. **Google Drive TIDAK masuk v2.0** (keputusan owner 2026-11-10; boleh dievaluasi ulang di versi berikutnya, bukan penghapusan permanen) |
 | Distribusi | APK dari landing page Astro+Vercel (bukan Play Store); **T15** |
-| Rilis | Satu rilis besar v2.0 (versi akhir 2.0.0+1) |
+| Rilis | v2.0 (2001) tayang 2026-11-10 → **v2.0.1 (2002) tayang 2026-11-14**; cek-update manual sudah berfungsi, jadi rilis berikutnya cukup bump versi + deploy |
 | Privasi | Offline-first; tanpa akun; tanpa izin kamera/mic/lokasi/storage |
 | Anti-slop | Mode **DURING** |
 | Git | Commit lokal boleh; **push hanya izin eksplisit owner** |
@@ -195,23 +195,23 @@ Tambahan kualitas: kontras AA (4.5:1 body / 3:1 large) light+dark; tap target �
 
 | Tahap | Isi | Status |
 |---|---|---|
-| T0 | Fondasi & jaring aman | 🟡 sebagian |
-| T1 | Performa (lag) | ⬜ belum |
-| T2 | Design system ke kode | 🟡 desain selesai |
-| T3 | Redesign layar + navigasi | 🟡 desain selesai |
-| T4 | Animasi & micro-interaction | ⬜ belum |
-| T5 | Statistik & insight | 🟡 desain selesai |
-| T6 | Subtask & lokasi | ⬜ belum |
-| T7 | Kategori/tag & pencarian | 🟡 desain selesai |
-| T8 | Widget (scroll + sinkron + tampilan) | 🟡 desain selesai |
-| T9 | Notifikasi | 🟡 desain selesai |
-| T10 | Backup/restore | 🟡 desain selesai |
-| T11 | Cek update | ⬜ belum |
-| T12 | Gamifikasi polish | ⬜ belum |
-| T13 | Bug audit & hardening | ⬜ belum |
-| T14 | Ikon/logo + aset | 🟡 sebagian |
-| **T15** | **Landing page Astro + distribusi** | 🟢 deploy selesai — live `tazk-manager-mfdu.vercel.app`; sisa APK+sha256 (T16) |
-| T16 | Docs final + rilis v2.0 | ⬜ belum |
+| T0 | Fondasi & jaring aman | 🟢 selesai |
+| T1 | Performa (lag) | 🟢 selesai |
+| T2 | Design system ke kode | 🟢 selesai |
+| T3 | Redesign layar + navigasi | 🟢 selesai |
+| T4 | Animasi & micro-interaction | 🟢 selesai |
+| T5 | Statistik & insight | 🟢 selesai |
+| T6 | Subtask & lokasi | 🟢 selesai |
+| T7 | Kategori/tag & pencarian | 🟢 selesai |
+| T8 | Widget (scroll + sinkron + tampilan) | 🟢 selesai — terverifikasi di perangkat |
+| T9 | Notifikasi | 🟢 selesai |
+| T10 | Backup/restore | 🟢 selesai |
+| T11 | Cek update | 🟢 selesai — terbukti di HP (menawarkan 2.0.1) |
+| T12 | Gamifikasi polish | 🟢 selesai |
+| T13 | Bug audit & hardening | 🟢 selesai |
+| T14 | Ikon/logo + aset | 🟢 selesai |
+| **T15** | **Landing page Astro + distribusi** | 🟢 deploy selesai — live `tazk-manager-mfdu.vercel.app` |
+| T16 | Docs final + rilis | 🟢 **v2.0.1 (versionCode 2002) TAYANG** — cek-update berfungsi |
 
 > Sumber kebenaran status terkini: `docs/STATUS.md` (bukan tabel di atas — tabel ini ringkasan).
 

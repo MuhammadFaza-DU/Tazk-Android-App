@@ -15,7 +15,7 @@
 <p align="center">
   <a href="https://tazk-manager-mfdu.vercel.app"><img alt="Download" src="https://img.shields.io/badge/Download-APK-4A5A44?style=flat-square&logo=android&logoColor=white"></a>
   <a href="https://github.com/MuhammadFaza-DU/Tazk-Android-App/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/MuhammadFaza-DU/Tazk-Android-App/actions/workflows/ci.yml/badge.svg"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-2.0.0-4A5A44?style=flat-square">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.0.1-4A5A44?style=flat-square">
   <img alt="Min SDK" src="https://img.shields.io/badge/Android-10%2B-4A5A44?style=flat-square&logo=android&logoColor=white">
   <img alt="Flutter" src="https://img.shields.io/badge/Flutter-3.44-02569B?style=flat-square&logo=flutter&logoColor=white">
   <img alt="License" src="https://img.shields.io/badge/License-MIT-C97B5A?style=flat-square">
@@ -74,7 +74,7 @@ The app is distributed as a signed APK, not through the Play Store.
 | | |
 |---|---|
 | Package | `com.tazk.tazk` |
-| Version | `2.0.0` |
+| Version | `2.0.1` |
 | Min SDK | `29` (Android 10) |
 | Target SDK | `36` |
 | Size | 54 MB (arm + arm64, single APK) |

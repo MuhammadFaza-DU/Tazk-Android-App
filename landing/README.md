@@ -34,6 +34,8 @@ Maskot **tidak punya alpha** (PNG 24bpp, dan SVG hanya pembungkus raster). Di he
 
 `vercel --prod` dari folder ini (butuh login Vercel). Setelah domain final diketahui, perbarui `downloadUrl` di `public/version.json` ke domain itu. Tombol unduh otomatis menjadi tautan nyata ketika `public/downloads/tazk.apk` ada (dicek saat build), dan checksum SHA-256 dihitung dari APK itu.
 
+**Rilis terkini: v2.0.1 (versionCode 2002)** — tayang 2026-11-14 di `https://tazk-manager-mfdu.vercel.app`. Prosedur: `flutter build apk --release --target-platform android-arm,android-arm64` → salin APK ke `public/downloads/tazk.apk` → isi `public/version.json` (`version`, `notes`, `sha256` dari `Get-FileHash`) → `npm run build` → `vercel deploy --prod --yes`. Verifikasi: `curl` `version.json` dan APK harus 200, lalu bandingkan SHA-256 hasil unduhan dengan yang tertulis.
+
 ## Gate yang sudah diverifikasi
 
 Lihat `../docs/artifacts/landing-gates.json`: kontras AA (light+dark), tanpa scroll horizontal 320–1440, reduced-motion 0 animasi, JS-off copy terbaca, berat 135,4 KB.

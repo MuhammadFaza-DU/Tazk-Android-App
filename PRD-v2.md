@@ -259,26 +259,26 @@ Perubahan besar: `core/theme/*` diganti ke token `DESIGN.md`; widget kit baru; g
 
 ## 8. Risiko & Roadmap
 
-### 8.1 Roadmap (16 tahap — satu rilis besar v2.0)
+### 8.1 Roadmap (16 tahap — v2.0 tayang 2026-11-10, v2.0.1 tayang 2026-11-14)
 | Tahap | Isi | Status |
 |---|---|---|
-| T0 | Fondasi & jaring aman (test, .gitignore, docs) | 🟡 sebagian |
-| T1 | **Performa (lag)** | ⬜ belum |
-| T2 | Design system ke kode (token, tema, widget kit) | 🟡 desain selesai |
-| T3 | Redesign layar + navigasi | 🟡 desain selesai |
-| T4 | Animasi & micro-interaction | ⬜ belum |
-| T5 | Statistik & insight | 🟡 desain selesai |
-| T6 | Subtask & lokasi | ⬜ belum |
-| T7 | Kategori/tag & pencarian | 🟡 desain selesai |
-| T8 | Widget (scroll + sinkron + tampilan) | 🟡 desain selesai |
-| T9 | Notifikasi (keandalan) | 🟡 desain selesai |
-| T10 | Backup/restore + export/import | 🟡 desain selesai |
-| T11 | Cek update | ⬜ belum |
-| T12 | Gamifikasi polish | ⬜ belum |
-| T13 | Bug audit & hardening | ⬜ belum |
-| T14 | Ikon & logo + aset | 🟡 sebagian |
-| T15 | Landing page (Astro) + distribusi | ⬜ belum |
-| T16 | Docs final + rilis v2.0 | ⬜ belum |
+| T0 | Fondasi & jaring aman (test, .gitignore, docs) | 🟢 selesai |
+| T1 | **Performa (lag)** | 🟢 selesai |
+| T2 | Design system ke kode (token, tema, widget kit) | 🟢 selesai |
+| T3 | Redesign layar + navigasi | 🟢 selesai |
+| T4 | Animasi & micro-interaction | 🟢 selesai |
+| T5 | Statistik & insight | 🟢 selesai |
+| T6 | Subtask & lokasi | 🟢 selesai |
+| T7 | Kategori/tag & pencarian | 🟢 selesai |
+| T8 | Widget (scroll + sinkron + tampilan) | 🟢 selesai — terverifikasi di perangkat |
+| T9 | Notifikasi (keandalan) | 🟢 selesai |
+| T10 | Backup/restore + export/import | 🟢 selesai |
+| T11 | Cek update | 🟢 selesai — terbukti di HP (menawarkan 2.0.1) |
+| T12 | Gamifikasi polish | 🟢 selesai |
+| T13 | Bug audit & hardening | 🟢 selesai |
+| T14 | Ikon & logo + aset | 🟢 selesai |
+| T15 | Landing page (Astro) + distribusi | 🟢 tayang `tazk-manager-mfdu.vercel.app` |
+| T16 | Docs final + rilis | 🟢 v2.0.1 (2002) tayang |
 
 **Urutan eksekusi:** **T1 → T2 → T3 → T4** dulu (fondasi performa sebelum animasi), lalu T5–T16 bertahap. Setiap tahap berakhir: `dart analyze` bersih → `flutter test` hijau → verifikasi HP → ringkasan → tawaran checkpoint git (`stable-YYYY-MM-DD-vN`).
 
