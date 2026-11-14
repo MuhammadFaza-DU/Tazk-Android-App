@@ -22,6 +22,8 @@ APK 54,4 MB · SHA-256 `645fc20a…32186e13` · `version.json` publik 200 · APK
 
 **Langkah berikutnya:** owner menguji alur **Unduh → install** dari dalam app (HP masih 2001). Setelah terpasang, verifikasi notifikasi "streak putus" pada hari bolong nyata (satu-satunya jalur yang belum pernah terpicu).
 
+**Tambahan 2026-11-14 (setelah owner bangun):** cek-update **dikonfirmasi owner berfungsi**. `tool/adb-tap.ps1` **teruji fungsional** di Galaxy A52 (3 jalur: tolak saat app lain di depan, tap checkbox berhasil, tolak saat teks tidak ada). Data HP dipulihkan setelah uji (XP 95, Level 1, habit belum dicentang).
+
 **Handoff 2026-11-10 (arsip)**
 
 **Posisi:** HEAD/tag = lihat `git log -1` & `git tag --points-at HEAD` (`stable-2026-11-10-v2`).

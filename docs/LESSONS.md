@@ -345,7 +345,7 @@
 - **Dampak:** privasi owner tersentuh lagi; screenshot pribadi tidak dikirim ke mana pun (share sheet dibatalkan), tapi tetap terambil.
 - **Kenapa terulang:** aturan L-018 berbentuk *"ingat untuk menghitung"* — tidak ada penegakan. Kesalahan berbasis ingatan akan terulang.
 - **Pencegahan otomatis (bukan sekadar diingat):** `tool/adb-tap.ps1` — menolak tap kalau fokus layar bukan app target (**sebelum** dan **sesudah**), dan mengambil koordinat **hanya** dari `uiautomator dump` (`bounds` node), tidak dari perkiraan. Screenshot hanya diambil setelah fokus terverifikasi.
-- **Status:** sintaks PowerShell terverifikasi (`Parser::ParseFile` → OK). **Belum diuji fungsional** — perangkat sudah dicabut; uji pertama harus dilakukan saat HP tersambung lagi, dan hasilnya dicatat di sini.
+- **Status:** **TERUJI FUNGSIONAL 2026-11-14 di Galaxy A52.** Tiga jalur dibuktikan: (a) app lain di depan → **ditolak** sebelum tap; (b) `-Text "Lower Day" -Checkbox` → tap tepat di kotak centang (151,1747), habit tercentang, streak 2 hari; (c) teks tidak ada di layar → **menolak menebak** (bukan tap buta). Jebakan yang ditemukan & diperbaiki saat uji: label Flutter sering **multi-baris** (`Lower Day\n1 hari`) sehingga pencocokan eksak gagal → ditambah fallback "mengandung", tetap dari `bounds`; dan tap tengah baris membuka detail, jadi ditambah flag `-Checkbox` untuk menekan kotak centang di sisi kiri.
 - **Aturan baru:** setiap tap `adb` untuk uji manual **WAJIB lewat `tool/adb-tap.ps1`**. Tap manual langsung hanya boleh bila skripnya tidak tersedia, dan saat itu wajib menyebutkan alasan di laporan.
 
 ---

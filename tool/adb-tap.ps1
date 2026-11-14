@@ -15,7 +15,9 @@ param(
   [int]$X = -1,
   [int]$Y = -1,
   [string]$Shot,
-  [int]$SettleSeconds = 2
+  [int]$SettleSeconds = 2,
+  # Tap di kotak centang (kiri baris), bukan tengah baris yang membuka detail.
+  [switch]$Checkbox
 )
 
 $ErrorActionPreference = 'Stop'
@@ -46,18 +48,34 @@ $tapY = $Y
 if ($Text) {
   & $adb shell uiautomator dump /sdcard/_tap_dump.xml | Out-Null
   $xml = (& $adb shell cat /sdcard/_tap_dump.xml) -join ''
-  $pattern = 'content-desc="' + [regex]::Escape($Text) + '"[^>]*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"'
-  $m = [regex]::Match($xml, $pattern)
+
+  # Label Flutter sering multi-baris ("Lower Day&#10;1 hari"), jadi cocokkan
+  # persis dulu, lalu jatuh ke "mengandung" — masih dari bounds node, bukan tebakan.
+  $escaped = [regex]::Escape($Text)
+  $m = [regex]::Match($xml, 'content-desc="' + $escaped + '"[^>]*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"')
   if (-not $m.Success) {
-    $pattern = 'text="' + [regex]::Escape($Text) + '"[^>]*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"'
-    $m = [regex]::Match($xml, $pattern)
+    $m = [regex]::Match($xml, 'text="' + $escaped + '"[^>]*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"')
+  }
+  if (-not $m.Success) {
+    $m = [regex]::Match($xml, 'content-desc="[^"]*' + $escaped + '[^"]*"[^>]*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"')
   }
   if (-not $m.Success) { throw "Node dengan teks '$Text' tidak ditemukan. Tidak menebak koordinat." }
 
   # Titik tengah kotak node, dihitung dari bounds asli perangkat (bukan screenshot).
-  $tapX = [int](($m.Groups[1].Value -as [int]) + (($m.Groups[3].Value -as [int]) - ($m.Groups[1].Value -as [int])) / 2)
-  $tapY = [int](($m.Groups[2].Value -as [int]) + (($m.Groups[4].Value -as [int]) - ($m.Groups[2].Value -as [int])) / 2)
-  Write-Host "target '$Text' -> ($tapX,$tapY)"
+  $left = [int]$m.Groups[1].Value
+  $top = [int]$m.Groups[2].Value
+  $right = [int]$m.Groups[3].Value
+  $bottom = [int]$m.Groups[4].Value
+
+  if ($Checkbox) {
+    # Kotak centang berada di kiri baris; tap tengah baris justru membuka detail.
+    $tapX = $left + [int](($right - $left) * 0.10)
+    $tapY = $top + [int](($bottom - $top) / 2)
+  } else {
+    $tapX = $left + [int](($right - $left) / 2)
+    $tapY = $top + [int](($bottom - $top) / 2)
+  }
+  Write-Host "target '$Text' -> ($tapX,$tapY)$(if ($Checkbox) { ' [checkbox]' })"
 } elseif ($X -lt 0 -or $Y -lt 0) {
   throw 'Butuh -Text (disarankan) atau -X/-Y yang sudah dipastikan.'
 }
@@ -68,8 +86,12 @@ Start-Sleep -Seconds $SettleSeconds
 Assert-TargetFocus 'sesudah tap'
 
 if ($Shot) {
-  & $adb shell screencap -p /sdcard/_tap_shot.png | Out-Null
+  & $adb shell screencap -p /sdcard/_tap_shot.png 2>&1 | Out-Null
+  # adb menulis progres ke stderr; PowerShell memperlakukannya sebagai error.
+  $prev = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
   & $adb pull /sdcard/_tap_shot.png $Shot 2>&1 | Out-Null
-  & $adb shell rm -f /sdcard/_tap_shot.png /sdcard/_tap_dump.xml | Out-Null
-  Write-Host "screenshot: $Shot"
+  $ErrorActionPreference = $prev
+  & $adb shell rm -f /sdcard/_tap_shot.png /sdcard/_tap_dump.xml 2>&1 | Out-Null
+  if (Test-Path $Shot) { Write-Host "screenshot: $Shot" } else { Write-Host "screenshot GAGAL: $Shot" }
 }
