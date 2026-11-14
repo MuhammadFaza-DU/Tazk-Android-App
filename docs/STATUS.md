@@ -25,7 +25,7 @@ APK 54,4 MB · SHA-256 `645fc20a…32186e13` · `version.json` publik 200 · APK
 **Handoff 2026-11-10 (arsip)**
 
 **Posisi:** HEAD/tag = lihat `git log -1` & `git tag --points-at HEAD` (`stable-2026-11-10-v2`).
-Tree bersih. **Belum di-push** (64+ commit lokal).
+Tree bersih. **Sudah di-push** (rilis v2.0.1 terkirim 2026-11-14).
 
 **Sudah selesai hari ini (2026-11-10):**
 1. **Google Drive ditutup untuk v2.0** (bukan hapus permanen) — backup = JSON offline + rencana pengingat (T13). Isu #14 ditutup.
@@ -64,9 +64,9 @@ Tree bersih. **Belum di-push** (64+ commit lokal).
 
 **Blocker/izin yang sudah diketahui:**
 - ~~Deploy Vercel BLOCKED~~ **SELESAI 2026-11-10** — project `tazk-manager`, produksi `tazk-manager-mfdu.vercel.app`, publik (proteksi dimatikan).
-- APK belum ada → tombol unduh L.4 ke `#unduh` + catatan "APK segera hadir" (jangan tautan mati).
-- Push ke GitHub **belum diizinkan**.
-- Di luar scope saat ini: isu **#12** (kontras chart), landing APK final, pengingat backup (masuk T13).
+- ~~APK belum ada~~ **SELESAI** — v2.0 (2001) lalu v2.0.1 (2002) sudah tayang; tombol unduh aktif dengan SHA-256 tampil.
+- ~~Push ke GitHub belum diizinkan~~ **SELESAI 2026-11-14** — commit + tag v2.0.1 ter-push.
+- Di luar scope saat ini: isu **#12** (kontras chart), pengingat backup (masuk T13).
 
 ## Handoff cepat (2026-11-09) — arsip
 
