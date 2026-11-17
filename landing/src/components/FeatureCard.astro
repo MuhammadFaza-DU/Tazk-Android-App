@@ -5,11 +5,17 @@ interface Props {
   title: string;
   body: string;
   icon: string;
+  featured?: boolean;
+  index?: number;
 }
-const { title, body, icon } = Astro.props;
+const { title, body, icon, featured = false, index = 0 } = Astro.props;
 ---
 
-<article class="tk-card">
+<article
+  class:list={["tk-card", featured && "tk-card--featured"]}
+  data-reveal
+  style={`--i:${index % 5}`}
+>
   <span class="tk-card__icon" aria-hidden="true">
     <svg
       viewBox="0 0 24 24"

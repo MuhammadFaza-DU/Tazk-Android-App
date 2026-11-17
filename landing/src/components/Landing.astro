@@ -37,8 +37,11 @@ if (apkReady) {
     <h2 class="tk-h3" id="proofs-title" data-reveal>{t.proofs.title}</h2>
     <div class="tk-proof" style="margin-top:22px">
       {
-        t.proofs.items.map((item) => (
+        t.proofs.items.map((item, i) => (
           <div class="tk-proof__item" data-reveal>
+            <span class="tk-proof__num" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
             <p class="tk-proof__title">{item.title}</p>
             <p class="tk-body">{item.body}</p>
           </div>
@@ -55,8 +58,8 @@ if (apkReady) {
     </div>
     <div class="tk-grid tk-grid--3">
       {
-        t.features.items.map((f) => (
-          <FeatureCard title={f.title} body={f.body} icon={f.icon} />
+        t.features.items.map((f, i) => (
+          <FeatureCard title={f.title} body={f.body} icon={f.icon} featured={i === 0} index={i} />
         ))
       }
     </div>

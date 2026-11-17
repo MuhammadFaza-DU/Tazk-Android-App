@@ -109,6 +109,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -187,7 +188,7 @@ li {
   border: 0;
 }
 .tk-skip {
-  position: absolute;
+  position: fixed;
   left: -9999px;
   top: 8px;
   z-index: 100;
@@ -400,6 +401,15 @@ li {
 .tk-split:hover {
   background: color-mix(in srgb, var(--tk-primary) 88%, var(--tk-ink));
 }
+@media (hover: hover) and (pointer: fine) {
+  .tk-split {
+    transition: background-color var(--tk-fast) var(--tk-ease),
+      transform var(--tk-fast) var(--tk-ease);
+  }
+  .tk-split:hover {
+    transform: translateY(-1px);
+  }
+}
 .tk-split__main {
   display: inline-flex;
   align-items: center;
@@ -469,7 +479,7 @@ li {
   font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--tk-ink-muted);
+  color: var(--tk-primary);
   margin-bottom: 14px;
 }
 .tk-h1 {
@@ -516,6 +526,7 @@ li {
 /* ---- Hero ---- */
 .tk-hero {
   padding-block: clamp(36px, 6vw, 80px) var(--tk-section-bottom);
+  overflow-x: clip;
 }
 .tk-hero__grid {
   display: grid;
@@ -538,9 +549,31 @@ li {
   margin-top: 26px;
 }
 .tk-hero__media {
+  position: relative;
   display: flex;
   justify-content: center;
   gap: 20px;
+}
+/* Ambient glow: panggung hangat di belakang mockup (dari token brand, bukan dekorasi asing) */
+.tk-hero__media::before {
+  content: "";
+  position: absolute;
+  inset: -18% -12%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      42% 38% at 32% 40%,
+      color-mix(in srgb, var(--tk-primary-container) 88%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      38% 34% at 72% 62%,
+      color-mix(in srgb, var(--tk-honey-container) 82%, transparent) 0%,
+      transparent 72%
+    );
+  filter: blur(28px) saturate(1.05);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 /* ---- Phone mockup (device frame, bukan UI palsu) ---- */
@@ -680,6 +713,24 @@ li {
     transform: translateY(28px) rotate(2.5deg) scale(0.94);
   }
 }
+/* Float lembut bergantian: mockup terasa hidup, murni transform (GPU) */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .tk-hero__media .tk-phone {
+    animation: tk-float 6.5s var(--tk-ease-gentle) infinite;
+  }
+  .tk-hero__media .tk-phone--second {
+    animation-delay: -3.2s;
+  }
+  @keyframes tk-float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -7px;
+    }
+  }
+}
 
 /* ---- Cards / grids ---- */
 .tk-grid {
@@ -748,6 +799,49 @@ li {
   margin-bottom: 6px;
 }
 
+/* Featured card: hierarki nyata di grid fitur (satu kartu menonjol, sisanya ringan) */
+.tk-card--featured {
+  background: var(--tk-primary-container);
+  border-color: color-mix(in srgb, var(--tk-primary) 34%, transparent);
+}
+.tk-card--featured .tk-card__icon {
+  color: var(--tk-primary);
+}
+.tk-card--featured h3 {
+  font-size: clamp(1.25rem, 1.9vw, 1.5rem);
+}
+.tk-card--featured .tk-body {
+  color: color-mix(in srgb, var(--tk-ink) 84%, transparent);
+}
+@media (min-width: 1000px) {
+  .tk-grid--3 .tk-card--featured {
+    grid-column: span 2;
+  }
+}
+
+/* Kontrak hover terpadu: semua permukaan kartu merespons dengan cara yang sama.
+   GPU-only (transform), gated pointer fine + reduced-motion. */
+.tk-tint,
+.tk-step {
+  transition: transform var(--tk-fast) var(--tk-ease-gentle);
+}
+@media (hover: hover) and (pointer: fine) {
+  .tk-tint:hover,
+  .tk-step:hover {
+    transform: translateY(-2px);
+  }
+  .tk-card--featured:hover {
+    transform: translateY(-3px);
+  }
+  .tk-card__icon svg {
+    transition: transform var(--tk-base) var(--tk-ease);
+  }
+  .tk-card:hover .tk-card__icon svg,
+  .tk-card--featured:hover .tk-card__icon svg {
+    transform: scale(1.12) rotate(-4deg);
+  }
+}
+
 /* ---- Proof row ---- */
 .tk-proof {
   display: grid;
@@ -781,11 +875,20 @@ li {
     padding-left: 0;
   }
 }
+.tk-proof__num {
+  font-family: var(--tk-font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--tk-primary);
+  display: block;
+  margin-bottom: 8px;
+}
 .tk-proof__title {
   font-family: var(--tk-font-display);
   font-weight: 600;
-  font-size: 18px;
-  margin-bottom: 4px;
+  font-size: 20px;
+  margin-bottom: 6px;
 }
 
 /* ---- Tint rows ---- */
@@ -1062,24 +1165,27 @@ li {
   display: inline-block;
 }
 
-/* ---- Reveal motion (JS-gated: tanpa JS semua terlihat) ---- */
+/* ---- Reveal motion (JS-gated: tanpa JS semua terlihat; dua arah, replay saat keluar-masuk viewport).
+   Memakai properti `translate` terpisah dari `transform` supaya hover transform kartu tetap bisa kompos. ---- */
 .js [data-reveal] {
   opacity: 0;
-  transform: translateY(12px);
+  translate: 0 12px;
   transition: opacity var(--tk-slow) var(--tk-ease),
-    transform var(--tk-slow) var(--tk-ease);
+    translate var(--tk-slow) var(--tk-ease);
   transition-delay: calc(var(--i, 0) * 40ms);
-  will-change: opacity, transform;
+  will-change: opacity, translate;
 }
 .js [data-reveal].is-visible {
   opacity: 1;
-  transform: none;
+  translate: none;
+  transition-delay: calc(var(--i, 0) * 40ms);
+  will-change: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .js [data-reveal] {
     opacity: 1 !important;
-    transform: none !important;
+    translate: none !important;
     transition: none !important;
   }
   .tk-card,
@@ -1087,7 +1193,11 @@ li {
   .tk-header,
   .tk-faq__a,
   .tk-faq__sign::before,
-  .tk-faq__sign::after {
+  .tk-faq__sign::after,
+  .tk-hero__media .tk-phone,
+  .tk-tint,
+  .tk-step,
+  .tk-card__icon svg {
     transition: none !important;
     animation: none !important;
   }

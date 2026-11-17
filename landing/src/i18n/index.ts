@@ -137,9 +137,9 @@ const id: Copy = {
         body: "Streak dihitung jujur, dan freeze yang tersisa selalu terlihat.",
       },
       {
-        icon: "widget",
-        title: "Widget yang bekerja",
-        body: "Centang dari layar utama, bahkan saat aplikasi tidak sedang dibuka.",
+        icon: "bell",
+        title: "Pengingat yang sopan",
+        body: "Notifikasi tugas dan habit mengikuti setelanmu, tanpa pengejar yang berisik.",
       },
       {
         icon: "chart",
@@ -306,9 +306,9 @@ const en: Copy = {
         body: "Streaks are counted honestly, and the freezes you have left are always visible.",
       },
       {
-        icon: "widget",
-        title: "A widget that works",
-        body: "Check from the home screen, even when the app is not open.",
+        icon: "bell",
+        title: "Polite reminders",
+        body: "Task and habit notifications follow your settings, without noisy nagging.",
       },
       {
         icon: "chart",

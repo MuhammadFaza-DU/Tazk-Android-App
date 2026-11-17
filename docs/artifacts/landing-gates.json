@@ -1,5 +1,5 @@
 {
-  "base": "http://localhost:4321",
+  "base": "http://localhost:4322",
   "contrast": {
     "light": [
       {
@@ -167,20 +167,20 @@
   },
   "reducedMotion": {
     "runningAnimations": 0,
-    "revealCount": 20,
+    "revealCount": 26,
     "allRevealsVisible": true,
     "cardTransitionDuration": "0s"
   },
   "jsOff": {
-    "htmlBytes": 18025,
+    "htmlBytes": 18358,
     "containsHeadline": true,
     "containsAllSectionTitles": true
   },
   "weight": {
     "count": 9,
-    "encodedKB": 143.7,
+    "encodedKB": 144.1,
     "byInitiatorKB": {
-      "link": 76.1,
+      "link": 76.5,
       "img": 20.6,
       "css": 44.5,
       "other": 2.5
