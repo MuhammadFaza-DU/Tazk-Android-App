@@ -210,7 +210,7 @@ Tambahan kualitas: kontras AA (4.5:1 body / 3:1 large) light+dark; tap target �
 | T12 | Gamifikasi polish | 🟢 selesai |
 | T13 | Bug audit & hardening | 🟢 selesai |
 | T14 | Ikon/logo + aset | 🟢 selesai |
-| **T15** | **Landing page Astro + distribusi** | 🟢 deploy selesai — live `tazk-manager-mfdu.vercel.app` |
+| **T15** | **Landing page Astro + distribusi** | 🟢 deploy selesai — live `tazk-manager-mfdu.vercel.app`; polish pass 2026-11-17 (`79d3f50`); ⚠ Git-integration build Vercel gagal → deploy manual via CLI |
 | T16 | Docs final + rilis | 🟢 **v2.0.1 (versionCode 2002) TAYANG** — cek-update berfungsi |
 
 > Sumber kebenaran status terkini: `docs/STATUS.md` (bukan tabel di atas — tabel ini ringkasan).

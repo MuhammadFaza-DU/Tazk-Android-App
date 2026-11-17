@@ -3,11 +3,28 @@
 Dokumen penanda posisi kerja. Baca ini dulu sebelum melanjutkan, supaya tidak
 mengulang keputusan yang sudah diambil atau mengerjakan hal yang sudah selesai.
 
-Terakhir diperbarui: **2026-11-14**
+Terakhir diperbarui: **2026-11-17**
 
-## Handoff cepat (2026-11-14) — WAJIB dibaca sesi berikutnya
+## Handoff cepat (2026-11-17) — WAJIB dibaca sesi berikutnya
 
-**Posisi:** HEAD = `git log -1`. Rilis v2.0.1 = commit **`6518003`** + tag **`stable-2026-11-14-v1`**; commit sesudahnya hanya dokumentasi. Tree bersih, **sudah di-push** (0 commit tertunda).
+**Posisi:** HEAD = `git log -1` → commit **`79d3f50`** + tag **`stable-2026-11-17-v1`**. Tree bersih, **sudah di-push**.
+
+**Landing page polish SELESAI & TAYANG** (commit `79d3f50`, deploy manual Vercel — lihat catatan deploy di bawah):
+- 8 temuan audit diperbaiki + efek kartu konsisten: ambient glow hero, float lembut 2 HP, featured card (span-2), nomor proof 01/02/03, eyebrow aksen primary, reveal **dua arah** (replay), hover terpadu kartu/ikon, konten dobel "Widget yang bekerja" → "Pengingat yang sopan" (ID+EN, ikon bell).
+- **Gate: All gates passed** (0 overflow 320–1440, kontras AA, reduced-motion, JS-off, ±144 KB). Bukti Playwright: reveal in/out/re-in ✓, hover ✓, reduced-motion ✓, console 0 error.
+- **3 bug ditemukan di perjalanan & diperbaiki:** overflow horizontal (glow clip + `.tk-skip` absolute→fixed), hover kalah spesifisitas dari rule reveal (diselesaikan `translate` vs `transform` terpisah), `will-change` permanen.
+- **Verifikasi produksi:** featured card / pengingat sopan ID+EN / bell / proof num / glow / float ada di CSS produksi; `version.json` 200; APK unduh tetap 200.
+
+**⚠️ TEMUAN INFRA: Git-integration build Vercel RUSAK (belum diperbaiki).** Deploy otomatis dari push GitHub gagal: `astro: command not found` (exit 127, beberapa deploy sebelumnya juga Error dengan pola sama). Rilis 2026-11-17 dideploy **manual** via `npx vercel deploy --prod` dari `landing/` (CLI logged in sebagai `muhammadfaza-du`) → Ready + alias produksi. **Konsekuensi: push GitHub TIDAK otomatis mengupdate situs** sampai Install Command di project Vercel `tazk-manager` diperbaiki (rekomendasi: set Install Command `npm install` atau bersihkan build cache). Perbaikan menunggu keputusan owner.
+
+**Langkah berikutnya (berjalan dari sesi sebelumnya):**
+1. Owner memperbaiki (atau meminta agent memperbaiki) Install Command Vercel di atas.
+2. Verifikasi notifikasi "streak putus" pada hari bolong nyata (satu-satunya jalur belum terpicu, sesi 2026-11-14).
+3. Evaluasi landing di perangkat/sentuhan nyata + Lighthouse (belum pernah dijalankan).
+
+**Handoff 2026-11-14 (arsip)**
+
+**Posisi:** HEAD = `git log -1`. Rilis v2.0.1 = commit **`6518003`** + tag **`stable-2026-11-14-v1`**; commit sesudahnya dokumentasi + polish landing. Tree bersih, **sudah di-push**.
 
 **Rilis terkini: v2.0.1 (versionCode 2002) — TAYANG.** `https://tazk-manager-mfdu.vercel.app`
 APK 54,4 MB · SHA-256 `645fc20a…32186e13` · `version.json` publik 200 · APK publik 200 · **hash end-to-end cocok**.
@@ -55,7 +72,7 @@ Tree bersih. **Sudah di-push** (rilis v2.0.1 terkirim 2026-11-14).
 | Landing | Light Sage & Sand **+ dark toggle**, bilingual ID/EN, tanpa board kanvas |
 | Ritme | Lapor per wave, lanjut otomatis kecuali ada keputusan baru |
 
-**Langkah berikutnya (mulai dari sini):** **Wave L + W0–W3 + W4 TUNTAS & TERVERIFIKASI DI HP** → tinggal **T16** (bump versi final + isi APK/sha256 di landing + rilis v2.0). Push & scan Strix menunggu keputusan owner.
+**Langkah berikutnya (mulai dari sini):** ~~tinggal T16~~ **T16 SELESAI** (rilis v2.0.1 tayang 2026-11-14). Sisa: verifikasi notifikasi streak putus di HP + perbaikan Git-integration Vercel (lihat handoff atas).
 
 **Landing page — kondisi sekarang (terverifikasi, bukan klaim):**
 - Kode: `landing/` (Astro 7, static). 4 rute: `/` (ID), `/en/` (EN), `/privasi`, `/en/privacy`.
@@ -63,11 +80,13 @@ Tree bersih. **Sudah di-push** (rilis v2.0.1 terkirim 2026-11-14).
 - Gate reproducible: `landing/scripts/gates.mjs` → **exit 0 "All gates passed"** (kontras AA light+dark, 0 overflow 320–1440, reduced-motion 0 animasi, JS-off copy terbaca, berat ≤900 KB, dark token benar) + menulis screenshot ke `docs/artifacts/`.
 - Bukti visual: `docs/artifacts/landing-id-{390,768,980,1440}.png`, `landing-dark-{390,1440}.png`, `landing-js-off-390.png`, `landing-gates.json`.
 - Belum: Lighthouse/field metrics, uji perangkat asli. (Deploy **selesai** — lihat log 2026-11-10 (deploy).)
+- **2026-11-17:** polish pass `79d3f50` (glow hero, featured card, reveal dua arah, hover terpadu, konten dobel diganti) — gate tetap All gates passed; deploy manual via CLI karena Git-integration build Vercel gagal (lihat blocker di bawah).
 
 **Blocker/izin yang sudah diketahui:**
 - ~~Deploy Vercel BLOCKED~~ **SELESAI 2026-11-10** — project `tazk-manager`, produksi `tazk-manager-mfdu.vercel.app`, publik (proteksi dimatikan).
 - ~~APK belum ada~~ **SELESAI** — v2.0 (2001) lalu v2.0.1 (2002) sudah tayang; tombol unduh aktif dengan SHA-256 tampil.
 - ~~Push ke GitHub belum diizinkan~~ **SELESAI 2026-11-14** — commit + tag v2.0.1 ter-push.
+- **BARU 2026-11-17: Git-integration build Vercel gagal** (`astro: command not found`, exit 127) — deploy dilakukan manual via CLI. Belum diperbaiki; lihat handoff atas.
 - Di luar scope saat ini: isu **#12** (kontras chart), pengingat backup (masuk T13).
 
 ## Handoff cepat (2026-11-09) — arsip
@@ -89,7 +108,7 @@ Tree bersih. **Sudah di-push** (rilis v2.0.1 terkirim 2026-11-14).
 - **Rekomendasi lanjut:** **T13 dulu** (hardening + a11y + isu tertunda), lalu T12 → T14 → T11 → T15 → T16.
 
 ## Log Perubahan (terbaru duluan)
-- 2026-11-17 (polish landing) — **Landing page polish "fix all" (8 temuan audit) + efek kartu konsisten.** Hero: ambient glow token-brand di belakang mockup + float lembut bergantian 2 HP (6,5s, reduced-motion aman). Fitur: featured card ("Centang dua arah", span-2 di desktop) memecah grid 6 kartu identik; konten dobel "Widget yang bekerja" diganti "Pengingat yang sopan" (ikon bell baru, ID+EN). Proofs: nomor 01/02/03 + title 20px. Eyebrow → warna primary. Motion: reveal dua arah (replay saat keluar-masuk viewport, observer toggle) memakai properti `translate` terpisah agar hover transform kartu tidak tertelan; hover terpadu (tint/step −2px, ikon kartu scale+rotate, featured −3px); `will-change` dilepas setelah reveal. **3 bug ditemukan & diperbaiki:** overflow horizontal 320–1024px (glow tanpa clip → `overflow-x: clip`; `.tk-skip` absolute → fixed), hover kartu kalah spesifisitas dari rule reveal (diselesaikan pemisahan `translate` vs `transform`). **Gate: All gates passed** (0 overflow, kontras AA light+dark, reduced-motion, JS-off, ±144 KB). Playwright headed: reveal dua arah in/out/re-in ✓, ikon & tint hover ✓, reduced-motion opacity 1 + animation none ✓, console 0 error. — *(commit menyusul)*
+- 2026-11-17 (polish landing) - **Landing page polish "fix all" (8 temuan audit) + efek kartu konsisten.** Hero: ambient glow token-brand di belakang mockup + float lembut bergantian 2 HP (6,5s, reduced-motion aman). Fitur: featured card ("Centang dua arah", span-2 di desktop) memecah grid 6 kartu identik; konten dobel "Widget yang bekerja" diganti "Pengingat yang sopan" (ikon bell baru, ID+EN). Proofs: nomor 01/02/03 + title 20px. Eyebrow → warna primary. Motion: reveal dua arah (replay saat keluar-masuk viewport, observer toggle) memakai properti `translate` terpisah agar hover transform kartu tidak tertelan; hover terpadu (tint/step −2px, ikon kartu scale+rotate, featured −3px); `will-change` dilepas setelah reveal. **3 bug ditemukan & diperbaiki:** overflow horizontal 320–1024px (glow tanpa clip → `overflow-x: clip`; `.tk-skip` absolute → fixed), hover kartu kalah spesifisitas dari rule reveal (diselesaikan pemisahan `translate` vs `transform`). **Gate: All gates passed** (0 overflow, kontras AA light+dark, reduced-motion, JS-off, ±144 KB). Playwright headed: reveal dua arah in/out/re-in ✓, ikon & tint hover ✓, reduced-motion opacity 1 + animation none ✓, console 0 error. **Deploy manual via `vercel deploy --prod`** (Git-integration build gagal: `astro: command not found`); produksi terverifikasi (featured card, pengingat sopan ID+EN, bell, proof num, glow, float, version.json 200). — *(commit 79d3f50, tag stable-2026-11-17-v1)*
 - 2026-11-14 (RILIS v2.0.1 — FINAL, ter-push) — **v2.0.1+2002 dirilis & diverifikasi end-to-end.** `pubspec` → **`2.0.1+2002`** (versionCode **2002** > 2001, tidak downgrade — `aapt dump badging`). APK arm+arm64 **57.010.735 byte (54,4 MB)**, SHA-256 **`645fc20a…32186e13`**. Deploy Vercel produksi → **`version.json` publik 200** (versi 2.0.1 + hash) dan **APK publik 200 ukuran 57.010.735**. **Bukti hash end-to-end:** unduh APK dari URL publik → SHA-256 **cocok persis**. Gate landing **All gates passed** (143,7 KB, kontras AA, 0 overflow 320–1440, reduced-motion, JS-off, dark token). **Cek-update DIVERIFIKASI DI HP:** Galaxy A52 yang masih v2.0.0/2001 menampilkan **"Versi 2.0.1 tersedia"** + tombol **Unduh / Nanti**. Git: commit **`6518003`** + tag **`stable-2026-11-14-v1`**, **keduanya ter-push**, 0 commit tertunda. **`dart analyze` 0 issue · `flutter test` 629/629.** HP sengaja **TIDAK** di-upgrade agar owner bisa menguji alur unduh sendiri. — *(commit 6518003)*
 - 2026-11-14 (pra-rilis, hasil scan Strix) — **Scan keamanan quick (diff-scoped) → 0 kerentanan, tapi 9 cacat kebenaran ditemukan & diperbaiki SEBELUM rilis.** Tiga paling berbahaya: (a) **self-heal bisa menghidupkan kembali streak yang baru diputus** dan **menelan penyelesaian berikutnya** — akar: `onTaskPriorityChanged` memberi XP tanpa penyelesaian sehingga hari itu tampak aktif; kini penyesuaian XP punya sumber sendiri `XpSource.adjustment` dan **hanya `task`/`habit` yang dihitung sebagai hari aktif**; (b) **notifikasi "streak putus" terkirim ulang tiap hari** — kini dijaga transisi (`currentStreak > 0`); (c) **`lastActiveDate` bisa mundur** walau kontraknya monoton — kini dijaga `isAfter`. Juga: repair jadi **transaksional** (anti lost-update lintas isolate), aritmetika tanggal pakai **konstruktor kalender** (aman DST), strip **tidak lagi menyatakan "tidak ada aktivitas" saat data belum ada**, strip mengikuti `currentDateProvider` (rollover tengah malam), fixture test tidak lagi bertanggal tetap, asersi test diperketat (jumlah panggilan eksak), dan `SuppressLint` yang tak perlu dihapus dari method native. **`dart analyze` 0 issue · `flutter test` 629/629** · probe ulang pada salinan DB asli tetap `CHANGED=false` (tidak mengarang streak). Pelajaran **L-021**. — *(commit 6518003)*
 - 2026-11-14 — **Tiga perbaikan streak (permintaan owner) SELESAI & TERVERIFIKASI DI HP (Galaxy A52, v2.0.0/2001).** (a) **Beri tahu saat streak putus** — `streakBrokenTitle`/`streakBrokenBody` yang selama ini **tidak pernah dipakai** kini dikirim lewat `showStreakBrokenNotification` (id `900004`, channel `streak_warning`, menghormati `notifyStreakWarning`). (b) **Riwayat hari aktif** — `StreakHistoryStrip` di Profil: 7 hari terakhir, ✅ = ada aktivitas, ⭕ = bolong, hari ini diberi cincin tebal; status dibawa **ikon + semantik**, bukan warna saja. (c) **Perbaiki data streak** — `repairStreakFromHistory()` dijalankan di `runDailyRollover` (monoton: **tidak pernah menurunkan** nilai, jadi freeze tetap bermakna; idempoten). Sumber kebenaran hari aktif = **net `xp_events` > 0 per hari** (bukan "ada event positif"), supaya penyelesaian yang dibatalkan tidak meninggalkan hari aktif palsu. **Bukti di HP:** strip menampilkan Min/Sen/Sel ⚪ · **Rab ✅** · Kam ⚪ · **Jum ✅** · Sab ⭕ — persis riwayat nyata (11 & 13 Nov aktif, 12 Nov bolong = penyebab reset). Centang "Lower Day" → **"2 hari" + "Naik ke level 2!"**; setelah dibatalkan data kembali (XP 95, Level 1). Toggle baterai terpasang & ON. `RepairStreakFromHistory` pada data asli mengembalikan `CHANGED=false` (riwayat jujur = 1) sehingga **tidak ada angka yang dikarang**. **`dart analyze` 0 issue · `flutter test` 625/625.** — *(commit aee5b8d)*
